@@ -1,45 +1,82 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { Navbar, NavbarBrand, NavbarContent, NavbarMenuItem, NavbarItem, NavbarMenu, Link, Button, NavbarMenuToggle } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
+import { useAppState } from "../app-provider";
 
-interface HeaderProps {
-  currentPage: string;
+// validating token
+// require => token
+// token => string, provide token from local storage
+// return => promise<boolean> (true if token is valid, false for invalid token)
+function validateToken(token: string): Promise<boolean> {
+  if (token) {
+    return fetch(`${process.env.BACKEND_URL}/api/validateToken`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+      .then((response) => {
+        console.log(response);
+        if (response.status === 403) {
+          return false;
+        } else {
+          return true;
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        return false;
+      });
+  } else {
+    return new Promise((resolve) => {
+      resolve(true);
+    });
+  }
 }
 
 // header component for user
 // require => currentPage
 // currentPage => string, provide the current page in small letters
-export default function Header({ currentPage }: HeaderProps) {
-  const [token, setToken] = useState<string>("");
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+export default function Header() {
+  const { token, setToken, currentPage, setCurrentPage, isLoading, setIsLoading } = useAppState();
   const router = useRouter();
-
-  // menu items is for mobile view
-  const menuItems = ["Home", "Dashboard", "Activity", "Analytics", "System", "Deployments", "My Settings", "Team Settings", "Help & Feedback", "Log Out"];
 
   // center items will show in center
   const centerItems = [
     {
       name: "home",
-      path: "/"
+      path: "/",
+      page: "home"
     },
     {
       name: "product",
-      path: "/product"
+      path: "/product",
+      page: "product"
     },
     {
       name: "profile",
       path: "/profile",
+      page: "profile",
+      state: "loggedin"
+    },
+    {
+      name: "cart",
+      path: "/cart",
+      page: "cart",
       state: "loggedin"
     },
     {
       name: "order",
       path: "/order",
+      page: "order",
       state: "loggedin"
     },
     {
       name: "delivery",
       path: "/delivery",
+      page: "delivery",
       state: "loggedin"
     }
   ];
@@ -48,12 +85,12 @@ export default function Header({ currentPage }: HeaderProps) {
   const rightItems = [
     {
       name: "sign in",
-      path: "#",
+      path: "/signin",
       state: "loggedout"
     },
     {
       name: "sign up",
-      path: "#",
+      path: "/signup",
       state: "loggedout"
     },
     {
@@ -64,27 +101,23 @@ export default function Header({ currentPage }: HeaderProps) {
   ];
 
   useEffect(() => {
-    setToken(window.localStorage.getItem("token") ?? "");
-  }, []);
-
-  useEffect(() => {
-    if (token === "sign out") {
-      window.localStorage.removeItem("token");
-      setToken("");
+    if (token) {
+      validateToken(token).then((result) => {
+        if (!result) {
+          alert("Token Expired!");
+          setCurrentPage("signout");
+          router.replace("/");
+        }
+      });
     }
   }, [token]);
 
   return (
     <Navbar
-      onMenuOpenChange={setIsMenuOpen}
       maxWidth="xl"
       isBordered={true}
     >
       <NavbarContent>
-        <NavbarMenuToggle
-          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-          className="sm:hidden"
-        />
         <NavbarBrand>
           <p className="font-bold text-2xl uppercase select-none">dailyhype</p>
         </NavbarBrand>
@@ -108,7 +141,7 @@ export default function Header({ currentPage }: HeaderProps) {
                   style={{ textTransform: "capitalize" }}
                   size="md"
                   className="px-2"
-                  color={item.name === currentPage ? "primary" : "foreground"}
+                  color={item.page === currentPage ? "primary" : "foreground"}
                   href={item.path}
                 >
                   {item.name}
@@ -131,14 +164,14 @@ export default function Header({ currentPage }: HeaderProps) {
             return (
               <NavbarItem key={`${item}-${index}`}>
                 <Button
-                  as={item.name === "sign out" ? Link : Button}
+                  as={item.name === "sign out" ? Button : Link}
                   color="primary"
                   href={item.path}
                   variant="flat"
                   style={{ textTransform: "capitalize" }}
                   onClick={() => {
                     if (item.name === "sign out") {
-                      setToken("sign out");
+                      setCurrentPage("signout");
                       router.replace("/");
                     }
                   }}
@@ -149,20 +182,6 @@ export default function Header({ currentPage }: HeaderProps) {
             );
         })}
       </NavbarContent>
-      <NavbarMenu>
-        {menuItems.map((item, index) => (
-          <NavbarMenuItem key={`${item}-${index}`}>
-            <Link
-              color={index === 2 ? "primary" : index === menuItems.length - 1 ? "danger" : "foreground"}
-              className="w-full"
-              href="#"
-              size="lg"
-            >
-              {item}
-            </Link>
-          </NavbarMenuItem>
-        ))}
-      </NavbarMenu>
     </Navbar>
   );
 }
