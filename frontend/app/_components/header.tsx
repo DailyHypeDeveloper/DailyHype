@@ -5,9 +5,24 @@ import { Navbar, NavbarBrand, NavbarContent, NavbarMenuItem, NavbarItem, NavbarM
 import { useRouter } from "next/navigation";
 import { useAppState } from "../app-provider";
 
+// typescript for center item navigation
+interface CenterItemInterface {
+  name: string;
+  path: string;
+  page: string;
+  state?: "loggedin";
+}
+
+// typescript for right item navigation
+interface RightItemInterface {
+  name: string;
+  path: string;
+  state: "loggedout" | "loggedin";
+}
+
 // validating token
 // require => token
-// token => string, provide token from local storage
+// token => string, provide token from your token state (got from useAppState())
 // return => promise<boolean> (true if token is valid, false for invalid token)
 function validateToken(token: string): Promise<boolean> {
   if (token) {
@@ -37,14 +52,17 @@ function validateToken(token: string): Promise<boolean> {
 }
 
 // header component for user
-// require => currentPage
-// currentPage => string, provide the current page in small letters
 export default function Header() {
-  const { token, setToken, currentPage, setCurrentPage, isLoading, setIsLoading } = useAppState();
+  const { token, currentPage, setCurrentPage } = useAppState();
   const router = useRouter();
 
-  // center items will show in center
-  const centerItems = [
+  // center items will show in center navigation
+  // array of objects, contain name, path, page and state
+  // name => to display navigation text
+  // path => to go to this path when this link is clicked
+  // page => to set current active page ui
+  // state => to show only if the user is logged in (only one value 'loggedin' is accepted)
+  const centerItems: CenterItemInterface[] = [
     {
       name: "home",
       path: "/",
@@ -81,8 +99,12 @@ export default function Header() {
     }
   ];
 
-  // right items will show in right side of nav bar
-  const rightItems = [
+  // right items will show in right side of navigation bar
+  // array of objects, contain name, path and state
+  // name => to display button text
+  // path => to navigate to this path if the button is clicked
+  // state => to determine when to show this button (only two values "loggedout" or "loggedin" are accepted)
+  const rightItems: RightItemInterface[] = [
     {
       name: "sign in",
       path: "/signin",
@@ -100,6 +122,8 @@ export default function Header() {
     }
   ];
 
+  // when the token is changed, this useEffect will run
+  // this will validate the token
   useEffect(() => {
     if (token) {
       validateToken(token).then((result) => {

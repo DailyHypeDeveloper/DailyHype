@@ -4,25 +4,36 @@ import { useState, useContext, createContext, useEffect } from "react";
 
 export const AppState = createContext<any>(null);
 
-// setting data type for user role
-type role = "public" | "customer" | "admin";
+// setting possible pages for active page ui
+type Page = "home" | "product" | "profile" | "cart" | "order" | "delivery" | "signout";
 
+// this is the context provider component
+// this will contain
 export default function AppProvider({ children }: { children: React.ReactNode }) {
   // for storing token, only string data type is allowed
   const [token, setToken] = useState<string>("");
 
-  // for storing user role, only "public", "admin" or "customer" is allowed
-  const [userRole, setUserRole] = useState<role>("public");
+  // for showing current active page ui
+  // refer to the above type page for available
+  const [currentPage, setCurrentPage] = useState<Page>("home");
 
-  const [currentPage, setCurrentPage] = useState<string>("home");
-
+  // for loading header based on token (verfiy token)
+  // don't change this loading state unless necessary
+  // this loading state will be set to false when the token is retrieved from the browser
+  // this is used for ux, the user will not see the header changes
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  // retrieveing token from local storage
+  // set loading state to false
   useEffect(() => {
+    // if token is undefined, it will be empty string
     setToken(localStorage.getItem("token") ?? "");
     setIsLoading(false);
   }, []);
 
+  // used for signout
+  // if currentpage is signout, this useEffect will run
+  // if token state is changed, the new token will be stored in browser
   useEffect(() => {
     if (token) {
       if (currentPage === "signout") {
@@ -35,12 +46,12 @@ export default function AppProvider({ children }: { children: React.ReactNode })
     }
   }, [token, currentPage]);
 
-  return <AppState.Provider value={{ token, setToken, userRole, setUserRole, currentPage, setCurrentPage, isLoading, setIsLoading }}>{children}</AppState.Provider>;
+  return <AppState.Provider value={{ token, setToken, currentPage, setCurrentPage, isLoading }}>{children}</AppState.Provider>;
 }
 
-// using the context state
+// to retrieve state and functions from the context
 // return the context
-// context => {token, setToken, userRole, setUserRole, currentPage, setCurrentPage}
+// context => {token, setToken, currentPage, setCurrentPage, isLoading}
 // for each of the state, refer to the above RootLayout function
 export function useAppState() {
   const context = useContext(AppState);
