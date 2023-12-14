@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Navbar, NavbarBrand, NavbarContent, Image, NavbarMenuItem, NavbarItem, NavbarMenu, Link, Button, NavbarMenuToggle, Input, Avatar, Badge, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
+import { Image, Link, Button, Input, Avatar, Badge, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { useAppState } from "../app-provider";
+import { useTheme } from "next-themes";
 
 // validating token
 // require => token
@@ -38,7 +39,8 @@ function validateToken(token: string): Promise<boolean> {
 
 // header component for user
 export default function Header() {
-  const { token, currentPage, setCurrentPage } = useAppState();
+  const { token, currentActivePage, setCurrentActivePage } = useAppState();
+  const { theme, setTheme } = useTheme();
   const router = useRouter();
 
   // when the token is changed, this useEffect will run
@@ -48,7 +50,7 @@ export default function Header() {
   //     validateToken(token).then((result) => {
   //       if (!result) {
   //         alert("Token Expired!");
-  //         setCurrentPage("signout");
+  //         setCurrentActivePage("signout");
   //         router.replace("/");
   //       }
   //     });
@@ -56,40 +58,60 @@ export default function Header() {
   // }, [token]);
 
   return (
-    <header className="flex items-center h-[75px] px-12 justify-start bg-slate-50 border-b-2 border-slate-300">
-      <Link href="/" className="flex uppercase font-bold text-slate-700 tracking-wider ml-2 text-2xl">
+    <header className="flex items-center h-[75px] px-12 justify-start dark:bg-slate-900 bg-slate-50 border-b-2 border-slate-300">
+      <Link href="/" className="flex dark:text-slate-200 uppercase font-bold text-slate-900 tracking-wider ml-2 text-2xl">
         dailyhype
       </Link>
       <div className="flex flex-1 justify-between items-center ms-4">
         <nav className="flex justify-start">
-          <Link href="/" className={`${currentPage === "home" ? "text-black font-medium" : "text-slate-500"} ms-8 cursor-pointer hover:font-medium hover:text-black`}>
+          <Link href="/" className={`${currentActivePage === "home" ? "text-black font-medium dark:text-white" : "text-slate-500 dark:text-slate-300"} ms-8 cursor-pointer hover:font-medium hover:text-black`}>
             <span>Home</span>
           </Link>
-          <Link href="/product" className={`${currentPage === "product" ? "text-black font-medium" : "text-slate-500"} ms-8 cursor-pointer hover:font-medium hover:text-black`}>
-            <span>Product</span>
+          <Link href="/man" className={`${currentActivePage === "man" ? "text-black font-medium dark:text-white" : "text-slate-500 dark:text-slate-300"} ms-8 cursor-pointer hover:font-medium hover:text-black`}>
+            Man
           </Link>
-          {token && (
-            <>
-              <Link href="/order" className={`${currentPage === "order" ? "text-black font-medium" : "text-slate-500"} ms-8 cursor-pointer hover:font-medium hover:text-black`}>
-                Order
-              </Link>
-              <Link href="/delivery" className={`${currentPage === "delivery" ? "text-black font-medium" : "text-slate-500"} ms-8 cursor-pointer hover:font-medium hover:text-black`}>
-                Delivery
-              </Link>
-            </>
-          )}
+          <Link href="/woman" className={`${currentActivePage === "woman" ? "text-black font-medium dark:text-white" : "text-slate-500 dark:text-slate-300"} ms-8 cursor-pointer hover:font-medium hover:text-black`}>
+            Woman
+          </Link>
+          <Link href="/kid" className={`${currentActivePage === "kid" ? "text-black font-medium dark:text-white" : "text-slate-500 dark:text-slate-300"} ms-8 cursor-pointer hover:font-medium hover:text-black`}>
+            Kid
+          </Link>
+          <Link href="/baby" className={`${currentActivePage === "baby" ? "text-black font-medium dark:text-white" : "text-slate-500 dark:text-slate-300"} ms-8 cursor-pointer hover:font-medium hover:text-black`}>
+            Baby
+          </Link>
         </nav>
         <nav className="flex flex-1 justify-end items-center">
-          <Input type="text" placeholder="Search Product" className="max-w-[350px] me-6" size="sm" variant="bordered" radius="sm" startContent={<Image width={25} src="/icons/search-icon.png" className="flex items-center justify-center" alt="Search Icon" />} />
+          <Input type="text" placeholder="Search Product" className="max-w-[350px] me-6" size="sm" variant="bordered" radius="sm" startContent={theme === "light" ? <Image width={20} src="/icons/search.svg" className="flex items-center justify-center" alt="Search Icon" /> : <Image width={20} src="/icons/search-dark.svg" className="flex items-center justify-center" alt="Search Icon" />} />
           <Badge content="1" color="primary" size="md">
-            <Link href="/cart" className="px-2 py-1 hover:bg-slate-200 rounded-md cursor-pointer">
-              <Image src="/icons/shopping-cart.png" width={30} alt="Shopping Cart Icon" />
+            <Link href="/cart" className="px-2 py-1 hover:dark:bg-slate-700 hover:bg-slate-200 rounded-md cursor-pointer" title="Shopping Bag">
+              {theme === "light" ? <Image src="/icons/shopping-bag.svg" radius="none" width={25} alt="Shopping Cart Icon" /> : <Image src="/icons/shopping-bag-dark.svg" radius="none" width={25} alt="Shopping Cart Icon" />}
             </Link>
           </Badge>
+          {theme === "light" ? (
+            <Image
+              title="Change to Dark Mode"
+              onClick={() => {
+                setTheme("dark");
+              }}
+              className="cursor-pointer ms-8"
+              src="/icons/moon.svg"
+              alt="Moon Icon"
+            />
+          ) : (
+            <Image
+              title="Change to Light Mode"
+              onClick={() => {
+                setTheme("light");
+              }}
+              className="cursor-pointer ms-8"
+              src="/icons/sun.svg"
+              alt="Sun Icon"
+            />
+          )}
           {token && (
             <Dropdown placement="bottom-end">
               <DropdownTrigger>
-                <Avatar isBordered as="button" className="transition-transform ms-6" src="https://i.pravatar.cc/150?u=a042581f4e29026704d" />
+                <Avatar as="button" className="transition-transform ms-8 border-2 border-gray-400" src="https://i.pravatar.cc/150?u=a042581f4e29026704d" />
               </DropdownTrigger>
               <DropdownMenu aria-label="Profile Actions" variant="flat">
                 <DropdownItem key="info" className="h-14 gap-2">
@@ -99,9 +121,15 @@ export default function Header() {
                 <DropdownItem href="/profile" key="profile">
                   Profile
                 </DropdownItem>
+                <DropdownItem href="/order" key="order">
+                  Order
+                </DropdownItem>
+                <DropdownItem href="/delivery" key="delivery">
+                  Delivery
+                </DropdownItem>
                 <DropdownItem
                   onClick={() => {
-                    setCurrentPage("signout");
+                    setCurrentActivePage("signout");
                     router.replace("/");
                   }}
                   key="logout"

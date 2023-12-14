@@ -4,10 +4,10 @@ import { useAppState } from "@/app/app-provider";
 import { useEffect } from "react";
 
 export default function Cart() {
-  const { token, setCurrentPage } = useAppState();
+  const { token, setCurrentActivePage } = useAppState();
 
   useEffect(() => {
-    setCurrentPage("delivery");
+    setCurrentActivePage("none");
   }, []);
 
   return (

@@ -6,7 +6,7 @@
 
 "use client";
 
-import { Input, Select, SelectItem } from "@nextui-org/react";
+import { Image, Input, Select, SelectItem } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { useAppState } from "@/app/app-provider";
 
@@ -25,27 +25,27 @@ interface OrderFilterInterface {
 const orderStatusOptions: OptionInterface[] = [
   {
     value: "all",
-    label: "All"
+    label: "All",
   },
   {
     value: "in progress",
-    label: "In Progress"
+    label: "In Progress",
   },
   {
     value: "confirmed",
-    label: "Confirmed"
+    label: "Confirmed",
   },
   {
     value: "delivered",
-    label: "Delivered"
+    label: "Delivered",
   },
   {
     value: "received",
-    label: "Received"
+    label: "Received",
   },
   {
     value: "cancelled",
-    label: "Cancelled"
+    label: "Cancelled",
   }
 ];
 
@@ -62,10 +62,8 @@ const monthOptions: OptionInterface[] = [
   { value: "9", label: "September" },
   { value: "10", label: "October" },
   { value: "11", label: "November" },
-  { value: "12", label: "December" }
+  { value: "12", label: "December" },
 ];
-
-const yearOptions: OptionInterface[] = [{ value: "0", label: "All" }];
 
 const getOrders = (filterOptions: OrderFilterInterface, offset: number, token: string) => {
   const { searchText, status, month, year } = filterOptions;
@@ -109,7 +107,7 @@ const getOrderData = (filterOptions: OrderFilterInterface, offset: number, token
 };
 
 export default function Order() {
-  const { token, setCurrentPage } = useAppState();
+  const { token, setCurrentActivePage } = useAppState();
 
   const [searchOrder, setSearchOrder] = useState<string>("");
   const [searchStatus, setSearchStatus] = useState<string>("all");
@@ -117,8 +115,10 @@ export default function Order() {
   const [searchYear, setSearchYear] = useState<string>("0");
 
   useEffect(() => {
-    setCurrentPage("order");
+    setCurrentActivePage("none");
   }, []);
+
+  const yearOptions: OptionInterface[] = [{ value: "0", label: "All" }];
 
   const date = new Date();
   yearOptions.push({ value: "1", label: date.getFullYear() + "" });
@@ -139,7 +139,7 @@ export default function Order() {
             variant="bordered"
             size="sm"
             radius="sm"
-            startContent="🔍"
+            startContent={<Image width={20} src="/icons/search.svg" className="flex items-center justify-center" alt="Search Icon" />}
             value={searchOrder}
             className="w-[350px]"
             onChange={(e) => {
@@ -159,15 +159,11 @@ export default function Order() {
             defaultSelectedKeys={["all"]}
             selectedKeys={[searchStatus]}
             onChange={(e) => {
-              if (e.target.value !== '')
-                setSearchStatus(e.target.value);
+              if (e.target.value !== "") setSearchStatus(e.target.value);
             }}
           >
             {orderStatusOptions.map((item) => (
-              <SelectItem
-                value={item.value}
-                key={item.value}
-              >
+              <SelectItem value={item.value} key={item.value}>
                 {item.label}
               </SelectItem>
             ))}
@@ -180,15 +176,11 @@ export default function Order() {
             selectedKeys={[searchMonth]}
             defaultSelectedKeys={["0"]}
             onChange={(e) => {
-              if (e.target.value !== '')
-                setSearchMonth(e.target.value);
+              if (e.target.value !== "") setSearchMonth(e.target.value);
             }}
           >
             {monthOptions.map((item) => (
-              <SelectItem
-                value={item.value}
-                key={item.value}
-              >
+              <SelectItem value={item.value} key={item.value}>
                 {item.label}
               </SelectItem>
             ))}
@@ -201,15 +193,11 @@ export default function Order() {
             selectedKeys={[searchYear]}
             defaultSelectedKeys={["0"]}
             onChange={(e) => {
-              if (e.target.value !== '')
-                setSearchYear(e.target.value);
+              if (e.target.value !== "") setSearchYear(e.target.value);
             }}
           >
             {yearOptions.map((item) => (
-              <SelectItem
-                value={item.value}
-                key={item.value}
-              >
+              <SelectItem value={item.value} key={item.value}>
                 {item.label}
               </SelectItem>
             ))}
