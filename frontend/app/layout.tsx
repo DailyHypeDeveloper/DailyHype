@@ -12,13 +12,13 @@ export const metadata: Metadata = {
   icons: [
     {
       media: "(prefers-color-scheme: light)",
-      url: "/images/logo.png"
+      url: "/images/logo.png",
     },
     {
       media: "(prefers-color-scheme: dark)",
-      url: "/images/logo.png"
-    }
-  ]
+      url: "/images/logo.png",
+    },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

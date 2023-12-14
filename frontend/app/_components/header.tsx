@@ -1,24 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Navbar, NavbarBrand, NavbarContent, NavbarMenuItem, NavbarItem, NavbarMenu, Link, Button, NavbarMenuToggle } from "@nextui-org/react";
+import { Navbar, NavbarBrand, NavbarContent, Image, NavbarMenuItem, NavbarItem, NavbarMenu, Link, Button, NavbarMenuToggle, Input, Avatar, Badge, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { useAppState } from "../app-provider";
-
-// typescript for center item navigation
-interface CenterItemInterface {
-  name: string;
-  path: string;
-  page: string;
-  state?: "loggedin";
-}
-
-// typescript for right item navigation
-interface RightItemInterface {
-  name: string;
-  path: string;
-  state: "loggedout" | "loggedin";
-}
 
 // validating token
 // require => token
@@ -29,8 +14,8 @@ function validateToken(token: string): Promise<boolean> {
     return fetch(`${process.env.BACKEND_URL}/api/validateToken`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     })
       .then((response) => {
         console.log(response);
@@ -56,156 +41,100 @@ export default function Header() {
   const { token, currentPage, setCurrentPage } = useAppState();
   const router = useRouter();
 
-  // center items will show in center navigation
-  // array of objects, contain name, path, page and state
-  // name => to display navigation text
-  // path => to go to this path when this link is clicked
-  // page => to set current active page ui
-  // state => to show only if the user is logged in (only one value 'loggedin' is accepted)
-  const centerItems: CenterItemInterface[] = [
-    {
-      name: "home",
-      path: "/",
-      page: "home"
-    },
-    {
-      name: "product",
-      path: "/product",
-      page: "product"
-    },
-    {
-      name: "profile",
-      path: "/profile",
-      page: "profile",
-      state: "loggedin"
-    },
-    {
-      name: "cart",
-      path: "/cart",
-      page: "cart",
-      state: "loggedin"
-    },
-    {
-      name: "order",
-      path: "/order",
-      page: "order",
-      state: "loggedin"
-    },
-    {
-      name: "delivery",
-      path: "/delivery",
-      page: "delivery",
-      state: "loggedin"
-    }
-  ];
-
-  // right items will show in right side of navigation bar
-  // array of objects, contain name, path and state
-  // name => to display button text
-  // path => to navigate to this path if the button is clicked
-  // state => to determine when to show this button (only two values "loggedout" or "loggedin" are accepted)
-  const rightItems: RightItemInterface[] = [
-    {
-      name: "sign in",
-      path: "/signin",
-      state: "loggedout"
-    },
-    {
-      name: "sign up",
-      path: "/signup",
-      state: "loggedout"
-    },
-    {
-      name: "sign out",
-      path: "#",
-      state: "loggedin"
-    }
-  ];
-
   // when the token is changed, this useEffect will run
   // this will validate the token
-  useEffect(() => {
-    if (token) {
-      validateToken(token).then((result) => {
-        if (!result) {
-          alert("Token Expired!");
-          setCurrentPage("signout");
-          router.replace("/");
-        }
-      });
-    }
-  }, [token]);
+  // useEffect(() => {
+  //   if (token) {
+  //     validateToken(token).then((result) => {
+  //       if (!result) {
+  //         alert("Token Expired!");
+  //         setCurrentPage("signout");
+  //         router.replace("/");
+  //       }
+  //     });
+  //   }
+  // }, [token]);
 
   return (
-    <Navbar
-      maxWidth="xl"
-      isBordered={true}
-    >
-      <NavbarContent>
-        <NavbarBrand>
-          <p className="font-bold text-2xl uppercase select-none">dailyhype</p>
-        </NavbarBrand>
-      </NavbarContent>
-
-      <NavbarContent
-        className="hidden sm:flex gap-4"
-        justify="center"
-      >
-        {centerItems.map((item, index) => {
-          let toShow = false;
-
-          if (item.state && item.state === "loggedin") {
-            if (token !== "") toShow = true;
-          } else toShow = true;
-
-          if (toShow)
-            return (
-              <NavbarItem key={`${item}-${index}`}>
-                <Link
-                  style={{ textTransform: "capitalize" }}
-                  size="md"
-                  className="px-2"
-                  color={item.page === currentPage ? "primary" : "foreground"}
-                  href={item.path}
-                >
-                  {item.name}
-                </Link>
-              </NavbarItem>
-            );
-        })}
-      </NavbarContent>
-      <NavbarContent justify="end">
-        {rightItems.map((item, index) => {
-          let toShow = false;
-
-          if (item.state === "loggedin") {
-            if (token !== "") toShow = true;
-          } else {
-            if (token === "") toShow = true;
-          }
-
-          if (toShow)
-            return (
-              <NavbarItem key={`${item}-${index}`}>
-                <Button
-                  as={item.name === "sign out" ? Button : Link}
-                  color="primary"
-                  href={item.path}
-                  variant="flat"
-                  style={{ textTransform: "capitalize" }}
+    <header className="flex items-center h-[75px] px-12 justify-start bg-slate-50 border-b-2 border-slate-300">
+      <Link href="/" className="flex uppercase font-bold text-slate-700 tracking-wider ml-2 text-2xl">
+        dailyhype
+      </Link>
+      <div className="flex flex-1 justify-between items-center ms-4">
+        <nav className="flex justify-start">
+          <Link href="/" className={`${currentPage === "home" ? "text-black font-medium" : "text-slate-500"} ms-8 cursor-pointer hover:font-medium hover:text-black`}>
+            <span>Home</span>
+          </Link>
+          <Link href="/product" className={`${currentPage === "product" ? "text-black font-medium" : "text-slate-500"} ms-8 cursor-pointer hover:font-medium hover:text-black`}>
+            <span>Product</span>
+          </Link>
+          {token && (
+            <>
+              <Link href="/order" className={`${currentPage === "order" ? "text-black font-medium" : "text-slate-500"} ms-8 cursor-pointer hover:font-medium hover:text-black`}>
+                Order
+              </Link>
+              <Link href="/delivery" className={`${currentPage === "delivery" ? "text-black font-medium" : "text-slate-500"} ms-8 cursor-pointer hover:font-medium hover:text-black`}>
+                Delivery
+              </Link>
+            </>
+          )}
+        </nav>
+        <nav className="flex flex-1 justify-end items-center">
+          <Input type="text" placeholder="Search Product" className="max-w-[350px] me-6" size="sm" variant="bordered" radius="sm" startContent={<Image width={25} src="/icons/search-icon.png" className="flex items-center justify-center" alt="Search Icon" />} />
+          <Badge content="1" color="primary" size="md">
+            <Link href="/cart" className="px-2 py-1 hover:bg-slate-200 rounded-md cursor-pointer">
+              <Image src="/icons/shopping-cart.png" width={30} alt="Shopping Cart Icon" />
+            </Link>
+          </Badge>
+          {token && (
+            <Dropdown placement="bottom-end">
+              <DropdownTrigger>
+                <Avatar isBordered as="button" className="transition-transform ms-6" src="https://i.pravatar.cc/150?u=a042581f4e29026704d" />
+              </DropdownTrigger>
+              <DropdownMenu aria-label="Profile Actions" variant="flat">
+                <DropdownItem key="info" className="h-14 gap-2">
+                  <p className="font-semibold">Signed in as</p>
+                  <p className="font-semibold">zoey@example.com</p>
+                </DropdownItem>
+                <DropdownItem href="/profile" key="profile">
+                  Profile
+                </DropdownItem>
+                <DropdownItem
                   onClick={() => {
-                    if (item.name === "sign out") {
-                      setCurrentPage("signout");
-                      router.replace("/");
-                    }
+                    setCurrentPage("signout");
+                    router.replace("/");
                   }}
+                  key="logout"
+                  color="danger"
                 >
-                  {item.name}
-                </Button>
-              </NavbarItem>
-            );
-        })}
-      </NavbarContent>
-    </Navbar>
+                  Sign Out
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          )}
+          {!token && (
+            <>
+              <Button
+                onClick={() => {
+                  router.push("/signin");
+                }}
+                variant="ghost"
+                className="ms-6"
+              >
+                Sign In
+              </Button>
+              <Button
+                onClick={() => {
+                  router.push("/signup");
+                }}
+                className="ms-4 text-white bg-gradient-to-r from-custom-color1 to-custom-color2"
+              >
+                Register
+              </Button>
+            </>
+          )}
+        </nav>
+      </div>
+    </header>
   );
 }
