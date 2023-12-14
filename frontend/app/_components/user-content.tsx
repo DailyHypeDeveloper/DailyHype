@@ -2,6 +2,7 @@
 
 import { useAppState } from "../app-provider";
 import Header from "./header";
+import Footer from "./footer";
 
 // this is the user view with header and footer
 // don't change this unless necessary
@@ -14,7 +15,7 @@ export default function UserContent({ children }: { children: React.ReactNode })
       <>
         <Header></Header>
         <main>{children}</main>
-        <footer></footer>
+        <Footer></Footer>
       </>
     )
   );

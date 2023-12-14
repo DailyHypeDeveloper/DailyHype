@@ -236,6 +236,7 @@ function finalisePayment() {
     })
         .then((result) => {
             // necessary data for inserting into payment table
+            console.log(result);
             result = result.paymentIntent;
             data.payment = {
                 transactionid: result.id,

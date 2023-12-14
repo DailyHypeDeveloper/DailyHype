@@ -7,7 +7,7 @@
 "use client";
 
 import { Input, Select, SelectItem } from "@nextui-org/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppState } from "@/app/app-provider";
 
 interface OptionInterface {
@@ -111,12 +111,14 @@ const getOrderData = (filterOptions: OrderFilterInterface, offset: number, token
 export default function Order() {
   const { token, setCurrentPage } = useAppState();
 
-  setCurrentPage("order");
-
   const [searchOrder, setSearchOrder] = useState<string>("");
   const [searchStatus, setSearchStatus] = useState<string>("all");
   const [searchMonth, setSearchMonth] = useState<string>("0");
   const [searchYear, setSearchYear] = useState<string>("0");
+
+  useEffect(() => {
+    setCurrentPage("order");
+  }, []);
 
   const date = new Date();
   yearOptions.push({ value: "1", label: date.getFullYear() + "" });
@@ -133,10 +135,11 @@ export default function Order() {
           <Input
             isClearable
             type="text"
-            placeholder="Search Order ..."
+            placeholder="Search Order"
             variant="bordered"
             size="sm"
             radius="sm"
+            startContent="🔍"
             value={searchOrder}
             className="w-[350px]"
             onChange={(e) => {
@@ -154,6 +157,11 @@ export default function Order() {
             variant="bordered"
             size="sm"
             defaultSelectedKeys={["all"]}
+            selectedKeys={[searchStatus]}
+            onChange={(e) => {
+              if (e.target.value !== '')
+                setSearchStatus(e.target.value);
+            }}
           >
             {orderStatusOptions.map((item) => (
               <SelectItem
@@ -169,7 +177,12 @@ export default function Order() {
             className="max-w-[150px] mr-8"
             variant="bordered"
             size="sm"
+            selectedKeys={[searchMonth]}
             defaultSelectedKeys={["0"]}
+            onChange={(e) => {
+              if (e.target.value !== '')
+                setSearchMonth(e.target.value);
+            }}
           >
             {monthOptions.map((item) => (
               <SelectItem
@@ -185,7 +198,12 @@ export default function Order() {
             className="max-w-[150px]"
             variant="bordered"
             size="sm"
+            selectedKeys={[searchYear]}
             defaultSelectedKeys={["0"]}
+            onChange={(e) => {
+              if (e.target.value !== '')
+                setSearchYear(e.target.value);
+            }}
           >
             {yearOptions.map((item) => (
               <SelectItem

@@ -1,11 +1,14 @@
 "use client";
 
+import { useEffect } from "react";
 import { useAppState } from "../app-provider";
 
 export default function Home() {
   const { token, setCurrentPage } = useAppState();
 
-  setCurrentPage("home");
+  useEffect(() => {
+    setCurrentPage("home");
+  }, []);
 
   return (
     <div>

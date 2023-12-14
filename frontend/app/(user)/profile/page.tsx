@@ -1,11 +1,10 @@
 "use client";
 
 import { useAppState } from "@/app/app-provider";
+import { useEffect } from "react";
 
 export default function Cart() {
-  const { token, setCurrentPage } = useAppState();
-
-  setCurrentPage("profile");
+  const { token } = useAppState();
 
   return (
     <div>
