@@ -4,10 +4,10 @@ import { useEffect } from "react";
 import { useAppState } from "../app-provider";
 
 export default function Home() {
-  const { token, setCurrentPage } = useAppState();
+  const { token, setCurrentActivePage } = useAppState();
 
   useEffect(() => {
-    setCurrentPage("home");
+    setCurrentActivePage("home");
   }, []);
 
   return (
