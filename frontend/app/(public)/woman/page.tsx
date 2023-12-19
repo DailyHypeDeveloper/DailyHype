@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { CurrentActivePage } from "@/app/_enums/global-enums";
 import { useAppState } from "@/app/app-provider";
 import { useEffect, useState } from "react";
 import {Card, CardBody, CardFooter, Image, Tooltip} from "@nextui-org/react";
@@ -48,7 +49,7 @@ export default function WomanProduct() {
   };
 
   useEffect(() => {
-    setCurrentActivePage("woman");
+    setCurrentActivePage(CurrentActivePage.Woman);
   }, []);
 
   return (

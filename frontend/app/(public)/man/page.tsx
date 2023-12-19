@@ -1,5 +1,6 @@
 "use client";
 
+import { CurrentActivePage } from "@/app/_enums/global-enums";
 import { useAppState } from "@/app/app-provider";
 import { useEffect, useState } from "react";
 import React from "react";
@@ -117,8 +118,8 @@ export default function ManProduct() {
   //card body end
 
   useEffect(() => {
-    setCurrentActivePage("man");
-     
+    setCurrentActivePage(CurrentActivePage.Man);
+     //const {categoryResult, pro} = getProductData();
   }, []);
 
   const handleItemsInputChange = (value: string) => {
