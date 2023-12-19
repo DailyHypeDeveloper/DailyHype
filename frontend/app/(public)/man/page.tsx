@@ -50,8 +50,8 @@ const getSidebarCategoryByType = () => {
 
 const getProductData = () => {
 
-  return Promise.all([getSidebarCategoryByType()]).then(([categoryResult])=>{
-    return {categoryResult:categoryResult, product:null}
+  return Promise.all([getSidebarCategoryByType()]).then(([categoryResult]) => {
+    return [categoryResult];
   })
 }
 
@@ -62,6 +62,7 @@ export default function ManProduct() {
   //card body start
   const [currentPage, setCurrentPage] = useState(1);
   const [isInvalid, setIsInvalid] = useState(false);
+  const [sidebarCategory, setSidebarCategory] = useState(null);
   const [selectedSidebarCategory, setSelectedSidebarCategory] = useState();
   let sidebarCategories;
 
@@ -119,7 +120,10 @@ export default function ManProduct() {
 
   useEffect(() => {
     setCurrentActivePage(CurrentActivePage.Man);
-     //const {categoryResult, pro} = getProductData();
+    getProductData().then(([categoryResult]) => {
+      setSidebarCategory(categoryResult);
+      sidebarCategories = categoryResult;
+    })
   }, []);
 
   const handleItemsInputChange = (value: string) => {
@@ -144,6 +148,22 @@ export default function ManProduct() {
           base: "px-3 first:rounded-t-medium last:rounded-b-medium rounded-none gap-3 h-12 data-[hover=true]:bg-default-100/80",
         }}
       >
+
+        {sidebarCategory !==null ? (
+          sidebarCategory.map((item, index) => (
+            <ListboxItem
+              key={item.categoryid}
+              endContent={<ItemCounter number={13} />}
+            >
+              {item.categoryname}
+            </ListboxItem>
+          ))
+        ) : (
+          // Render a loading state or placeholder while sidebarCategory is null
+          <div>Loading...</div>
+        )}
+
+
         <ListboxItem
           key="issues"
           endContent={<ItemCounter number={13} />}
