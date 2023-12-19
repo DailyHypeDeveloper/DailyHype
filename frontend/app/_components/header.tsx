@@ -5,57 +5,46 @@ import { Image, Link, Button, Input, Avatar, Badge, Dropdown, DropdownTrigger, D
 import { useRouter } from "next/navigation";
 import { useAppState } from "../app-provider";
 import { useTheme } from "next-themes";
-
-// validating token
-// require => token
-// token => string, provide token from your token state (got from useAppState())
-// return => promise<boolean> (true if token is valid, false for invalid token)
-function validateToken(token: string): Promise<boolean> {
-  if (token) {
-    return fetch(`${process.env.BACKEND_URL}/api/validateToken`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => {
-        console.log(response);
-        if (response.status === 403) {
-          return false;
-        } else {
-          return true;
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        return false;
-      });
-  } else {
-    return new Promise((resolve) => {
-      resolve(true);
-    });
-  }
-}
+import { validateToken } from "../_functions/common-functions";
+import { CurrentActivePage } from "../_enums/global-enums";
 
 // header component for user
 export default function Header() {
-  const { token, currentActivePage, setCurrentActivePage } = useAppState();
+  const { token, setToken, userInfo, currentActivePage, setCurrentActivePage, cart } = useAppState();
   const { theme, setTheme } = useTheme();
   const router = useRouter();
 
   // when the token is changed, this useEffect will run
   // this will validate the token
-  // useEffect(() => {
-  //   if (token) {
-  //     validateToken(token).then((result) => {
-  //       if (!result) {
-  //         alert("Token Expired!");
-  //         setCurrentActivePage("signout");
-  //         router.replace("/");
-  //       }
-  //     });
-  //   }
-  // }, [token]);
+  useEffect(() => {
+    if (token) {
+      validateToken(token).then((result) => {
+        if (!result) {
+          alert("Token Expired!");
+          setCurrentActivePage(CurrentActivePage.SignOut);
+        }
+      });
+    }
+  }, [token]);
+
+  // used for signout
+  // if currentActivepage is signout, this useEffect will run
+  // if token state is changed, the new token will be stored in browser
+  useEffect(() => {
+    if (currentActivePage === "signout" && token) {
+      localStorage.removeItem("token");
+      setToken("");
+      setCurrentActivePage(CurrentActivePage.Home);
+      router.replace("/");
+    } else if (!token && currentActivePage === "signout") {
+      localStorage.removeItem("token");
+      setToken("");
+      setCurrentActivePage(CurrentActivePage.Home);
+      router.replace("/");
+    } else if (token) {
+      localStorage.setItem("token", token);
+    }
+  }, [token, currentActivePage]);
 
   return (
     <header className="flex items-center h-[75px] px-12 justify-start dark:bg-slate-900 bg-slate-50 border-b-2 border-slate-300">
@@ -81,10 +70,10 @@ export default function Header() {
           </Link>
         </nav>
         <nav className="flex flex-1 justify-end items-center">
-          <Input type="text" placeholder="Search Product" className="max-w-[350px] me-6" size="sm" variant="bordered" radius="sm" startContent={theme === "light" ? <Image width={20} src="/icons/search.svg" className="flex items-center justify-center" alt="Search Icon" /> : <Image width={20} src="/icons/search-dark.svg" className="flex items-center justify-center" alt="Search Icon" />} />
-          <Badge content="1" color="primary" size="md">
+          <Input type="text" placeholder="Search Product" className="max-w-[350px] me-6" size="sm" variant="bordered" radius="sm" startContent={theme === "dark" ? <Image width={20} src="/icons/search-dark.svg" className="flex items-center justify-center" alt="Search Icon" /> : <Image width={20} src="/icons/search.svg" className="flex items-center justify-center" alt="Search Icon" />} />
+          <Badge content={cart ? cart.length : 0} className="bg-custom-color2 text-white" size="md">
             <Link href="/cart" className="px-2 py-1 hover:dark:bg-slate-700 hover:bg-slate-200 rounded-md cursor-pointer" title="Shopping Bag">
-              {theme === "light" ? <Image src="/icons/shopping-bag.svg" radius="none" width={25} alt="Shopping Cart Icon" /> : <Image src="/icons/shopping-bag-dark.svg" radius="none" width={25} alt="Shopping Cart Icon" />}
+              {theme === "dark" ? <Image src="/icons/shopping-bag-dark.svg" radius="none" width={25} alt="Shopping Cart Icon" /> : <Image src="/icons/shopping-bag.svg" radius="none" width={25} alt="Shopping Cart Icon" />}
             </Link>
           </Badge>
           {theme === "light" ? (
@@ -111,12 +100,12 @@ export default function Header() {
           {token && (
             <Dropdown placement="bottom-end">
               <DropdownTrigger>
-                <Avatar as="button" className="transition-transform ms-8 border-2 border-gray-400" src="https://i.pravatar.cc/150?u=a042581f4e29026704d" />
+                <Avatar as="button" className="transition-transform ms-8 border-2 border-gray-400" src={userInfo.image ? userInfo.image : theme === "light" ? "/icons/user.svg" : "/icons/user-dark.svg"} />
               </DropdownTrigger>
               <DropdownMenu aria-label="Profile Actions" variant="flat">
-                <DropdownItem key="info" className="h-14 gap-2">
-                  <p className="font-semibold">Signed in as</p>
-                  <p className="font-semibold">zoey@example.com</p>
+                <DropdownItem href="/profile" key="info" className="h-14 gap-2">
+                  <p className="font-medium">Signed in as</p>
+                  <p className="font-medium">{userInfo.email}</p>
                 </DropdownItem>
                 <DropdownItem href="/profile" key="profile">
                   Profile

@@ -1,21 +1,27 @@
 "use client";
 
 import { useState, useContext, createContext, useEffect } from "react";
+import { CurrentActivePage } from "./_enums/global-enums";
 
 export const AppState = createContext<any>(null);
 
-// setting possible pages for active page ui
-type Page = "home" | "man" | "woman" | "kid" | "baby" | "signout" | "none";
+interface UserBasicInfoInterface {
+  name: string;
+  email: string;
+  image: string;
+}
 
 // this is the context provider component
-// this will contain
 export default function AppProvider({ children }: { children: React.ReactNode }) {
+  // this will store user basic info such as name, email, image url
+  const [userInfo, setUserInfo] = useState<UserBasicInfoInterface>({ name: "", email: "a@gmail.com", image: "" });
+
   // for storing token, only string data type is allowed
   const [token, setToken] = useState<string>("");
 
   // for showing current active page ui
-  // refer to the above type page for available
-  const [currentActivePage, setCurrentActivePage] = useState<Page>("home");
+  // refer to the global-enums.ts
+  const [currentActivePage, setCurrentActivePage] = useState<CurrentActivePage>(CurrentActivePage.Home);
 
   // for loading header based on token (verfiy token)
   // don't change this loading state unless necessary
@@ -36,28 +42,14 @@ export default function AppProvider({ children }: { children: React.ReactNode })
     setIsLoading(false);
   }, []);
 
-  // used for signout
-  // if currentActivepage is signout, this useEffect will run
-  // if token state is changed, the new token will be stored in browser
-  useEffect(() => {
-    if (token) {
-      if (currentActivePage === "signout") {
-        localStorage.removeItem("token");
-        setToken("");
-        setCurrentActivePage("home");
-      } else {
-        localStorage.setItem("token", token);
-      }
-    }
-  }, [token, currentActivePage]);
-
-  return <AppState.Provider value={{ token, setToken, currentActivePage, setCurrentActivePage, cart, setCart, isLoading }}>{children}</AppState.Provider>;
+  return <AppState.Provider value={{ token, setToken, userInfo, setUserInfo, currentActivePage, setCurrentActivePage, cart, setCart, isLoading, setIsLoading }}>{children}</AppState.Provider>;
 }
 
-// to retrieve state and functions from the context
-// return the context
-// context => {token, setToken, currentActivePage, setCurrentActivePage, isLoading}
-// for each of the state, refer to the above RootLayout function
+/**
+ *
+ * This will return states and setState stored in context
+ * @returns context (token, setToken, userInfo, setUserInfo, currentActivePage, setCurrentActivePage, cart, setCart, isLoading, setIsLoading)
+ */
 export function useAppState() {
   const context = useContext(AppState);
   if (!context) {

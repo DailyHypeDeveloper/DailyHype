@@ -1,5 +1,6 @@
 "use client";
 
+import { CurrentActivePage } from "@/app/_enums/global-enums";
 import { useAppState } from "@/app/app-provider";
 import { useEffect } from "react";
 
@@ -7,7 +8,7 @@ export default function WomanProduct() {
   const { setCurrentActivePage } = useAppState();
 
   useEffect(() => {
-    setCurrentActivePage("woman");
+    setCurrentActivePage(CurrentActivePage.Woman);
   }, []);
 
   return <div>This is woman product page!</div>;
