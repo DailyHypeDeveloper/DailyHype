@@ -34,6 +34,12 @@ export default function Order() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showScrollButton, setShowScrollButton] = useState<boolean>(false);
 
+  if (!token) {
+    alert("Unauthorized Access!");
+    router.replace("/signout");
+    return null;
+  }
+
   const orderFilterProps = {
     searchOrder,
     setSearchOrder,
@@ -62,10 +68,7 @@ export default function Order() {
   };
 
   useEffect(() => {
-    if (!token) {
-      alert("Unauthorized Access!");
-      router.replace("/signout");
-    } else {
+    if (token) {
       setCurrentActivePage(CurrentActivePage.AllOrder);
       const handleScroll = () => {
         const scrollY = window.scrollY || document.documentElement.scrollTop;
@@ -109,10 +112,6 @@ export default function Order() {
     setIsLoading(true);
     if (orderDivRef.current) orderDivRef.current.scrollIntoView();
   }, [currentPage]);
-
-  if (!token) {
-    return null;
-  }
 
   return (
     <>
