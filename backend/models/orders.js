@@ -4,11 +4,11 @@
 // Date: 15.11.2023
 // Description: Connect to database to manage order information
 
-const { query } = require('../database');
-const { DUPLICATE_ENTRY_ERROR, EMPTY_RESULT_ERROR, SQL_ERROR_CODE, INVALID_INPUT_ERROR, UNEXPECTED_ERROR } = require('../errors');
+const { query } = require("../database");
+const { DUPLICATE_ENTRY_ERROR, EMPTY_RESULT_ERROR, SQL_ERROR_CODE, INVALID_INPUT_ERROR, UNEXPECTED_ERROR } = require("../errors");
 
 module.exports.getOrderByMonth = function getOrderByMonth(month, gender) {
-    const sql = `
+  const sql = `
         SELECT po.orderid, u.name, u.gender, po.totalqty, po.totalamount
         FROM ProductOrder po, AppUser u
         WHERE po.userid = u.userid
@@ -16,47 +16,44 @@ module.exports.getOrderByMonth = function getOrderByMonth(month, gender) {
         AND EXTRACT(MONTH FROM po.createdat) = $1
     `;
 
-    return query(sql, [month, gender])
-        .then((result) => {
-            return result.rows;
-        })
-}
+  return query(sql, [month, gender]).then((result) => {
+    return result.rows;
+  });
+};
 
 module.exports.createOrder = function createOrder(qty, amount, deliveryAddress, userid) {
-    const sql = `
+  const sql = `
         INSERT INTO ProductOrder (updatedAt, totalQty, totalAmount, deliveryAddress, orderStatus, userID) VALUES (NOW(), $1, $2, $3, $4, $5) RETURNING orderID;
     `;
-    return query(sql, [qty, amount, deliveryAddress, "in progress", userid])
-        .catch(function (error) {
-            console.error(error);
-            throw error;
-        });
-}
+  return query(sql, [qty, amount, deliveryAddress, "in progress", userid]).catch(function (error) {
+    console.error(error);
+    throw error;
+  });
+};
 
 module.exports.createOrderItems = function createOrderItems(orderitems, orderid) {
+  const placeholders = orderitems.map((item, index) => `($${index * 4 + 1}, $${index * 4 + 2}, $${index * 4 + 3}, $${index * 4 + 4})`).join(", ");
 
-    const placeholders = orderitems.map((item, index) => `($${index * 4 + 1}, $${index * 4 + 2}, $${index * 4 + 3}, $${index * 4 + 4})`).join(', ');
-
-    const sql = `
+  const sql = `
         INSERT INTO ProductOrderItem (productdetailid, orderid, qty, unitprice)
         VALUES ${placeholders};
     `;
 
-    // combining all arrarys into a single array
-    const params = orderitems.flatMap(item => [item.productdetailid, orderid, item.qty, item.unitprice]);
+  // combining all arrarys into a single array
+  const params = orderitems.flatMap((item) => [item.productdetailid, orderid, item.qty, item.unitprice]);
 
-    return query(sql, params)
-        .then(function (result) {
-            return result.rowCount;
-        })
-        .catch(function (error) {
-            console.error(error);
-            throw error;
-        })
-}
+  return query(sql, params)
+    .then(function (result) {
+      return result.rowCount;
+    })
+    .catch(function (error) {
+      console.error(error);
+      throw error;
+    });
+};
 
-module.exports.getOrderByIdStatusDate = function getOrderByIdStatusDate(userid, offset, status, month, year, search) {
-    const sql = `
+module.exports.getOrderByIdStatusDate = function getOrderByIdStatusDate(userid, offset, limit, status, month, year, search) {
+  const sql = `
         SELECT DISTINCT po.orderid, po.totalqty, po.totalamount, po.deliveryaddress, po.orderstatus, po.createdat
         FROM ProductOrder po, Product p, ProductOrderItem poi, ProductDetail pd
         WHERE po.orderid = poi.orderid
@@ -68,22 +65,21 @@ module.exports.getOrderByIdStatusDate = function getOrderByIdStatusDate(userid, 
         AND ($5 = 0 OR EXTRACT(YEAR FROM po.createdat) = $5)
         AND p.productname ILIKE $6
         ORDER BY po.createdat DESC
-        LIMIT 5 OFFSET $3
+        LIMIT $7 OFFSET $3
     `;
 
-    return query(sql, [userid, status, offset, month, year, '%' + search + '%'])
-        .then(function (result) {
-            const rows = result.rows;
-            if (rows.length === 0) {
-                throw new EMPTY_RESULT_ERROR(`User Order Not Found`);
-            }
-            return rows;
-        })
-}
+  return query(sql, [userid, status, offset, month, year, "%" + search + "%", limit]).then(function (result) {
+    const rows = result.rows;
+    if (rows.length === 0) {
+      throw new EMPTY_RESULT_ERROR(`User Order Not Found`);
+    }
+    return rows;
+  });
+};
 
 // retrieve 10 orders for admin dashboard with offset
 module.exports.getOrderByAdmin = function getOrderByAdmin(offset) {
-    const sql = `
+  const sql = `
         SELECT o.orderid, o.totalqty, o.totalamount, o.deliveryaddress, o.orderstatus, u.name, o.createdat, p.paymentMethod, u.userid
         FROM ProductOrder o, Payment p, AppUser u
         WHERE o.orderid = p.orderid
@@ -92,31 +88,29 @@ module.exports.getOrderByAdmin = function getOrderByAdmin(offset) {
         LIMIT 10 OFFSET $1
     `;
 
-    return query(sql, [offset])
-        .then(function (result) {
-            const rows = result.rows;
-            if (rows.length === 0) {
-                throw new EMPTY_RESULT_ERROR(`Order Not Found`);
-            }
-            return rows;
-        })
-}
+  return query(sql, [offset]).then(function (result) {
+    const rows = result.rows;
+    if (rows.length === 0) {
+      throw new EMPTY_RESULT_ERROR(`Order Not Found`);
+    }
+    return rows;
+  });
+};
 
 // get total order count for admin dashboard
 module.exports.getOrderCountByAdmin = function getOrderCountByAdmin() {
-    const sql = `
+  const sql = `
         SELECT COUNT(*) AS count FROM ProductOrder 
     `;
 
-    return query(sql, [])
-        .then((result) => {
-            const rows = result.rows;
-            return rows[0].count;
-        })
-}
+  return query(sql, []).then((result) => {
+    const rows = result.rows;
+    return rows[0].count;
+  });
+};
 
 module.exports.getOrderByIDAdmin = function getOrderByIDAdmin(orderid) {
-    const sql = `
+  const sql = `
         SELECT o.orderid, o.totalqty, o.totalamount, o.deliveryaddress, o.orderstatus, u.name, o.createdat, p.paymentMethod, u.userid
         FROM ProductOrder o, Payment p, AppUser u
         WHERE o.orderid = p.orderid
@@ -124,19 +118,18 @@ module.exports.getOrderByIDAdmin = function getOrderByIDAdmin(orderid) {
         AND o.orderid = $1
     `;
 
-    return query(sql, [orderid])
-        .then(function (result) {
-            const rows = result.rows;
-            if (rows.length === 0) {
-                throw new EMPTY_RESULT_ERROR(`Order Not Found`);
-            }
-            return rows[0];
-        })
-}
+  return query(sql, [orderid]).then(function (result) {
+    const rows = result.rows;
+    if (rows.length === 0) {
+      throw new EMPTY_RESULT_ERROR(`Order Not Found`);
+    }
+    return rows[0];
+  });
+};
 
 // get order detail by admin
 module.exports.getOrderDetailByAdmin = function getOrderDetailByAdmin(orderid) {
-    const sql = `
+  const sql = `
         SELECT pd.productdetailid, poi.qty, poi.unitprice, p.productname, s.name AS size, c.name AS colour, p.productid
         FROM ProductDetail pd, Product p, ProductOrderItem poi, Size s, Colour c
         WHERE poi.productdetailid = pd.productdetailid
@@ -146,66 +139,61 @@ module.exports.getOrderDetailByAdmin = function getOrderDetailByAdmin(orderid) {
         AND pd.colourid = c.colourid
     `;
 
-    return query(sql, [orderid])
-        .then(function (result) {
-            const rows = result.rows;
-            if (rows.length === 0) {
-                throw new EMPTY_RESULT_ERROR(`Order Not Found`);
-            }
-            return rows;
-        })
-}
+  return query(sql, [orderid]).then(function (result) {
+    const rows = result.rows;
+    if (rows.length === 0) {
+      throw new EMPTY_RESULT_ERROR(`Order Not Found`);
+    }
+    return rows;
+  });
+};
 
 // get order status by order id for checking update order status
 module.exports.getOrderStatusById = function getOrderStatusById(orderid) {
-    const sql = `
+  const sql = `
         SELECT orderstatus FROM ProductOrder WHERE orderid = $1
     `;
 
-    return query(sql, [orderid])
-        .then(function (result) {
-            const rows = result.rows;
-            if (rows.length === 0) {
-                throw new EMPTY_RESULT_ERROR(`Order Not Found`);
-            }
-            return rows[0].orderstatus;
-        })
-}
+  return query(sql, [orderid]).then(function (result) {
+    const rows = result.rows;
+    if (rows.length === 0) {
+      throw new EMPTY_RESULT_ERROR(`Order Not Found`);
+    }
+    return rows[0].orderstatus;
+  });
+};
 
 // update order status from admin (confirmed, delivered, cancelled)
 module.exports.updateOrderStatusByAdmin = function updateOrderStatusByAdmin(orderid, status) {
-    const sql = `
+  const sql = `
         UPDATE ProductOrder SET orderstatus = $1 WHERE orderid = $2
     `;
 
-    return query(sql, [status, orderid])
-        .then(function (result) {
-            const rows = result.rowCount;
-            if (rows === 0) {
-                throw new EMPTY_RESULT_ERROR(`Order ${orderid} Not Found`);
-            }
-            return rows;
-        })
-}
-
+  return query(sql, [status, orderid]).then(function (result) {
+    const rows = result.rowCount;
+    if (rows === 0) {
+      throw new EMPTY_RESULT_ERROR(`Order ${orderid} Not Found`);
+    }
+    return rows;
+  });
+};
 
 module.exports.getOrderItemQtyByOrderId = function getOrderItemQtyByOrderId(orderid) {
-    const sql = `
+  const sql = `
         SELECT qty, productdetailid
         FROM ProductOrderItem
         WHERE orderid = $1
     `;
 
-    return query(sql, [orderid])
-        .then(function (result) {
-            return result.rows;
-        })
-}
+  return query(sql, [orderid]).then(function (result) {
+    return result.rows;
+  });
+};
 
-// retrieving individual order items by order id array 
+// retrieving individual order items by order id array
 // example order id array: [1, 2, 3]
 module.exports.getOrderItemByOrderId = function getOrderItemByOrderId(orderidarr) {
-    const sql = `
+  const sql = `
         SELECT poi.productdetailid, poi.qty, poi.unitprice, p.productname, p.rating, c.name AS colour, s.name AS size, poi.orderid, p.productid
         FROM ProductOrderItem poi, Colour c, Size s, ProductDetail pd, Product p
         WHERE pd.productid = p.productid
@@ -215,15 +203,14 @@ module.exports.getOrderItemByOrderId = function getOrderItemByOrderId(orderidarr
         AND poi.orderid IN (SELECT UNNEST($1::int[]))
     `;
 
-    return query(sql, [orderidarr])
-        .then(function (result) {
-            return result.rows;
-        })
-}
+  return query(sql, [orderidarr]).then(function (result) {
+    return result.rows;
+  });
+};
 
 // get total number of order by user id and order status
 module.exports.getTotalOrderCountById = function getTotalOrderCountById(userid, status, month, year, search) {
-    const sql = `
+  const sql = `
         SELECT COUNT(DISTINCT po.*) AS count 
         FROM ProductOrder po, ProductOrderItem poi, Product p, ProductDetail pd
         WHERE po.orderid = poi.orderid
@@ -236,15 +223,11 @@ module.exports.getTotalOrderCountById = function getTotalOrderCountById(userid, 
         AND p.productname LIKE $5;
     `;
 
-    return query(sql, [userid, status, month, year, '%' + search + '%'])
-        .then(function (result) {
-            const rows = result.rows;
-            if (rows.length === 0) {
-                throw new EMPTY_RESULT_ERROR(`User Order Not Found`);
-            }
-            return rows[0].count;
-        })
-}
+  return query(sql, [userid, status, month, year, "%" + search + "%"]).then(function (result) {
+    const rows = result.rows;
+    return rows[0].count;
+  });
+};
 
 // module.exports.updateOrder = function updateOrder(orderstatus, orderid) {
 
@@ -271,22 +254,21 @@ module.exports.getTotalOrderCountById = function getTotalOrderCountById(userid, 
 // }
 
 module.exports.updateOrderStatusByUser = function updateOrderStatusByUser(orderid, status, userid) {
-    const sql = `
+  const sql = `
         UPDATE ProductOrder SET orderstatus = $1 WHERE orderid = $2 AND userid = $3
     `;
 
-    return query(sql, [status, orderid, userid])
-        .then((result) => {
-            const rows = result.rowCount;
-            if (rows === 0) {
-                throw new EMPTY_RESULT_ERROR(`Order Not Found`);
-            }
-            return rows;
-        })
-}
+  return query(sql, [status, orderid, userid]).then((result) => {
+    const rows = result.rowCount;
+    if (rows === 0) {
+      throw new EMPTY_RESULT_ERROR(`Order Not Found`);
+    }
+    return rows;
+  });
+};
 
 module.exports.generateStats = function generateStats(startdate, enddate, region, gender, categoryid, productid) {
-    const sql = `
+  const sql = `
         SELECT EXTRACT(MONTH FROM po.createdat) AS month, COUNT(DISTINCT po.*) AS count, u.gender
         FROM ProductOrder po
         JOIN AppUser u ON u.userid = po.userid
@@ -304,9 +286,8 @@ module.exports.generateStats = function generateStats(startdate, enddate, region
         ORDER BY 1
     `;
 
-    return query(sql, [startdate, enddate, region, gender, categoryid, productid])
-        .then((result) => {
-            const rows = result.rows;
-            return rows;
-        })
-}
+  return query(sql, [startdate, enddate, region, gender, categoryid, productid]).then((result) => {
+    const rows = result.rows;
+    return rows;
+  });
+};

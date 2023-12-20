@@ -8,7 +8,7 @@ export default function Cart() {
   const { token, setCurrentActivePage } = useAppState();
 
   useEffect(() => {
-    setCurrentActivePage(CurrentActivePage.None);
+    setCurrentActivePage(CurrentActivePage.Profile);
   }, []);
 
   return (
