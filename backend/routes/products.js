@@ -545,6 +545,25 @@ router.delete('/deleteProductDetail', validationFn.validateToken, function (req,
         })
 })
 
+//CA2
+//get side bar categories by typeid
+router.get('/categories/:typeid', function (req, res) {
+    const typeid = req.params.typeid;
+    console.log("typeid",typeid);
+    if (!typeid || isNaN(typeid)) {
+        return res.status(400).json({ error: "Invalid Type ID" });
+    }
+    return productsModel.getCategoriesByType(typeid)
+        .then((category) => {
+            return res.json({ category: category })
+        })
+        .catch((error)=>{
+            console.log(error);
+            return res.status(500).json({error: "Unknown Error"})
+        })
+})
+//CA2-end
+
 // Name: Zay Yar Tun
 // checking product information in shopping cart
 

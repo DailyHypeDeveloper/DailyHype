@@ -329,6 +329,22 @@ module.exports.generateStats = function generateStats() {
         })
 }
 
+//CA2
+//get side bar categories by typeid
+module.exports.getCategoriesByType = function getCategoriesByType(typeid) {
+    const sql = `SELECT DISTINCT c.* FROM product p, category c WHERE p.categoryid=c.categoryid AND typeid=$1`;
+    //result: categoryid, categoryname, createdat, updatedat
+    return query(sql, [typeid])
+        .then(result => {
+            return result.rows;
+        })
+        .catch(error => {
+            throw new Error(`Error retrieving categories by typeid: ${error.message}`);
+        });
+};
+//CA2-end
+
+
 // Name: Zay Yar Tun
 
 module.exports.getProductIDByOrderID = function getProductIDByOrderID(orderid) {
