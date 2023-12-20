@@ -1,3 +1,5 @@
+// this layout is taken from shein website
+
 "use client";
 
 import { Accordion, AccordionItem, Divider, Link } from "@nextui-org/react";
