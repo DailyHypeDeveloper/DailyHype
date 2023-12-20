@@ -6,11 +6,10 @@ import { useRouter } from "next/navigation";
 import { useAppState } from "../app-provider";
 import { useTheme } from "next-themes";
 import { validateToken } from "../_functions/common-functions";
-import { CurrentActivePage } from "../_enums/global-enums";
 
 // header component for user
 export default function Header() {
-  const { token, setToken, userInfo, currentActivePage, setCurrentActivePage, cart } = useAppState();
+  const { token, userInfo, currentActivePage, cart } = useAppState();
   const { theme, setTheme } = useTheme();
   const router = useRouter();
 
@@ -21,34 +20,17 @@ export default function Header() {
       validateToken(token).then((result) => {
         if (!result) {
           alert("Token Expired!");
-          setCurrentActivePage(CurrentActivePage.SignOut);
+          router.replace("/signout");
+        } else {
+          localStorage.setItem("token", token);
         }
       });
     }
   }, [token]);
 
-  // used for signout
-  // if currentActivepage is signout, this useEffect will run
-  // if token state is changed, the new token will be stored in browser
-  useEffect(() => {
-    if (currentActivePage === "signout" && token) {
-      localStorage.removeItem("token");
-      setToken("");
-      setCurrentActivePage(CurrentActivePage.Home);
-      router.replace("/");
-    } else if (!token && currentActivePage === "signout") {
-      localStorage.removeItem("token");
-      setToken("");
-      setCurrentActivePage(CurrentActivePage.Home);
-      router.replace("/");
-    } else if (token) {
-      localStorage.setItem("token", token);
-    }
-  }, [token, currentActivePage]);
-
   return (
     <header className="flex items-center h-[75px] px-12 justify-start dark:bg-slate-900 bg-slate-50 border-b-2 border-slate-300">
-      <Link href="/" className="flex dark:text-slate-200 uppercase font-bold text-slate-900 tracking-wider ml-2 text-2xl">
+      <Link href="/" className="flex dark:text-slate-200 uppercase font-bold text-slate-900 tracking-wider ml-2 text-3xl">
         dailyhype
       </Link>
       <div className="flex flex-1 justify-between items-center ms-4">
@@ -70,7 +52,7 @@ export default function Header() {
           </Link>
         </nav>
         <nav className="flex flex-1 justify-end items-center">
-          <Input type="text" placeholder="Search Product" className="max-w-[350px] me-6" size="sm" variant="bordered" radius="sm" startContent={theme === "dark" ? <Image width={20} src="/icons/search-dark.svg" className="flex items-center justify-center" alt="Search Icon" /> : <Image width={20} src="/icons/search.svg" className="flex items-center justify-center" alt="Search Icon" />} />
+          <Input type="text" placeholder="Search Product" className="max-w-[300px] me-6" size="sm" variant="bordered" radius="sm" startContent={theme === "dark" ? <Image width={20} src="/icons/search-dark.svg" className="flex items-center justify-center" alt="Search Icon" /> : <Image width={20} src="/icons/search.svg" className="flex items-center justify-center" alt="Search Icon" />} />
           <Badge content={cart ? cart.length : 0} className="bg-custom-color2 text-white" size="md">
             <Link href="/cart" className="px-2 py-1 hover:dark:bg-slate-700 hover:bg-slate-200 rounded-md cursor-pointer" title="Shopping Bag">
               {theme === "dark" ? <Image src="/icons/shopping-bag-dark.svg" radius="none" width={25} alt="Shopping Cart Icon" /> : <Image src="/icons/shopping-bag.svg" radius="none" width={25} alt="Shopping Cart Icon" />}
@@ -103,7 +85,7 @@ export default function Header() {
                 <Avatar as="button" className="transition-transform ms-8 border-2 border-gray-400" src={userInfo.image ? userInfo.image : theme === "light" ? "/icons/user.svg" : "/icons/user-dark.svg"} />
               </DropdownTrigger>
               <DropdownMenu aria-label="Profile Actions" variant="flat">
-                <DropdownItem href="/profile" key="info" className="h-14 gap-2">
+                <DropdownItem href="/personal" key="info" className="h-14 gap-2">
                   <p className="font-medium">Signed in as</p>
                   <p className="font-medium">{userInfo.email}</p>
                 </DropdownItem>
@@ -118,8 +100,7 @@ export default function Header() {
                 </DropdownItem>
                 <DropdownItem
                   onClick={() => {
-                    setCurrentActivePage("signout");
-                    router.replace("/");
+                    router.replace("/signout");
                   }}
                   key="logout"
                   color="danger"

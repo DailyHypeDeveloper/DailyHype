@@ -3,7 +3,7 @@
 // Class: DIT/FT/2B/02
 // Date: 1.12.2023
 
-const stripe = Stripe("pk_test_51OCyWqG90ViYRErRAWzgOOpigNlHcHn7t9wsDCNWoDgM4SgCEEZokhVnkQhZU13MV0z1gyzcASpSzE5KYWEPHJMB00RldOQbnp");
+const stripe = Stripe("pk_test_51OP59GDoGYotiWHLoyrEnu2W4W6XYmPk94V4iJw66c3h5YSZktk4JqLJEp59PVDbwOomBqDcfuiZ0PrZpWK8Oo4f00g0ioukHS");
 
 let data = {};
 let elements;
