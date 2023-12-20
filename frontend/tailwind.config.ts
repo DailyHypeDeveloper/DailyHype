@@ -18,7 +18,8 @@ const config: Config = {
       colors: {
         'custom-color1': '#764BA2',
         'custom-color2': '#667EEA',
-        'custom-color3': '#10182F'
+        'custom-color3': '#10182F',
+        'custom-color4': '#fb6050'
       }
     },
   },
