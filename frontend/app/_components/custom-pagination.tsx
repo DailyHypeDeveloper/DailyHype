@@ -44,18 +44,21 @@ export default function CustomPagination({ total, initialPage, className, onChan
   };
 
   return (
-    <Pagination
-      disableCursorAnimation
-      showControls
-      total={total}
-      initialPage={initialPage}
-      className={cn("gap-2", `${className} gap-2`)}
-      onChange={(current) => {
-        onChange && onChange(current);
-      }}
-      radius="full"
-      renderItem={renderItem}
-      variant="light"
-    />
+    <div className="flex w-full max-w-full justify-end">
+      <label className="mt-2 mr-5 text-slate-600 dark:text-slate-400">Total {total} pages</label>
+      <Pagination
+        disableCursorAnimation
+        showControls
+        total={total}
+        initialPage={initialPage}
+        className={cn("gap-2", `${className} gap-2`)}
+        onChange={(current) => {
+          onChange && onChange(current);
+        }}
+        radius="full"
+        renderItem={renderItem}
+        variant="light"
+      />
+    </div>
   );
 }

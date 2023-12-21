@@ -49,8 +49,8 @@ export function mapStringToOrderStatusValue(value: string): OrderStatusValue {
   switch (value) {
     case "all":
       return OrderStatusValue.All;
-    case "in progress":
-      return OrderStatusValue.InProgress;
+    case "inprogress":
+      return OrderStatusValue.InProgressValue;
     case "confirmed":
       return OrderStatusValue.Confirmed;
     case "delivered":
@@ -59,6 +59,8 @@ export function mapStringToOrderStatusValue(value: string): OrderStatusValue {
       return OrderStatusValue.Received;
     case "cancelled":
       return OrderStatusValue.Cancelled;
+    case "returned":
+      return OrderStatusValue.Returned;
     default:
       return OrderStatusValue.All;
   }

@@ -12,6 +12,7 @@ export enum CurrentActivePage {
   AddressBook = "address book",
   ManageAccount = "manage my account",
   AllOrder = "all orders",
+  InProgressOrder = "in progress orders",
   ConfirmedOrder = "confirmed orders",
   DeliveredOrder = "delivered orders",
   ReceivedOrder = "received orders",
@@ -19,4 +20,16 @@ export enum CurrentActivePage {
   ReturnedOrder = "returned orders",
   AllDelivery = "all deliveries",
   None = "none",
+}
+
+/**
+ * enum used for url routing
+ */
+export enum URL {}
+
+/**
+ * enum used for error message
+ */
+export enum ErrorMessage {
+  Unauthorized = "Unauthorized Access!",
 }

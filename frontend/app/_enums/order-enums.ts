@@ -22,9 +22,11 @@ export enum MonthValue {
  */
 export enum OrderStatusValue {
   All = "all",
-  InProgress = "in progress",
+  InProgress = "inprogress",
+  InProgressValue = "in progress",
   Confirmed = "confirmed",
   Delivered = "delivered",
   Received = "received",
   Cancelled = "cancelled",
+  Returned = "returned",
 }

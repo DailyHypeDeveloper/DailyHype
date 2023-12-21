@@ -6,16 +6,15 @@
 
 import { OrderStatusValue, MonthValue } from "@/app/_enums/order-enums";
 import { Button, Divider, Image, Link, Skeleton, Tooltip } from "@nextui-org/react";
-import { useAppState } from "@/app/app-provider";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { capitaliseWord, formatDateByMonthDayYear, formatMoney } from "@/app/_functions/formatter";
-
-export const dynamic = "force-dynamic";
+import { mapStringToOrderStatusValue } from "@/app/_functions/order-utils";
+import { useAppState } from "@/app/app-provider";
 
 interface OrderFilterDataProps {
   searchOrder: string;
-  searchStatus: OrderStatusValue;
+  orderStatus: string;
   searchMonth: MonthValue;
   searchYear: string;
   showOrderNo: number;
@@ -51,7 +50,7 @@ const orderStatusInfoText: OrderStatusInfoText = {
   refunded: "",
 };
 
-const getOrders = (filterOptions: FilterOptions, offset: number, limit: number, token: string) => {
+const getOrders = (filterOptions: FilterOptions, offset: number, limit: number, token: string | null) => {
   const { searchText, status, month, year } = filterOptions;
   offset = (offset - 1) * limit;
   return fetch(`${process.env.BACKEND_URL}/api/orders?limit=${limit}&offset=${offset}&search=${searchText}&status=${status}&month=${month}&year=${year}`, {
@@ -71,7 +70,7 @@ const getOrders = (filterOptions: FilterOptions, offset: number, limit: number, 
     });
 };
 
-const getOrderCount = (filterOptions: FilterOptions, token: string) => {
+const getOrderCount = (filterOptions: FilterOptions, token: string | null) => {
   const { searchText, status, month, year } = filterOptions;
 
   return fetch(`${process.env.BACKEND_URL}/api/orderCount?status=${status}&year=${year}&month=${month}&search=${searchText}`, {
@@ -91,25 +90,25 @@ const getOrderCount = (filterOptions: FilterOptions, token: string) => {
     });
 };
 
-const getOrderData = (filterOptions: FilterOptions, offset: number, limit: number, token: string) => {
+const getOrderData = (filterOptions: FilterOptions, offset: number, limit: number, token: string | null) => {
   return Promise.all([getOrders(filterOptions, offset, limit, token), getOrderCount(filterOptions, token)])
     .then(([orderData, orderCount]) => {
       return [orderData.order, orderCount];
     })
     .catch((error) => {
       console.error(error);
-      return [];
+      return [[], [1]];
     });
 };
 
-export default function OrderList({ searchOrder, searchStatus, searchMonth, searchYear, showOrderNo, isLoading, orderCount, setOrderCount, setIsLoading, currentPage }: OrderFilterDataProps) {
-  const { token } = useAppState();
+export default function OrderList({ searchOrder, orderStatus, searchMonth, searchYear, showOrderNo, isLoading, orderCount, setOrderCount, setIsLoading, currentPage }: OrderFilterDataProps) {
+  const { token, setToken } = useAppState();
   const { theme } = useTheme();
   const [orderData, setOrderData] = useState<any>([]);
 
   useEffect(() => {
     if (isLoading)
-      getOrderData({ searchText: searchOrder, status: searchStatus, month: searchMonth, year: searchYear }, currentPage, showOrderNo, token).then((result) => {
+      getOrderData({ searchText: searchOrder, status: mapStringToOrderStatusValue(orderStatus), month: searchMonth, year: searchYear }, currentPage, showOrderNo, token).then((result) => {
         setOrderData(result[0]);
         setOrderCount(Math.ceil(result[1].count / showOrderNo));
         console.log(result);

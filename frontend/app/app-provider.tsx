@@ -17,7 +17,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
   const [userInfo, setUserInfo] = useState<UserBasicInfoInterface>({ name: "", email: "a@gmail.com", image: "" });
 
   // for storing token, only string data type is allowed
-  const [token, setToken] = useState<string>("");
+  const [token, setToken] = useState<string | null>(null);
 
   // for showing current active page ui
   // refer to the global-enums.ts
@@ -36,8 +36,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
   // retrieveing token from local storage
   // set loading state to false
   useEffect(() => {
-    // if token is undefined, it will be empty string
-    setToken(localStorage.getItem("token") ?? "");
+    setToken(localStorage.getItem("token"));
     setCart(JSON.parse(localStorage.getItem("cart") ?? "[]"));
     setIsLoading(false);
   }, []);

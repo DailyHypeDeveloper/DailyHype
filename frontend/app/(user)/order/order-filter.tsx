@@ -106,8 +106,8 @@ export default function OrderFilter({ searchOrder, setSearchOrder, searchStatus,
   }, [searchOrder, searchStatus, searchMonth, searchYear, showOrderNo]);
 
   return (
-    <div className="flex flex-row justify-between mt-8 mb-16 max-h-10">
-      <div className="flex flex-1">
+    <div className="flex flex-row justify-between mt-4 mb-8 max-h-10">
+      <div className="flex basis-1/3">
         <Input
           isClearable
           type="text"
@@ -117,7 +117,7 @@ export default function OrderFilter({ searchOrder, setSearchOrder, searchStatus,
           radius="sm"
           startContent={theme === "dark" ? <Image width={20} src="/icons/search-dark.svg" className="flex items-center justify-center" alt="Search Icon" /> : <Image width={20} src="/icons/search.svg" className="flex items-center justify-center" alt="Search Icon" />}
           value={searchOrder}
-          className="w-[350px]"
+          className="w-full max-w-full"
           onChange={(e) => {
             setSearchOrder(e.target.value);
           }}
@@ -126,10 +126,10 @@ export default function OrderFilter({ searchOrder, setSearchOrder, searchStatus,
           }}
         />
       </div>
-      <div className="flex flex-row flex-1 justify-end">
+      <div className="flex flex-row basis-2/3 justify-end">
         <Select
           label="No of Orders"
-          className="max-w-[150px] mr-8"
+          className="max-w-[140px] mr-4"
           variant="bordered"
           size="sm"
           defaultSelectedKeys={["all"]}
@@ -146,7 +146,7 @@ export default function OrderFilter({ searchOrder, setSearchOrder, searchStatus,
         </Select>
         <Select
           label="Order Status"
-          className="max-w-[150px] mr-8"
+          className="max-w-[130px] mr-4"
           variant="bordered"
           size="sm"
           defaultSelectedKeys={["all"]}
@@ -163,7 +163,7 @@ export default function OrderFilter({ searchOrder, setSearchOrder, searchStatus,
         </Select>
         <Select
           label="Month"
-          className="max-w-[150px] mr-8"
+          className="max-w-[130px] mr-4"
           variant="bordered"
           size="sm"
           selectedKeys={[searchMonth]}
@@ -180,7 +180,7 @@ export default function OrderFilter({ searchOrder, setSearchOrder, searchStatus,
         </Select>
         <Select
           label="Year"
-          className="max-w-[150px]"
+          className="max-w-[100px]"
           variant="bordered"
           size="sm"
           selectedKeys={[searchYear]}

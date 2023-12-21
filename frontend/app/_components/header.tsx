@@ -13,7 +13,7 @@ import { validateToken } from "../_functions/common-functions";
 
 // header component for user
 export default function Header() {
-  const { token, userInfo, currentActivePage, cart } = useAppState();
+  const { token, setToken, userInfo, currentActivePage, cart } = useAppState();
   const { theme, setTheme } = useTheme();
   const router = useRouter();
 
@@ -24,9 +24,9 @@ export default function Header() {
       validateToken(token).then((result) => {
         if (!result) {
           alert("Token Expired!");
-          router.replace("/signout");
-        } else {
-          localStorage.setItem("token", token);
+          localStorage.removeItem("token");
+          setToken(null);
+          router.replace("/signin");
         }
       });
     }
@@ -34,7 +34,7 @@ export default function Header() {
 
   return (
     <header className="flex items-center h-[75px] px-12 justify-start dark:bg-slate-900 bg-slate-50 border-b-2 border-slate-300">
-      <Link href="/" className="flex dark:text-slate-200 uppercase font-bold text-slate-900 tracking-wider ml-2 text-3xl">
+      <Link href="/" className="flex dark:text-slate-200 uppercase font-semibold text-slate-900 tracking-wider ml-2 text-3xl">
         dailyhype
       </Link>
       <div className="flex flex-1 justify-between items-center ms-4">
@@ -89,22 +89,25 @@ export default function Header() {
                 <Avatar as="button" className="transition-transform ms-8 border-2 border-gray-400" src={userInfo.image ? userInfo.image : theme === "light" ? "/icons/user.svg" : "/icons/user-dark.svg"} />
               </DropdownTrigger>
               <DropdownMenu aria-label="Profile Actions" variant="flat">
-                <DropdownItem href="/personal" key="info" className="h-14 gap-2">
+                <DropdownItem aria-label="User Information" href="/personal" key="info" className="h-14 gap-2">
                   <p className="font-medium">Signed in as</p>
                   <p className="font-medium">{userInfo.email}</p>
                 </DropdownItem>
-                <DropdownItem href="/profile" key="profile">
+                <DropdownItem aria-label="Profile" href="/profile" key="profile">
                   Profile
                 </DropdownItem>
-                <DropdownItem href="/order" key="order">
+                <DropdownItem aria-label="Order" href="/order/all" key="order">
                   Order
                 </DropdownItem>
-                <DropdownItem href="/delivery" key="delivery">
+                <DropdownItem aria-label="Delivery" href="/delivery" key="delivery">
                   Delivery
                 </DropdownItem>
                 <DropdownItem
+                  aria-label="Sign Out"
                   onClick={() => {
-                    router.replace("/signout");
+                    localStorage.removeItem("token");
+                    setToken(null);
+                    router.replace("/");
                   }}
                   key="logout"
                   color="danger"
