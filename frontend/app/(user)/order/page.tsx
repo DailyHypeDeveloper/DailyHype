@@ -17,7 +17,7 @@ import { Button, Image } from "@nextui-org/react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 
-export default function Order() {
+export default function Page() {
   const orderDivRef = useRef<HTMLDivElement>(null);
 
   const { token, setCurrentActivePage } = useAppState();
@@ -115,7 +115,7 @@ export default function Order() {
 
   return (
     <>
-      <div ref={orderDivRef} className="flex flex-col max-w-full py-10 px-28">
+      <div ref={orderDivRef} className="flex flex-col max-w-full py-10">
         <h2 className="text-2xl font-medium uppercase tracking-wide">Your Orders</h2>
         <OrderFilter {...orderFilterProps} />
         <OrderList {...orderFilterDataProps} />
