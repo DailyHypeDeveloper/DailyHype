@@ -549,7 +549,7 @@ router.delete('/deleteProductDetail', validationFn.validateToken, function (req,
 //get side bar categories by typeid
 router.get('/categories/:typeid', function (req, res) {
     const typeid = req.params.typeid;
-    console.log("typeid",typeid);
+    console.log("typeid", typeid);
     if (!typeid || isNaN(typeid)) {
         return res.status(400).json({ error: "Invalid Type ID" });
     }
@@ -557,9 +557,85 @@ router.get('/categories/:typeid', function (req, res) {
         .then((category) => {
             return res.json({ category: category })
         })
-        .catch((error)=>{
+        .catch((error) => {
             console.log(error);
-            return res.status(500).json({error: "Unknown Error"})
+            return res.status(500).json({ error: "Unknown Error" })
+        })
+})
+
+//2.
+//get products by categoryid, offset, litmit, isinstock
+router.get('/productsByCategory', function (req, res) {
+    const { categoryid, limit, offset, isinstock } = req.query;
+    
+    if (!categoryid || isNaN(categoryid) ||
+        !limit || isNaN(limit) || limit < 2 || limit > 100 ||
+        !offset || isNaN(offset) || offset < 0 ||
+        isinstock !== '0' && isinstock !== '1') {
+        return res.status(400).json({ error: "Invalid Request" });
+    }
+    return productsModel.getProductsByCategoryID(categoryid, limit, offset, isinstock)
+        .then((product) => {
+            return res.json({ product: product });
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.status(500).json({ error: "Unknown Error" })
+        })
+})
+//3.
+//get productcount by categoryid and isinstock
+router.get('/productsCountByCategory', function (req, res) {
+    const { categoryid, isinstock } = req.query;
+
+    if (!categoryid || isNaN(categoryid) ||
+        isinstock !== '0' && isinstock !== '1') {
+        return res.status(400).json({ error: "Invalid Request" });
+    }
+    return productsModel.getProductCountByCategoryID(categoryid, isinstock)
+        .then((productCount) => {
+            return res.json({ productCount: productCount[0].productcount  });
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.status(500).json({ error: "Unknown Error" })
+        })
+})
+
+//4.
+//get image by productid
+router.get('/productImage/:productid', function (req, res) {
+    const { productid } = req.params;
+
+    if (!productid || isNaN(productid)) {
+        return res.status(400).json({ error: "Invalid Product ID" });
+    }
+
+    return productsModel.getImageByProductID(productid)
+        .then((image) => {
+            return res.json({ image: image  });
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.status(500).json({ error: "Unknown Error" })
+        })
+})
+//5.
+//get colours by productid
+router.get('/productColour/:productid', function (req, res) {
+    const { productid } = req.params;
+
+    if (!productid || isNaN(productid)) {
+        return res.status(400).json({ error: "Invalid Product ID" });
+    }
+
+    return productsModel.getColourByProductID(productid)
+        .then((colour) => {
+            return res.json({ colour: colour  });
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.status(500).json({ error: "Unknown Error" })
         })
 })
 //CA2-end

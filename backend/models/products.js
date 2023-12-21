@@ -8,7 +8,7 @@ const { query } = require('../database'); // Import database connection/query ex
 const { DUPLICATE_ENTRY_ERROR, EMPTY_RESULT_ERROR, SQL_ERROR_CODE, TABLE_ALREADY_EXISTS_ERROR } = require('../errors');
 
 
-//get the total number of products
+//get the total number of products still neeed???
 module.exports.getTotalProductCount = function getTotalProductCount() {
     const sql = `SELECT COUNT(*) AS total FROM product;`;
 
@@ -330,16 +330,123 @@ module.exports.generateStats = function generateStats() {
 }
 
 //CA2
+//1.
 //get side bar categories by typeid
 module.exports.getCategoriesByType = function getCategoriesByType(typeid) {
-    const sql = `SELECT DISTINCT c.* FROM product p, category c WHERE p.categoryid=c.categoryid AND typeid=$1`;
-    //result: categoryid, categoryname, createdat, updatedat
+    const sql = `SELECT COUNT(*) AS "productcount", c.*
+    FROM product p, category c WHERE p.categoryid=c.categoryid AND typeid=$1
+    GROUP BY c.categoryid, c.categoryname, c.createdat, c.updatedat`;
+    //result: productcount, categoryid, categoryname, createdat, updatedat
     return query(sql, [typeid])
         .then(result => {
             return result.rows;
         })
         .catch(error => {
             throw new Error(`Error retrieving categories by typeid: ${error.message}`);
+        });
+};
+
+//2.
+//get products by categoryid, offset, litmit, isinstock
+module.exports.getProductsByCategoryID = function getProductsByCategoryID(categoryid, limit, offset, isinstock) {
+
+    let sql = ``;
+    if (isinstock == "1") {
+        sql = `
+            SELECT P.*
+            FROM product P
+            WHERE P.categoryid=$1
+            AND P.productid IN (SELECT PD.productid FROM productdetail PD WHERE qty>0)
+            LIMIT $2 OFFSET $3;`;
+    }
+    else {
+        sql = `
+            SELECT P.*
+            FROM product P
+            WHERE P.categoryid=$1
+            LIMIT $2 OFFSET $3;`;
+    }
+    /*SELECT P.*, ARRAY_AGG(I.url) AS productimg, ARRAY_AGG(DISTINCT  c.name) AS colour
+    FROM product P, image I, productimage PI, productdetail PD, colour C
+    WHERE P.categoryid=3
+    AND P.productID = PI.productID 
+    AND PI.imageID = I.imageID
+    AND P.productid = PD.productid
+    AND PD.colourid = C.colourid
+    GROUP BY P.*, P.productid
+    LIMIT 2 OFFSET 0;*/
+    return query(sql, [categoryid, limit, offset])
+        .then(result => {
+            return result.rows;
+        })
+        .catch(error => {
+            throw new Error(`Error retrieving products by categoryid: ${error.message}`);
+        });
+};
+
+//3.
+//get productcount by categoryid and isinstock
+module.exports.getProductCountByCategoryID = function getProductCountByCategoryID(categoryid, isinstock) {
+
+    let sql = ``;
+    if (isinstock == "1") {
+        sql = `
+            SELECT COUNT(P.*) AS productcount
+            FROM product P
+            WHERE P.categoryid=$1
+            AND P.productid IN (SELECT PD.productid FROM productdetail PD WHERE qty>0);`;
+    }
+    else {
+        sql = `
+            SELECT COUNT(P.*) AS productcount
+            FROM product P
+            WHERE P.categoryid=$1;`;
+    }
+    return query(sql, [categoryid])
+        .then(result => {
+            return result.rows;
+        })
+        .catch(error => {
+            throw new Error(`Error retrieving product count by categoryid: ${error.message}`);
+        });
+};
+
+//4.
+//get image by productid
+module.exports.getImageByProductID = function getImageByProductID(productid) {
+    const sql = `
+        SELECT I.*
+        FROM
+        product P, image I, productimage PI
+        WHERE P.productid=$1
+        AND P.productID = PI.productID 
+        AND PI.imageID = I.imageID ;`;
+
+    return query(sql, [productid])
+        .then(result => {
+            return result.rows;
+        })
+        .catch(error => {
+            throw new Error(`Error retrieving image by productid: ${error.message}`);
+        });
+};
+
+//5.
+//get colours by productid
+module.exports.getColourByProductID = function getColourByProductID(productid) {
+    const sql = `
+        SELECT DISTINCT C.*
+        FROM
+        productdetail PD, colour C
+        WHERE PD.productid=$1
+        AND PD.colourid = C.colourid;`;
+
+    return query(sql, [productid])
+        .then(result => {
+            return result.rows;
+        })
+        .catch(error => {
+            throw new Error(`Error retrieving image by productid: ${error.message}`);
         });
 };
 //CA2-end
