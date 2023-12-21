@@ -9,7 +9,10 @@ const { EMPTY_RESULT_ERROR, SQL_ERROR_CODE } = require('../errors');
 const cloudinary = require("../cloudinary");
 
 module.exports.checkLogin = function checkLogin(loginEmail, loginPassword) {
-    const sql = `SELECT email, password, userID, role FROM appuser WHERE email = $1`;
+    const sql = `
+        SELECT u.email, u.userID, u.name, u.password, u.role, i.url FROM appuser u, image i 
+        WHERE u.email = $1 
+        AND i.imageid = u.imageid`;
     return query(sql, [loginEmail])
         .then(function (result) {
             const rows = result.rows;

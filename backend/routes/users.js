@@ -20,6 +20,7 @@ router.post('/login', function (req, res) {
             if (!user) {
                 res.status(401).json({ error: 'Invalid email or password' });
             } else {
+                delete user.password;
                 console.log(user);
                 const token = jwt.sign({ email: user.email, userId: user.userid, role: user.role }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
                 res.status(200).json({ token: token, user: user });
