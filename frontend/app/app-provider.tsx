@@ -5,16 +5,19 @@ import { CurrentActivePage } from "./_enums/global-enums";
 
 export const AppState = createContext<any>(null);
 
+type UserRole = "" | "user" | "admin";
+
 interface UserBasicInfoInterface {
   name: string;
   email: string;
   image: string;
+  role: UserRole;
 }
 
 // this is the context provider component
 export default function AppProvider({ children }: { children: React.ReactNode }) {
   // this will store user basic info such as name, email, image url
-  const [userInfo, setUserInfo] = useState<UserBasicInfoInterface>({ name: "", email: "a@gmail.com", image: "" });
+  const [userInfo, setUserInfo] = useState<UserBasicInfoInterface>({ name: "", email: "", image: "", role: "" });
 
   // for storing token, only string data type is allowed
   const [token, setToken] = useState<string | null>(null);
@@ -38,8 +41,18 @@ export default function AppProvider({ children }: { children: React.ReactNode })
   useEffect(() => {
     setToken(localStorage.getItem("token"));
     setCart(JSON.parse(localStorage.getItem("cart") ?? "[]"));
+    const user = sessionStorage.getItem("user");
+    if (user) {
+      setUserInfo(JSON.parse(user));
+    }
     setIsLoading(false);
   }, []);
+
+  useEffect(() => {
+    if (userInfo.name && userInfo.email && userInfo.image && userInfo.role) {
+      sessionStorage.setItem("user", JSON.stringify(userInfo));
+    }
+  }, [userInfo]);
 
   return <AppState.Provider value={{ token, setToken, userInfo, setUserInfo, currentActivePage, setCurrentActivePage, cart, setCart, isLoading, setIsLoading }}>{children}</AppState.Provider>;
 }

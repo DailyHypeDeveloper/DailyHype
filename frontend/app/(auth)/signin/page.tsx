@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { setToken } = useAppState();
+  const { setToken, setUserInfo } = useAppState();
   const router = useRouter();
 
   const isValidEmail = (email: string) => {
@@ -39,10 +39,11 @@ export default function SignIn() {
       })
       .then((result) => {
         const token = result.token;
-        console.log("Login successful! Token:", token);
+        const user = result.user;
+        setUserInfo({ name: user.name, email: user.email, image: user.url, role: user.role });
         localStorage.setItem("token", token);
         setToken(token);
-        router.replace("/");
+        router.push("/");
       })
       .catch((error) => {
         console.error("Login failed:", error.message);

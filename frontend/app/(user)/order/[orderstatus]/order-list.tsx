@@ -122,10 +122,10 @@ export default function OrderList({ searchOrder, orderStatus, searchMonth, searc
         <div className="flex flex-col max-w-full mb-8 border-1 rounded-xl">
           <label>{}</label>
           <div className="flex py-4 border-b-1">
-            <Skeleton className="flex basis-4/5 mx-12 rounded-lg h-12" />
-            <Skeleton className="flex ms-auto basis-1/5 me-16 rounded-lg w-full h-12" />
+            <Skeleton className="flex basis-4/5 mx-8 rounded-lg h-12" />
+            <Skeleton className="flex ms-auto basis-1/5 me-8 rounded-lg w-full h-12" />
           </div>
-          <div className="flex flex-col mx-12 my-4">
+          <div className="flex flex-col mx-8 my-4">
             <div className="flex justify-start">
               <div className="me-5">
                 <Skeleton className="flex w-[120px] rounded-lg h-[150px]" />
@@ -145,7 +145,7 @@ export default function OrderList({ searchOrder, orderStatus, searchMonth, searc
             <div key={index} className="flex flex-col max-w-full mb-8 border-1 rounded-xl">
               <div className="flex py-4 border-b-1">
                 <div className="flex justify-start basis-4/5">
-                  <div className="flex flex-col ms-12 me-12">
+                  <div className="flex flex-col ms-8 me-12">
                     <label className="text-small mb-2">Order placed</label>
                     <label className="text-small font-medium">{formatDateByMonthDayYear(order.createdat)}</label>
                   </div>
@@ -173,7 +173,7 @@ export default function OrderList({ searchOrder, orderStatus, searchMonth, searc
                     <label className="text-small font-medium">{order.deliveryaddress}</label>
                   </div>
                 </div>
-                <div className="flex justify-end basis-1/5 me-12">
+                <div className="flex justify-end basis-1/5 me-8">
                   <div className="flex flex-col">
                     <label className="text-right font-medium text-small mb-2">Order #{order.orderid}</label>
                     <div className="flex">
@@ -184,11 +184,11 @@ export default function OrderList({ searchOrder, orderStatus, searchMonth, searc
                       )}
                       {order.orderstatus === "delivered" && (
                         <>
-                          <Link href="" className="me-3 text-custom-color2 underline text-small">
+                          <Link href="" className="me-2 text-custom-color2 underline text-small">
                             Receive Order
                           </Link>
                           <Divider orientation="vertical" />
-                          <Link href="" className="ms-3 text-custom-color2 underline text-small">
+                          <Link href="" className="ms-2 text-custom-color2 underline text-small">
                             Return Order
                           </Link>
                         </>
@@ -206,7 +206,7 @@ export default function OrderList({ searchOrder, orderStatus, searchMonth, searc
                 console.log(product);
                 return (
                   <div key={index}>
-                    <div className="flex flex-col mx-12 my-4">
+                    <div className="flex flex-col mx-8 my-4">
                       <div className="flex justify-start">
                         <div className="me-5">
                           <Image src={product.image} width={120} height={150} alt="Product Image" />
