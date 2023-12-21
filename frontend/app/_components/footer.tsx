@@ -1,3 +1,7 @@
+// Name: Zay Yar Tun
+// Admin No: 2235035
+// Class: DIT/FT/2B/02
+
 "use client";
 
 import { Image } from "@nextui-org/react";
@@ -13,7 +17,7 @@ export default function Footer() {
       <div className="flex mt-8 justify-start">
         <div className="flex flex-col me-60">
           <Link className="mt-3 text-slate-500 dark:text-slate-300 cursor-pointer hover:font-medium" href="/about">
-            About
+            About Us
           </Link>
           <Link className="mt-3 text-slate-500 dark:text-slate-300 cursor-pointer hover:font-medium" href="">
             Payment Methods
@@ -24,7 +28,7 @@ export default function Footer() {
           <Link className="mt-3 text-slate-500 dark:text-slate-300 cursor-pointer hover:font-medium" href="">
             Return and Refund
           </Link>
-          <Link className="mt-3 text-slate-500 dark:text-slate-300 cursor-pointer hover:font-medium" href="">
+          <Link className="mt-3 text-slate-500 dark:text-slate-300 cursor-pointer hover:font-medium" href="/contact">
             Contact Us
           </Link>
         </div>
@@ -86,7 +90,7 @@ export default function Footer() {
       <div className="flex mt-10 pt-6 border-t-2 justify-between text-slate-500 dark:text-slate-300">
         <label>&copy; 2023 DailyHype. All rights reserved</label>
         <div>
-          <Link className="cursor-pointer hover:font-medium me-8" href="">
+          <Link className="cursor-pointer hover:font-medium me-8" href="/privacypolicy">
             Privacy Policy
           </Link>
           <Link className="cursor-pointer hover:font-medium me-8" href="">

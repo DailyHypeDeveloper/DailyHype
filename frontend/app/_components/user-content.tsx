@@ -1,3 +1,7 @@
+// Name: Zay Yar Tun
+// Admin No: 2235035
+// Class: DIT/FT/2B/02
+
 "use client";
 
 import { useAppState } from "../app-provider";
@@ -23,7 +27,7 @@ export default function UserContent({ children }: { children: React.ReactNode })
         </Breadcrumbs>
         <div className="flex max-w-full mx-10 my-10">
           <UserSideBar />
-          <main className="flex basis-4/5">{children}</main>
+          <main className="flex max-w-full basis-4/5 mx-12">{children}</main>
         </div>
         <Footer></Footer>
       </>
