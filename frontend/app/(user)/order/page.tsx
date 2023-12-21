@@ -115,7 +115,7 @@ export default function Page() {
 
   return (
     <>
-      <div ref={orderDivRef} className="flex flex-col max-w-full py-10">
+      <div ref={orderDivRef} className="flex flex-col max-w-full">
         <h2 className="text-2xl font-medium uppercase tracking-wide">Your Orders</h2>
         <OrderFilter {...orderFilterProps} />
         <OrderList {...orderFilterDataProps} />

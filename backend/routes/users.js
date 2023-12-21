@@ -36,6 +36,7 @@ router.post('/login', function (req, res) {
             }
         });
 });
+//ok
 
 router.post('/signup', function (req, res) {
     const { name, email, password, phone, gender, address, region,role } = req.body;

@@ -29,7 +29,22 @@ const teams = [
   
   <b>My Portfolio Website:</b> <a href="https://www.facebook.com">https://www.facebook.com</a>`,
   },
-  { name: "Wai Yan Aung", image: "", position: `2<sup>nd</sup> Year DIT student`, description: "" },
+  { name: "Wai Yan Aung",
+    image: "https://res.cloudinary.com/dcrv5rnoy/image/upload/v1701608292/Design/xlu4rhgcqlhgqb07c3d2.jpg", 
+    position: `2<sup>nd</sup> Year DIT student`, 
+    description: ` I am currently studying at Singapore Polytechnic with a keen interest in building full-stack websites. I thrive on the balance between technology and creativity, constantly seeking new ways to blend my technical skills with my love for music and gaming.
+
+    <b>Modules Learnt: </b>
+    1. Enterprise Systems Development
+    2. Java Application Development
+    3. Application Development Studio (Current Project DailyHype)
+    4. Android Development
+    5. Mobile Application Development
+    6. Backend Web Development
+    7. Frontend Web Development 
+    
+    <b>My Portfolio Website:</b> <a href="https://charmtzy.github.io/portfoilio.github.io/">CharmTzy</a>`
+   },
   { name: "Ang Wei Liang", image: "", position: `2<sup>nd</sup> Year DIT student`, description: "" },
   { name: "Thu Htet San", image: "", position: `2<sup>nd</sup> Year DIT student`, description: "" },
   { name: "Angie", image: "", position: `2<sup>nd</sup> Year DIT student`, description: "" },
