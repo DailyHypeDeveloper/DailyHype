@@ -9,7 +9,7 @@ import { useAppState } from "@/app/app-provider";
 import { useEffect } from "react";
 
 export default function Cart() {
-  const { token, cart, setCart, setCurrentActivePage } = useAppState();
+  const { cart, setCart, setCurrentActivePage } = useAppState();
 
   useEffect(() => {
     setCurrentActivePage(CurrentActivePage.None);

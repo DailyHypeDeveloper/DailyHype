@@ -18,19 +18,21 @@ export default function UserContent({ children }: { children: React.ReactNode })
   const { isLoading, currentActivePage } = useAppState();
 
   return (
-    !isLoading && (
-      <>
-        <Header></Header>
-        <Breadcrumbs className="mx-10 mt-10">
-          <BreadcrumbItem href="/">Home</BreadcrumbItem>
-          <BreadcrumbItem>{capitaliseWord(currentActivePage)}</BreadcrumbItem>
-        </Breadcrumbs>
-        <div className="flex max-w-full mx-10 my-10">
-          <UserSideBar />
-          <main className="flex max-w-full basis-4/5 mx-12">{children}</main>
-        </div>
-        <Footer></Footer>
-      </>
-    )
+    <>
+      {!isLoading && (
+        <>
+          <Header></Header>
+          <Breadcrumbs className="mx-10 mt-10">
+            <BreadcrumbItem href="/">Home</BreadcrumbItem>
+            <BreadcrumbItem>{capitaliseWord(currentActivePage)}</BreadcrumbItem>
+          </Breadcrumbs>
+          <div className="flex max-w-full mx-10 my-10">
+            <UserSideBar />
+            <main className="flex w-full max-w-full basis-4/5 mx-12">{children}</main>
+          </div>
+          <Footer></Footer>
+        </>
+      )}
+    </>
   );
 }

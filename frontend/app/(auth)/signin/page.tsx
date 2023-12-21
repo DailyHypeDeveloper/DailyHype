@@ -1,14 +1,14 @@
 "use client";
-import React, {useState} from "react";
-import {Input} from "@nextui-org/react";
+import React, { useState } from "react";
+import { Input } from "@nextui-org/react";
 import Image from "next/image";
-import {useAppState} from "@/app/app-provider";
-import {useRouter} from "next/navigation";
+import { useAppState } from "@/app/app-provider";
+import { useRouter } from "next/navigation";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const {token, setToken, setCurrentActivePage} = useAppState();
+  const { setToken } = useAppState();
   const router = useRouter();
 
   const isValidEmail = (email: string) => {
@@ -29,7 +29,7 @@ export default function SignIn() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({email, password}),
+      body: JSON.stringify({ email, password }),
     })
       .then((response) => {
         if (response.status === 403) {
@@ -40,6 +40,7 @@ export default function SignIn() {
       .then((result) => {
         const token = result.token;
         console.log("Login successful! Token:", token);
+        localStorage.setItem("token", token);
         setToken(token);
         router.replace("/");
       })
@@ -61,32 +62,14 @@ export default function SignIn() {
         <h2 className="text-3xl text-center">Log in</h2>
         <form onSubmit={handleSubmit} className="w-full">
           <div className="mb-12">
-            <Input
-              type="email"
-              label="Email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full sm:w-[85%] h-10 border-none rounded-md text-base px-4 sm:px-24 block mx-auto "
-            />
+            <Input type="email" label="Email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full sm:w-[85%] h-10 border-none rounded-md text-base px-4 sm:px-24 block mx-auto " />
           </div>
           <div className="mb-16">
-            <Input
-              type="password"
-              label="Password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full sm:w-[85%] h-10 border-none rounded-md text-base px-4 sm:px-24 block mx-auto"
-            />
+            <Input type="password" label="Password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full sm:w-[85%] h-10 border-none rounded-md text-base px-4 sm:px-24 block mx-auto" />
           </div>
 
           <div className="w-full flex flex-col items-center sm:flex-row sm:justify-center">
-            <button
-              type="submit"
-              className="bg-white text-black px-6 py-3 uppercase rounded-md hover:bg-gray-200 mb-2 sm:mb-0 sm:mr-4 md:mr-8 lg:mr-12 xl:mr-16 2xl:mr-52"
-              id="loginButton"
-            >
+            <button type="submit" className="bg-white text-black px-6 py-3 uppercase rounded-md hover:bg-gray-200 mb-2 sm:mb-0 sm:mr-4 md:mr-8 lg:mr-12 xl:mr-16 2xl:mr-52" id="loginButton">
               Log In
             </button>
             <a href="./signup" className="mt-2 sm:mt-0 hover:text-gray-200">
