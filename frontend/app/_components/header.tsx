@@ -13,7 +13,7 @@ import { validateToken } from "../_functions/common-functions";
 
 // header component for user
 export default function Header() {
-  const { token, userInfo, currentActivePage, cart } = useAppState();
+  const { token, setToken, userInfo, currentActivePage, cart } = useAppState();
   const { theme, setTheme } = useTheme();
   const router = useRouter();
 

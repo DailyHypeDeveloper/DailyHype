@@ -11,9 +11,7 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
-  Button,
-  RadioGroup,
-  Radio,
+  Button
 } from "@nextui-org/react";
 
 export default function Cart() {
