@@ -25,7 +25,9 @@ export enum CurrentActivePage {
 /**
  * enum used for url routing
  */
-export enum URL {}
+export enum URL {
+  Home = "/"
+}
 
 /**
  * enum used for error message

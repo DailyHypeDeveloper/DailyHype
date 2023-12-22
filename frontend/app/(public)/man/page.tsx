@@ -6,27 +6,13 @@ import { useEffect, useState } from "react";
 import React from "react";
 import { Listbox, ListboxItem, Switch, Card, CardBody, CardFooter, Image, Tooltip, Pagination, Input } from "@nextui-org/react";
 
-
-const ChevronRightIcon = (props) => (
-  <svg
-    aria-hidden="true"
-    fill="none"
-    focusable="false"
-    height="1em"
-    role="presentation"
-    stroke="currentColor"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    strokeWidth="1.5"
-    viewBox="0 0 24 24"
-    width="1em"
-    {...props}
-  >
+const ChevronRightIcon = (props: any) => (
+  <svg aria-hidden="true" fill="none" focusable="false" height="1em" role="presentation" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="1em" {...props}>
     <path d="m9 18 6-6-6-6" />
   </svg>
 );
 
-const ItemCounter = ({ number }) => (
+const ItemCounter = ({ number }: { number: any }) => (
   <div className="flex items-center gap-1 text-default-400">
     <span className="text-small">{number}</span>
     <ChevronRightIcon className="text-xl" />
@@ -36,7 +22,7 @@ const ItemCounter = ({ number }) => (
 
 //get sidebar category by Type ID
 const getSidebarCategoryByType = () => {
-  const typeid = 1;//men
+  const typeid = 1; //men
   return fetch(`${process.env.BACKEND_URL}/api/categories/${typeid}`)
     .then((response) => {
       return response.json();
@@ -45,15 +31,14 @@ const getSidebarCategoryByType = () => {
       console.log(result.category);
       //result.category -> categoryid, categoryname, createdat, updatedat
       return result.category;
-    })
-}
+    });
+};
 
 const getProductData = () => {
-
   return Promise.all([getSidebarCategoryByType()]).then(([categoryResult]) => {
     return [categoryResult];
-  })
-}
+  });
+};
 
 export default function ManProduct() {
   const { setCurrentActivePage } = useAppState();
@@ -62,7 +47,7 @@ export default function ManProduct() {
   //card body start
   const [currentPage, setCurrentPage] = useState(1);
   const [isInvalid, setIsInvalid] = useState(false);
-  const [sidebarCategory, setSidebarCategory] = useState(null);
+  const [sidebarCategory, setSidebarCategory] = useState<any>(null);
   const [selectedSidebarCategory, setSelectedSidebarCategory] = useState();
   let sidebarCategories;
 
@@ -123,7 +108,7 @@ export default function ManProduct() {
     getProductData().then(([categoryResult]) => {
       setSidebarCategory(categoryResult);
       sidebarCategories = categoryResult;
-    })
+    });
   }, []);
 
   const handleItemsInputChange = (value: string) => {
@@ -134,12 +119,10 @@ export default function ManProduct() {
     } else {
       setIsInvalid(true);
     }
-  }
+  };
 
   return (
     <div className="flex">
-
-
       <Listbox
         aria-label="User Menu"
         onAction={(key) => alert(key)}
@@ -148,13 +131,9 @@ export default function ManProduct() {
           base: "px-3 first:rounded-t-medium last:rounded-b-medium rounded-none gap-3 h-12 data-[hover=true]:bg-default-100/80",
         }}
       >
-
-        {sidebarCategory !==null ? (
-          sidebarCategory.map((item, index) => (
-            <ListboxItem
-              key={item.categoryid}
-              endContent={<ItemCounter number={13} />}
-            >
+        {sidebarCategory !== null ? (
+          sidebarCategory.map((item: any, index: number) => (
+            <ListboxItem key={item.categoryid} endContent={<ItemCounter number={13} />}>
               {item.categoryname}
             </ListboxItem>
           ))
@@ -163,48 +142,22 @@ export default function ManProduct() {
           <div>Loading...</div>
         )}
 
-
-        <ListboxItem
-          key="issues"
-          endContent={<ItemCounter number={13} />}
-        >
+        <ListboxItem key="issues" endContent={<ItemCounter number={13} />}>
           Issues
         </ListboxItem>
-        <ListboxItem
-          key="pull_requests"
-          endContent={<ItemCounter number={6} />}
-
-        >
+        <ListboxItem key="pull_requests" endContent={<ItemCounter number={6} />}>
           Pull Requests
         </ListboxItem>
-        <ListboxItem
-          key="discussions"
-          endContent={<ItemCounter number={293} />}
-
-        >
+        <ListboxItem key="discussions" endContent={<ItemCounter number={293} />}>
           Discussions
         </ListboxItem>
-        <ListboxItem
-          key="actions"
-          endContent={<ItemCounter number={2} />}
-
-        >
+        <ListboxItem key="actions" endContent={<ItemCounter number={2} />}>
           Actions
         </ListboxItem>
-        <ListboxItem
-          key="projects"
-          endContent={<ItemCounter number={4} />}
-
-        >
+        <ListboxItem key="projects" endContent={<ItemCounter number={4} />}>
           Projects
         </ListboxItem>
-        <ListboxItem
-          key="releases"
-          className="group h-auto py-3"
-          endContent={<ItemCounter number={399} />}
-
-          textValue="Releases"
-        >
+        <ListboxItem key="releases" className="group h-auto py-3" endContent={<ItemCounter number={399} />} textValue="Releases">
           <div className="flex flex-col gap-1">
             <span>Releases</span>
             <div className="px-2 py-1 rounded-small bg-default-100 group-data-[hover=true]:bg-default-200">
@@ -216,25 +169,13 @@ export default function ManProduct() {
             </div>
           </div>
         </ListboxItem>
-        <ListboxItem
-          key="contributors"
-          endContent={<ItemCounter number={79} />}
-
-        >
+        <ListboxItem key="contributors" endContent={<ItemCounter number={79} />}>
           Contributors
         </ListboxItem>
-        <ListboxItem
-          key="watchers"
-          endContent={<ItemCounter number={82} />}
-
-        >
+        <ListboxItem key="watchers" endContent={<ItemCounter number={82} />}>
           Watchers
         </ListboxItem>
-        <ListboxItem
-          key="license"
-          endContent={<span className="text-small text-default-400">MIT</span>}
-
-        >
+        <ListboxItem key="license" endContent={<span className="text-small text-default-400">MIT</span>}>
           License
         </ListboxItem>
       </Listbox>
@@ -243,23 +184,21 @@ export default function ManProduct() {
         <h1 className="text-2xl font-semibold">Women Jumpsuits & Bodysuits</h1>
         <div className="flex justify-end m-2 gap-2">
           <h5 className="font-medium text-sm mt-0.5">Show Only In stock Items</h5>
-          <Switch defaultSelected color="success" size="sm" onValueChange={(isSelected: boolean) => { setIsInStock(isSelected); }}></Switch>
+          <Switch
+            defaultSelected
+            color="success"
+            size="sm"
+            onValueChange={(isSelected: boolean) => {
+              setIsInStock(isSelected);
+            }}
+          ></Switch>
         </div>
         <div className="gap-5 m-5 grid sm:grid-cols-2 lg:grid-cols-4 md:grid-cols-3">
           {list.map((item, index) => (
-
-            <Tooltip key={index} color={'warning'} content={item.title} className="capitalize">
+            <Tooltip key={index} color={"warning"} content={item.title} className="capitalize">
               <Card shadow="sm" key={index} isPressable onPress={() => console.log("item pressed")}>
                 <CardBody className="overflow-visible p-0">
-                  <Image
-                    shadow="sm"
-                    radius="lg"
-                    width="100%"
-                    alt={item.title}
-                    className="w-full object-cover h-[140px]"
-                    src={item.img}
-                  />
-
+                  <Image shadow="sm" radius="lg" width="100%" alt={item.title} className="w-full object-cover h-[140px]" src={item.img} />
                 </CardBody>
                 <CardBody className="mt-2 py-0 ">
                   <b>{item.title}</b>
@@ -269,7 +208,6 @@ export default function ManProduct() {
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="fill-yellow-400 stroke-0 hover:stroke-2 stroke-yellow-400 w-6 h-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
                   </svg>
-
                 </CardFooter>
                 <CardBody className="mb-1 py-0">
                   <p className="text-default-500">${item.price}</p>
@@ -290,11 +228,10 @@ export default function ManProduct() {
               isInvalid={isInvalid}
               color={isInvalid ? "danger" : "success"}
               errorMessage={isInvalid && "Please enter number between 20 and 100"}
-              startContent={
-                <div className="sm pointer-events-none flex items-center">
-                </div>
-              }
-              onValueChange={(value: string) => { handleItemsInputChange(value) }}
+              startContent={<div className="sm pointer-events-none flex items-center"></div>}
+              onValueChange={(value: string) => {
+                handleItemsInputChange(value);
+              }}
             />
           </div>
           <div className="flex flex-col items-center gap-3">

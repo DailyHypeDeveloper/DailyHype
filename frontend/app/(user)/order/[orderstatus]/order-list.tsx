@@ -175,7 +175,9 @@ export default function OrderList({ searchOrder, orderStatus, searchMonth, searc
                 </div>
                 <div className="flex justify-end basis-1/5 me-8">
                   <div className="flex flex-col">
-                    <label className="text-right font-medium text-small mb-2">Order #{order.orderid}</label>
+                    <Link href={`/order/orderdetail/${order.orderid}`} className="text-right text-black dark:text-white underline font-medium text-small mb-2">
+                      Order #{order.orderid}
+                    </Link>
                     <div className="flex">
                       {order.orderstatus === "in progress" && (
                         <Link href="" className="text-custom-color2 underline text-small">

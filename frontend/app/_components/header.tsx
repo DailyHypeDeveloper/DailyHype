@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { useAppState } from "../app-provider";
 import { useTheme } from "next-themes";
 import { validateToken } from "../_functions/common-functions";
+import { URL } from "../_enums/global-enums";
 
 // header component for user
 export default function Header() {
@@ -107,7 +108,7 @@ export default function Header() {
                   onClick={() => {
                     localStorage.removeItem("token");
                     setToken(null);
-                    router.replace("/");
+                    router.replace(URL.Home);
                   }}
                   key="logout"
                   color="danger"

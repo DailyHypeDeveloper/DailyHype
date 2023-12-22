@@ -7,7 +7,7 @@
 
 import { Accordion, AccordionItem, Divider, Link, Selection } from "@nextui-org/react";
 import { useAppState } from "../app-provider";
-import { CurrentActivePage } from "../_enums/global-enums";
+import { CurrentActivePage, URL } from "../_enums/global-enums";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -106,7 +106,7 @@ export default function UserSideBar() {
         onClick={() => {
           localStorage.removeItem("token");
           setToken(null);
-          router.replace("/");
+          router.replace(URL.Home);
         }}
         className="my-2 cursor-pointer text-medium text-black font-semibold dark:text-white"
       >
