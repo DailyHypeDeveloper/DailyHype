@@ -2,7 +2,7 @@
 
 import { useAppState } from "@/app/app-provider";
 import { useEffect } from "react";
-import { CurrentActivePage } from "@/app/_enums/global-enums";
+import { CurrentActivePage, URL } from "@/app/_enums/global-enums";
 import { useRouter } from "next/navigation";
 
 export default function Cart() {
@@ -15,7 +15,7 @@ export default function Cart() {
       alert("Unauthorized Access!");
       localStorage.removeItem("token");
       setToken(null);
-      router.replace("/signin");
+      router.replace(URL.SignIn);
     }
   }, []);
 

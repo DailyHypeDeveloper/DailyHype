@@ -19,7 +19,9 @@ const config: Config = {
         'custom-color1': '#764BA2',
         'custom-color2': '#667EEA',
         'custom-color3': '#10182F',
-        'custom-color4': '#fb6050'
+        'custom-color4': '#fb6050',
+        'logo-color': '#fb6050',
+        'logo-color-lighter': '#ffe7e2'
       }
     },
   },

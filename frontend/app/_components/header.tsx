@@ -9,7 +9,8 @@ import { Image, Link, Button, Input, Avatar, Badge, Dropdown, DropdownTrigger, D
 import { useRouter } from "next/navigation";
 import { useAppState } from "../app-provider";
 import { useTheme } from "next-themes";
-import { validateToken } from "../_functions/common-functions";
+import { validateAdminToken, validateUserToken } from "../_functions/common-functions";
+import { URL } from "../_enums/global-enums";
 
 // header component for user
 export default function Header() {
@@ -21,12 +22,19 @@ export default function Header() {
   // this will validate the token
   useEffect(() => {
     if (token) {
-      validateToken(token).then((result) => {
+      validateUserToken(token).then((result) => {
         if (!result) {
-          alert("Token Expired!");
-          localStorage.removeItem("token");
-          setToken(null);
-          router.replace("/signin");
+          validateAdminToken(token).then((result) => {
+            if(!result) {
+              alert("Token Expired!");
+              localStorage.removeItem("token");
+              setToken(null);
+              router.replace(URL.SignIn);
+            }
+            else {
+              router.replace(URL.Dashboard);
+            }
+          })
         }
       });
     }
@@ -39,7 +47,7 @@ export default function Header() {
       </Link>
       <div className="flex flex-1 justify-between items-center ms-4">
         <nav className="flex justify-start">
-          <Link href="/" className={`${currentActivePage === "home" ? "text-black font-medium dark:text-white" : "text-slate-500 dark:text-slate-300"} ms-8 cursor-pointer hover:font-medium hover:text-black`}>
+          <Link href={URL.Home} className={`${currentActivePage === "home" ? "text-black font-medium dark:text-white" : "text-slate-500 dark:text-slate-300"} ms-8 cursor-pointer hover:font-medium hover:text-black`}>
             <span>Home</span>
           </Link>
           <Link href="/man" className={`${currentActivePage === "man" ? "text-black font-medium dark:text-white" : "text-slate-500 dark:text-slate-300"} ms-8 cursor-pointer hover:font-medium hover:text-black`}>
@@ -121,7 +129,7 @@ export default function Header() {
             <>
               <Button
                 onClick={() => {
-                  router.push("/signin");
+                  router.push(URL.SignIn);
                 }}
                 variant="ghost"
                 className="ms-6"

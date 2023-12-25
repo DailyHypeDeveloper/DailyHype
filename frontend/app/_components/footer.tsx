@@ -7,16 +7,17 @@
 import { Image } from "@nextui-org/react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
+import { URL } from "../_enums/global-enums";
 
 export default function Footer() {
   const { theme } = useTheme();
 
   return (
     <footer className="flex flex-col dark:bg-slate-900 bg-slate-50 max-w-full px-36 py-10 border-t-2 border-slate-300">
-      <label className="tracking-wide uppercase text-lg font-medium">dailyhype</label>
+      <label className="tracking-wide uppercase text-2xl font-medium">dailyhype</label>
       <div className="flex mt-8 justify-start">
         <div className="flex flex-col me-60">
-          <Link className="mt-3 text-slate-500 dark:text-slate-300 cursor-pointer hover:font-medium" href="/about">
+          <Link className="mt-3 text-slate-500 dark:text-slate-300 cursor-pointer hover:font-medium" href={URL.About}>
             About Us
           </Link>
           <Link className="mt-3 text-slate-500 dark:text-slate-300 cursor-pointer hover:font-medium" href="">
@@ -36,10 +37,10 @@ export default function Footer() {
           <Link className="mt-3 text-slate-500 dark:text-slate-300 cursor-pointer hover:font-medium" href="">
             Feedback
           </Link>
-          <Link className="mt-3 text-slate-500 dark:text-slate-300 cursor-pointer hover:font-medium" href="">
+          <Link className="mt-3 text-slate-500 dark:text-slate-300 cursor-pointer hover:font-medium" href={URL.FAQ}>
             FAQ
           </Link>
-          <Link className="mt-3 text-slate-500 dark:text-slate-300 cursor-pointer hover:font-medium" href="">
+          <Link className="mt-3 text-slate-500 dark:text-slate-300 cursor-pointer hover:font-medium" href={URL.Help}>
             Help and Support
           </Link>
         </div>

@@ -19,13 +19,25 @@ export enum CurrentActivePage {
   CancelledOrder = "cancelled orders",
   ReturnedOrder = "returned orders",
   AllDelivery = "all deliveries",
+  Dashboard = "dashboard",
+  Forms = "forms",
+  UserForm = "user form",
   None = "none",
 }
 
 /**
  * enum used for url routing
  */
-export enum URL {}
+export enum URL {
+  Home = "/",
+  SignIn = "/signin",
+  SignUp = "/signup",
+  About = "/about",
+  FAQ = "/faq",
+  Help = "/help",
+  Dashboard = "/dashboard",
+  UserForm = ""
+}
 
 /**
  * enum used for error message

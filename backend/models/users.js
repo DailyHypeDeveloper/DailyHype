@@ -10,9 +10,10 @@ const cloudinary = require("../cloudinary");
 
 module.exports.checkLogin = function checkLogin(loginEmail, loginPassword) {
     const sql = `
-        SELECT u.email, u.userID, u.name, u.password, u.role, i.url FROM appuser u, image i 
-        WHERE u.email = $1 
-        AND i.imageid = u.imageid`;
+        SELECT u.email, u.userID, u.name, u.password, u.role, i.url 
+        FROM appuser u
+        LEFT JOIN image i ON i.imageid= u.imageid
+        WHERE u.email = $1 `;
     return query(sql, [loginEmail])
         .then(function (result) {
             const rows = result.rows;
