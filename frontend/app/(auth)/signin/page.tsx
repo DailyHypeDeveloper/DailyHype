@@ -4,7 +4,7 @@ import { Input } from "@nextui-org/react";
 import Image from "next/image";
 import { useAppState } from "@/app/app-provider";
 import { useRouter } from "next/navigation";
-import { URL } from "@/app/_enums/global-enums";
+import { ErrorMessage, URL } from "@/app/_enums/global-enums";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -34,7 +34,7 @@ export default function SignIn() {
     })
       .then((response) => {
         if (response.status === 403) {
-          throw new Error("Unauthorized Access");
+          throw new Error(ErrorMessage.Unauthorized);
         }
         return response.json();
       })
@@ -44,7 +44,7 @@ export default function SignIn() {
         setUserInfo({ name: user.name, email: user.email, image: user.url, role: user.role });
         localStorage.setItem("token", token);
         setToken(token);
-        router.push("/");
+        router.push(URL.Home);
       })
       .catch((error) => {
         console.error("Login failed:", error.message);
