@@ -1,7 +1,3 @@
-// Name: Zay Yar Tun
-// Admin No: 2235035
-// Class: DIT/FT/2B/02
-
 "use client";
 
 import React, { useEffect } from "react";
@@ -25,16 +21,15 @@ export default function Header() {
       validateUserToken(token).then((result) => {
         if (!result) {
           validateAdminToken(token).then((result) => {
-            if(!result) {
+            if (!result) {
               alert("Token Expired!");
               localStorage.removeItem("token");
               setToken(null);
               router.replace(URL.SignIn);
-            }
-            else {
+            } else {
               router.replace(URL.Dashboard);
             }
-          })
+          });
         }
       });
     }
@@ -42,7 +37,7 @@ export default function Header() {
 
   return (
     <header className="flex items-center h-[75px] px-12 justify-start dark:bg-slate-900 bg-slate-50 border-b-2 border-slate-300">
-      <Link href="/" className="flex dark:text-slate-200 uppercase font-semibold text-slate-900 tracking-wider ml-2 text-3xl">
+      <Link href={URL.Home} className="flex dark:text-slate-200 uppercase font-semibold text-slate-900 tracking-wider ml-2 text-3xl">
         dailyhype
       </Link>
       <div className="flex flex-1 justify-between items-center ms-4">
@@ -50,23 +45,23 @@ export default function Header() {
           <Link href={URL.Home} className={`${currentActivePage === "home" ? "text-black font-medium dark:text-white" : "text-slate-500 dark:text-slate-300"} ms-8 cursor-pointer hover:font-medium hover:text-black`}>
             <span>Home</span>
           </Link>
-          <Link href="/man" className={`${currentActivePage === "man" ? "text-black font-medium dark:text-white" : "text-slate-500 dark:text-slate-300"} ms-8 cursor-pointer hover:font-medium hover:text-black`}>
+          <Link href={URL.Man} className={`${currentActivePage === "man" ? "text-black font-medium dark:text-white" : "text-slate-500 dark:text-slate-300"} ms-8 cursor-pointer hover:font-medium hover:text-black`}>
             Man
           </Link>
-          <Link href="/woman" className={`${currentActivePage === "woman" ? "text-black font-medium dark:text-white" : "text-slate-500 dark:text-slate-300"} ms-8 cursor-pointer hover:font-medium hover:text-black`}>
+          <Link href={URL.Woman} className={`${currentActivePage === "woman" ? "text-black font-medium dark:text-white" : "text-slate-500 dark:text-slate-300"} ms-8 cursor-pointer hover:font-medium hover:text-black`}>
             Woman
           </Link>
-          <Link href="/kid" className={`${currentActivePage === "kid" ? "text-black font-medium dark:text-white" : "text-slate-500 dark:text-slate-300"} ms-8 cursor-pointer hover:font-medium hover:text-black`}>
+          <Link href={URL.Kid} className={`${currentActivePage === "kid" ? "text-black font-medium dark:text-white" : "text-slate-500 dark:text-slate-300"} ms-8 cursor-pointer hover:font-medium hover:text-black`}>
             Kid
           </Link>
-          <Link href="/baby" className={`${currentActivePage === "baby" ? "text-black font-medium dark:text-white" : "text-slate-500 dark:text-slate-300"} ms-8 cursor-pointer hover:font-medium hover:text-black`}>
+          <Link href={URL.Baby} className={`${currentActivePage === "baby" ? "text-black font-medium dark:text-white" : "text-slate-500 dark:text-slate-300"} ms-8 cursor-pointer hover:font-medium hover:text-black`}>
             Baby
           </Link>
         </nav>
         <nav className="flex flex-1 justify-end items-center">
           <Input type="text" placeholder="Search Product" className="max-w-[300px] me-6" size="sm" variant="bordered" radius="sm" startContent={theme === "dark" ? <Image width={20} src="/icons/search-dark.svg" className="flex items-center justify-center" alt="Search Icon" /> : <Image width={20} src="/icons/search.svg" className="flex items-center justify-center" alt="Search Icon" />} />
           <Badge content={cart ? cart.length : 0} className="bg-custom-color2 text-white" size="md">
-            <Link href="/cart" className="px-2 py-1 hover:dark:bg-slate-700 hover:bg-slate-200 rounded-md cursor-pointer" title="Shopping Bag">
+            <Link href={URL.Cart} className="px-2 py-1 hover:dark:bg-slate-700 hover:bg-slate-200 rounded-md cursor-pointer" title="Shopping Bag">
               {theme === "dark" ? <Image src="/icons/shopping-bag-dark.svg" radius="none" width={25} alt="Shopping Cart Icon" /> : <Image src="/icons/shopping-bag.svg" radius="none" width={25} alt="Shopping Cart Icon" />}
             </Link>
           </Badge>
@@ -97,17 +92,17 @@ export default function Header() {
                 <Avatar as="button" className="transition-transform ms-8 border-2 border-gray-400" src={userInfo.image ? userInfo.image : theme === "light" ? "/icons/user.svg" : "/icons/user-dark.svg"} />
               </DropdownTrigger>
               <DropdownMenu aria-label="Profile Actions" variant="flat">
-                <DropdownItem aria-label="User Information" href="/personal" key="info" className="h-14 gap-2">
+                <DropdownItem aria-label="User Information" href={URL.Personal} key="info" className="h-14 gap-2">
                   <p className="font-medium">Signed in as</p>
                   <p className="font-medium">{userInfo.email}</p>
                 </DropdownItem>
-                <DropdownItem aria-label="Profile" href="/profile" key="profile">
+                <DropdownItem aria-label="Profile" href={URL.Profile}key="profile">
                   Profile
                 </DropdownItem>
-                <DropdownItem aria-label="Order" href="/order/all" key="order">
+                <DropdownItem aria-label="Order" href={URL.AllOrder} key="order">
                   Order
                 </DropdownItem>
-                <DropdownItem aria-label="Delivery" href="/delivery" key="delivery">
+                <DropdownItem aria-label="Delivery" href={URL.Delivery} key="delivery">
                   Delivery
                 </DropdownItem>
                 <DropdownItem
@@ -115,7 +110,7 @@ export default function Header() {
                   onClick={() => {
                     localStorage.removeItem("token");
                     setToken(null);
-                    router.replace("/");
+                    router.replace(URL.Home);
                   }}
                   key="logout"
                   color="danger"
@@ -138,7 +133,7 @@ export default function Header() {
               </Button>
               <Button
                 onClick={() => {
-                  router.push("/signup");
+                  router.push(URL.SignUp);
                 }}
                 className="ms-4 text-white bg-gradient-to-r from-custom-color1 to-custom-color2"
               >
