@@ -41,7 +41,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
   useEffect(() => {
     setToken(localStorage.getItem("token"));
     setCart(JSON.parse(localStorage.getItem("cart") ?? "[]"));
-    const user = sessionStorage.getItem("user");
+    const user = localStorage.getItem("user");
     if (user) {
       setUserInfo(JSON.parse(user));
     }
@@ -50,7 +50,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     if (userInfo.name && userInfo.email && userInfo.image && userInfo.role) {
-      sessionStorage.setItem("user", JSON.stringify(userInfo));
+      localStorage.setItem("user", JSON.stringify(userInfo));
     }
   }, [userInfo]);
 

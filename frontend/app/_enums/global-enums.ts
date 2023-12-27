@@ -20,7 +20,6 @@ export enum CurrentActivePage {
   ReturnedOrder = "returned orders",
   AllDelivery = "all deliveries",
   Dashboard = "dashboard",
-  Forms = "forms",
   UserForm = "user form",
   None = "none",
 }
@@ -30,13 +29,27 @@ export enum CurrentActivePage {
  */
 export enum URL {
   Home = "/",
+  Man = "/man",
+  Woman = "/woman",
+  Kid = "/kid",
+  Baby = "/baby",
+  Cart = "/cart",
+  Personal = "/personal",
+  Profile = "/profile",
+  AllOrder = "/order/all",
+  Delivery = "/delivery",
   SignIn = "/signin",
   SignUp = "/signup",
   About = "/about",
-  FAQ = "/faq",
+  Contact = "/contact",
+  Feedback = "/feedback",
   Help = "/help",
+  PrivacyPolicy = "/privacypolicy",
+  TermsNConditions = "/terms",
+  SiteMap = "/sitemap",
   Dashboard = "/dashboard",
-  UserForm = ""
+  UserForm = "/form/user",
+  ProductForm = "/form/product"
 }
 
 /**

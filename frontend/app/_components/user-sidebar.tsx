@@ -7,7 +7,7 @@
 
 import { Accordion, AccordionItem, Divider, Link, Selection } from "@nextui-org/react";
 import { useAppState } from "../app-provider";
-import { CurrentActivePage } from "../_enums/global-enums";
+import { CurrentActivePage, URL } from "../_enums/global-enums";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -31,13 +31,13 @@ export default function UserSideBar() {
 
   return (
     <div className="flex flex-col basis-1/5 items-start">
-      <Link href="/personal" className="mb-5 text-large text-black font-semibold dark:text-white">
+      <Link href={URL.Personal} className="mb-5 text-large text-black font-semibold dark:text-white">
         Personal Center
       </Link>
       <Accordion selectedKeys={selectedKeys} onSelectionChange={setSelectedKeys} className="m-0 p-0" selectionMode="multiple" isCompact>
         <AccordionItem key="1" className="font-semibold" aria-label="My Account" title="My Account">
           <div className="flex flex-col cursor-default">
-            <Link className={`text-small indent-3 text-slate-800 dark:text-slate-200 mt-2 mb-4 ${currentActivePage === CurrentActivePage.Profile ? "font-semibold" : "font-normal"}`} href="/profile">
+            <Link className={`text-small indent-3 text-slate-800 dark:text-slate-200 mt-2 mb-4 ${currentActivePage === CurrentActivePage.Profile ? "font-semibold" : "font-normal"}`} href={URL.Profile}>
               My Profile
             </Link>
             <Link className={`text-small indent-3 text-slate-800 dark:text-slate-200 mb-4 ${currentActivePage === CurrentActivePage.AddressBook ? "font-semibold" : "font-normal"}`} href="">
@@ -50,7 +50,7 @@ export default function UserSideBar() {
         </AccordionItem>
         <AccordionItem key="2" className="font-semibold" aria-label="My Orders" title="My Orders">
           <div className="flex flex-col cursor-default">
-            <Link className={`text-small indent-3 text-slate-800 dark:text-slate-200 mt-2 mb-4 ${currentActivePage === CurrentActivePage.AllOrder ? "font-semibold" : "font-normal"}`} href="/order/all">
+            <Link className={`text-small indent-3 text-slate-800 dark:text-slate-200 mt-2 mb-4 ${currentActivePage === CurrentActivePage.AllOrder ? "font-semibold" : "font-normal"}`} href={URL.AllOrder}>
               All Orders
             </Link>
             <Link className={`text-small indent-3 text-slate-800 dark:text-slate-200 mb-4 ${currentActivePage === CurrentActivePage.InProgressOrder ? "font-semibold" : "font-normal"}`} href="/order/inprogress">
@@ -75,7 +75,7 @@ export default function UserSideBar() {
         </AccordionItem>
         <AccordionItem key="3" className="font-semibold" aria-label="My Deliveries" title="My Deliveries">
           <div className="flex flex-col cursor-default">
-            <Link className={`text-small indent-3 text-slate-800 dark:text-slate-200 mb-4 ${currentActivePage === CurrentActivePage.AllDelivery ? "font-semibold" : "font-normal"}`} href="/delivery">
+            <Link className={`text-small indent-3 text-slate-800 dark:text-slate-200 mb-4 ${currentActivePage === CurrentActivePage.AllDelivery ? "font-semibold" : "font-normal"}`} href={URL.Delivery}>
               All Deliveries
             </Link>
           </div>
@@ -106,7 +106,7 @@ export default function UserSideBar() {
         onClick={() => {
           localStorage.removeItem("token");
           setToken(null);
-          router.replace("/");
+          router.replace(URL.Home);
         }}
         className="my-2 cursor-pointer text-medium text-black font-semibold dark:text-white"
       >
