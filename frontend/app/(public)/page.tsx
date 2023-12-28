@@ -1,18 +1,4 @@
-"use client";
-
-import {useEffect, useState} from "react";
-import {useAppState} from "../app-provider";
-import {Button, Divider, Image, Link} from "@nextui-org/react";
-
-const getLatestProducts = () => {
-  return fetch(`${process.env.BACKEND_URL}/api/latestproduct/6`, {
-    method: "GET",
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      return data.product;
-    });
-};
+import {currentUser} from "@clerk/nextjs";
 
 export default function Home() {
   const {setCurrentActivePage} = useAppState();
