@@ -4,6 +4,7 @@ import { Input } from "@nextui-org/react";
 import Image from "next/image";
 import { useAppState } from "@/app/app-provider";
 import { useRouter } from "next/navigation";
+import { ErrorMessage, URL } from "@/app/_enums/global-enums";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -33,7 +34,7 @@ export default function SignIn() {
     })
       .then((response) => {
         if (response.status === 403) {
-          throw new Error("Unauthorized Access");
+          throw new Error(ErrorMessage.Unauthorized);
         }
         return response.json();
       })
@@ -43,7 +44,7 @@ export default function SignIn() {
         setUserInfo({ name: user.name, email: user.email, image: user.url, role: user.role });
         localStorage.setItem("token", token);
         setToken(token);
-        router.push("/");
+        router.push(URL.Home);
       })
       .catch((error) => {
         console.error("Login failed:", error.message);
@@ -53,7 +54,7 @@ export default function SignIn() {
   return (
     <div className="w-full min-h-screen grid grid-cols-1 sm:grid-cols-2">
       <div className="left w-full sm:min-h-full flex justify-center items-center flex-col p-8">
-        <a href="/signin" className="logo-box">
+        <a href={URL.Home} className="logo-box">
           <Image src="/images/logo.png" alt="Logo" width={300} height={150} />
         </a>
         <p className="text-center mt-4">Stay Tuned, stay Hyped!</p>

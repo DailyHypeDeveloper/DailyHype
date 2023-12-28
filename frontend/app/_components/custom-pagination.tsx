@@ -9,7 +9,7 @@
 import { Pagination, PaginationItemType, PaginationItemRenderProps } from "@nextui-org/react";
 import { clsx as cn } from "clsx";
 
-export default function CustomPagination({ total, initialPage, className, onChange }: { total: number; initialPage: number; className?: string; onChange?: (current: number) => void }) {
+export default function CustomPagination({ total, currentPage, className, onChange }: { total: number; currentPage: number; className?: string; onChange?: (current: number) => void }) {
   const renderItem = ({ ref, key, value, isActive, onNext, onPrevious, setPage, className }: PaginationItemRenderProps) => {
     if (value === PaginationItemType.NEXT) {
       return (
@@ -50,7 +50,7 @@ export default function CustomPagination({ total, initialPage, className, onChan
         disableCursorAnimation
         showControls
         total={total}
-        initialPage={initialPage}
+        page={currentPage}
         className={cn("gap-2", `${className} gap-2`)}
         onChange={(current) => {
           onChange && onChange(current);

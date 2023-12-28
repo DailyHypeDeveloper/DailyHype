@@ -1,22 +1,19 @@
-// Name: Zay Yar Tun
-// Admin No: 2235035
-// Class: DIT/FT/2B/02
-
 "use client";
 
 import { Image } from "@nextui-org/react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
+import { URL } from "../_enums/global-enums";
 
 export default function Footer() {
   const { theme } = useTheme();
 
   return (
     <footer className="flex flex-col dark:bg-slate-900 bg-slate-50 max-w-full px-36 py-10 border-t-2 border-slate-300">
-      <label className="tracking-wide uppercase text-lg font-medium">dailyhype</label>
+      <label className="tracking-wide uppercase text-2xl font-medium">dailyhype</label>
       <div className="flex mt-8 justify-start">
         <div className="flex flex-col me-60">
-          <Link className="mt-3 text-slate-500 dark:text-slate-300 cursor-pointer hover:font-medium" href="/about">
+          <Link className="mt-3 text-slate-500 dark:text-slate-300 cursor-pointer hover:font-medium" href={URL.About}>
             About Us
           </Link>
           <Link className="mt-3 text-slate-500 dark:text-slate-300 cursor-pointer hover:font-medium" href="">
@@ -28,19 +25,16 @@ export default function Footer() {
           <Link className="mt-3 text-slate-500 dark:text-slate-300 cursor-pointer hover:font-medium" href="">
             Return and Refund
           </Link>
-          <Link className="mt-3 text-slate-500 dark:text-slate-300 cursor-pointer hover:font-medium" href="/contact">
-            Contact Us
-          </Link>
         </div>
         <div className="flex flex-col">
-          <Link className="mt-3 text-slate-500 dark:text-slate-300 cursor-pointer hover:font-medium" href="">
+          <Link className="mt-3 text-slate-500 dark:text-slate-300 cursor-pointer hover:font-medium" href={URL.Feedback}>
             Feedback
           </Link>
-          <Link className="mt-3 text-slate-500 dark:text-slate-300 cursor-pointer hover:font-medium" href="">
-            FAQ
-          </Link>
-          <Link className="mt-3 text-slate-500 dark:text-slate-300 cursor-pointer hover:font-medium" href="">
+          <Link className="mt-3 text-slate-500 dark:text-slate-300 cursor-pointer hover:font-medium" href={URL.Help}>
             Help and Support
+          </Link>
+          <Link className="mt-3 text-slate-500 dark:text-slate-300 cursor-pointer hover:font-medium" href={URL.Contact}>
+            Contact Us
           </Link>
         </div>
         <div className="flex flex-col max-w-sm ms-auto">
@@ -90,13 +84,13 @@ export default function Footer() {
       <div className="flex mt-10 pt-6 border-t-2 justify-between text-slate-500 dark:text-slate-300">
         <label>&copy; 2023 DailyHype. All rights reserved</label>
         <div>
-          <Link className="cursor-pointer hover:font-medium me-8" href="/privacypolicy">
+          <Link className="cursor-pointer hover:font-medium me-8" href={URL.PrivacyPolicy}>
             Privacy Policy
           </Link>
-          <Link className="cursor-pointer hover:font-medium me-8" href="">
+          <Link className="cursor-pointer hover:font-medium me-8" href={URL.TermsNConditions}>
             Terms and Conditions
           </Link>
-          <Link className="cursor-pointer hover:font-medium" href="">
+          <Link className="cursor-pointer hover:font-medium" href={URL.SiteMap}>
             Sitemap
           </Link>
         </div>

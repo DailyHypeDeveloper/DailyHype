@@ -149,7 +149,7 @@ const getProductWithImageAndColour = (categoryid: number, noOfItems: number, cur
       return Promise.all(productDataArr);
     })
     .then((result) => {
-      console.log(result);
+      // console.log(result);
       return result;
     });
 };
@@ -197,7 +197,7 @@ export default function ManProduct() {
   useEffect(() => {
     getProductWithImageAndColour(selectedCategoryID.values().next().value, noOfItems, currentPage, isInStock)
       .then((productDataArray: Product[]) => {
-        setProductArr(productDataArray);
+        if (productDataArray) setProductArr(productDataArray);
       })
       .catch((error) => {
         console.log(error);
@@ -206,14 +206,19 @@ export default function ManProduct() {
 
   useEffect(() => {
     getTotalPages(selectedCategoryID.values().next().value, isInStock, noOfItems)
-      .then((totalPage) => {
+      .then((totalPage = 1) => {
+        console.log(totalPage);
         setCurrentPage(1);
-        setTotalPages(totalPage);
+        if (!isNaN(totalPage)) setTotalPages(totalPage);
       })
       .catch((error) => {
         console.log(error);
       });
   }, [noOfItems]);
+
+  useEffect(() => {
+    console.log("Current " + currentPage);
+  }, [currentPage]);
 
   const handleItemsInputChange = (value: string) => {
     const newValue = parseInt(value, 10);
@@ -229,6 +234,7 @@ export default function ManProduct() {
   //   () => Array.from(selectedCategoryID).join(", "),
   //   [selectedCategoryID]
   // );
+  // console.log(totalPages);
 
   return (
     <div className="flex">
@@ -262,11 +268,8 @@ export default function ManProduct() {
           <h5 className="font-medium text-sm mt-0.5">Show Only In stock Items</h5>
           <Switch
             defaultSelected
+            color="success"
             size="sm"
-            classNames={{
-              wrapper: "bg-yellow-500 group-data-[selected=true]:bg-black",
-              thumb: "bg-white group-data-[selected=true]:bg-slate-700",
-            }}
             onValueChange={(isSelected: boolean) => {
               setIsInStock(isSelected);
             }}
@@ -319,7 +322,7 @@ export default function ManProduct() {
               {" "}
               page {currentPage} of {totalPages}
             </p>
-            <CustomPagination total={totalPages} initialPage={1} onChange={(page) => setCurrentPage(page)} />
+            <CustomPagination total={totalPages} currentPage={currentPage} onChange={(page) => setCurrentPage(page)} />
           </div>
         </div>
       </div>

@@ -19,6 +19,8 @@ export enum CurrentActivePage {
   CancelledOrder = "cancelled orders",
   ReturnedOrder = "returned orders",
   AllDelivery = "all deliveries",
+  Dashboard = "dashboard",
+  UserForm = "user form",
   None = "none",
 }
 
@@ -26,7 +28,28 @@ export enum CurrentActivePage {
  * enum used for url routing
  */
 export enum URL {
-  Home = "/"
+  Home = "/",
+  Man = "/man",
+  Woman = "/woman",
+  Kid = "/kid",
+  Baby = "/baby",
+  Cart = "/cart",
+  Personal = "/personal",
+  Profile = "/profile",
+  AllOrder = "/order/all",
+  Delivery = "/delivery",
+  SignIn = "/signin",
+  SignUp = "/signup",
+  About = "/about",
+  Contact = "/contact",
+  Feedback = "/feedback",
+  Help = "/help",
+  PrivacyPolicy = "/privacypolicy",
+  TermsNConditions = "/terms",
+  SiteMap = "/sitemap",
+  Dashboard = "/dashboard",
+  UserForm = "/form/user",
+  ProductForm = "/form/product"
 }
 
 /**
