@@ -7,8 +7,9 @@ import { useRouter } from "next/navigation";
 import OrderFilter from "./order-filter";
 import { MonthValue, OrderStatusValue } from "@/app/_enums/order-enums";
 import OrderList from "./order-list";
-import { Button, Image } from "@nextui-org/react";
+import { Button, Image, Input } from "@nextui-org/react";
 import { useTheme } from "next-themes";
+import CustomPagination from "@/app/_components/custom-pagination";
 
 export default function Page({ params }: { params: { orderstatus: string } }) {
   const orderDivRef = useRef<HTMLDivElement>(null);
@@ -79,12 +80,41 @@ export default function Page({ params }: { params: { orderstatus: string } }) {
     }
   }, []);
 
+  useEffect(() => {
+    setIsLoading(true);
+  }, [searchOrder, searchMonth, searchYear, showOrderNo]);
+
+  useEffect(() => {
+    setIsLoading(true);
+  }, [currentPage]);
+
   if (!token) return <></>;
 
   return (
     <div ref={orderDivRef} className="flex flex-col w-full">
       <OrderFilter {...orderFilterProps} selectedTab={orderStatus} />
+      <div className="flex justify-between mb-4 items-center">
+        {!isLoading && <label className="mb-2 ms-2">{orderCount} orders found</label>}
+        <Input
+          isClearable
+          type="text"
+          placeholder="Search Order"
+          variant="bordered"
+          size="sm"
+          radius="sm"
+          startContent={theme === "dark" ? <Image width={20} src="/icons/search-dark.svg" className="flex items-center justify-center" alt="Search Icon" /> : <Image width={20} src="/icons/search.svg" className="flex items-center justify-center" alt="Search Icon" />}
+          value={searchOrder}
+          className="w-full max-w-[365px] ms-auto"
+          onChange={(e) => {
+            setSearchOrder(e.target.value);
+          }}
+          onClear={() => {
+            setSearchOrder("");
+          }}
+        />
+      </div>
       <OrderList {...orderFilterDataProps} />
+      {orderCount > 0 && <CustomPagination initialPage={currentPage} total={Math.ceil(orderCount / showOrderNo)} onChange={(current) => setCurrentPage(current)} />}
       {showScrollButton && (
         <Button
           className="fixed bottom-10 right-10 min-w-0 min-h-0 p-0 w-12 h-12 outline-none rounded-full"

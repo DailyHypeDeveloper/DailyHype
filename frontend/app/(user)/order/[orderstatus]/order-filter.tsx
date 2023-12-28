@@ -3,6 +3,7 @@
 import { MonthValue } from "@/app/_enums/order-enums";
 import { mapStringToMonthValue, mapStringToNoOfOrder } from "@/app/_functions/order-utils";
 import { Tabs, Tab, Select, SelectItem } from "@nextui-org/react";
+import { useEffect } from "react";
 
 interface orderFilterProps {
   searchMonth: MonthValue;
@@ -26,7 +27,7 @@ interface Year {
 
 const noOfOrderOptions: { value: string; label: string }[] = [
   { value: "5", label: "5 orders" },
-  { value: "10", label: "10 orders" },
+  { value: "8", label: "8 orders" },
   { value: "15", label: "15 orders" },
   { value: "20", label: "20 orders" },
 ];

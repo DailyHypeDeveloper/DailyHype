@@ -47,9 +47,11 @@ export default function Home() {
           <div className="flex max-w-full mt-12 mx-12 justify-around">
             {latestProduct.map((item: any) => {
               return (
-                <div className="flex flex-col w-[200px]">
+                <div key={item.productid} className="flex flex-col w-[200px]">
                   <Image src={item.url} width={200} alt={item.productname} />
-                  <Link href="" className="mt-4 text-black dark:text-white">{item.productname}</Link>
+                  <Link href="" className="mt-4 text-black dark:text-white">
+                    {item.productname}
+                  </Link>
                   <label className="mt-3 text-small">${item.unitprice}</label>
                 </div>
               );
