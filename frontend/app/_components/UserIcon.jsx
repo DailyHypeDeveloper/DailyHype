@@ -1,25 +1,16 @@
 import React from "react";
-export const UserIcon = ({
-  fill = 'currentColor',
-  filled,
-  size=24,
-  height,
-  width,
-  label,
-  ...props
-}) => {
+export const UserIcon = () => {
   return (
     <svg
       data-name="Iconly/Curved/Profile"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
-      width={size || width || 24}
-      height={size || height || 24}
-      {...props}
+      width={24}
+      height={24}
     >
       <g
         fill="none"
-        stroke={fill}
+        stroke={'currentColor'}
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeMiterlimit={10}
