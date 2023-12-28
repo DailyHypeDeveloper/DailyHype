@@ -1,16 +1,16 @@
 import {currentUser} from "@clerk/nextjs";
 
 export default function Home() {
-  const {setCurrentActivePage} = useAppState();
-  const [latestProduct, setLatestProduct] = useState<any>([]);
+  // const {setCurrentActivePage} = useAppState();
+  // const [latestProduct, setLatestProduct] = useState<any>([]);
 
-  useEffect(() => {
-    setCurrentActivePage("home");
-    getLatestProducts().then((data) => {
-      console.log(data);
-      setLatestProduct(data);
-    });
-  }, []);
+  // useEffect(() => {
+  //   setCurrentActivePage("home");
+  //   getLatestProducts().then((data) => {
+  //     console.log(data);
+  //     setLatestProduct(data);
+  //   });
+  // }, []);
 
   return <div>This is home page</div>;
 
