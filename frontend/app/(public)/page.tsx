@@ -1,14 +1,8 @@
-"use client";
+import {currentUser} from "@clerk/nextjs";
 
-import { useEffect } from "react";
-import { useAppState } from "../app-provider";
-
-export default function Home() {
-  const { token, setCurrentActivePage } = useAppState();
-
-  useEffect(() => {
-    setCurrentActivePage("home");
-  }, []);
+export default async function Home() {
+  const user = await currentUser();
+  console.log(user);
 
   return (
     <div>

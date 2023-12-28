@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import UIProvider from "./nextui-provider";
 import AppProvider from "./app-provider";
+import { ClerkProvider } from "@clerk/nextjs";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,9 +27,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={`${inter.className} dark:bg-slate-900`}>
+        <ClerkProvider>
         <UIProvider>
           <AppProvider>{children}</AppProvider>
         </UIProvider>
+        </ClerkProvider>
       </body>
     </html>
   );
