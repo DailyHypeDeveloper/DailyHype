@@ -1,4 +1,3 @@
-import {currentUser} from "@clerk/nextjs";
 
 export default function Home() {
   // const {setCurrentActivePage} = useAppState();

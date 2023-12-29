@@ -12,6 +12,7 @@ const validationFn = require('../middlewares/validateToken');
 const { EMPTY_RESULT_ERROR, DUPLICATE_ENTRY_ERROR } = require('../errors');
 const cloudinary = require("../cloudinary");
 const multer = require("multer");
+const sendVerificationEmail = require("../nodemailer/sendmail");
 
 router.post('/login', function (req, res) {
     const { email, password } = req.body;
@@ -64,6 +65,18 @@ router.post('/signup', function (req, res) {
             res.status(500).json({ error: 'Unknown Error' });
         });
 });
+
+router.post("/sendmail", async (req, res) => {
+    try {
+      const email = req.body.email; 
+      console.log(email);
+      const info = await sendVerificationEmail.sendEmail(email);
+      res.status(200).json({ message: "Email sent successfully", info });
+    } catch (error) {
+      console.error("Error sending verification email:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
 
 // Admin part
 
