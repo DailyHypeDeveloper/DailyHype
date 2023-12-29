@@ -9,6 +9,7 @@ const paymentRoute = require("./routes/payments");
 const profileRoute = require("./routes/profile");
 const deliveryRoute = require("./routes/delivery");
 const reviewRoute = require("./routes/reviews");
+const sendmail = require("./nodemailer/sendmail");
 
 const app = express();
 app.use(cors());
@@ -42,7 +43,6 @@ app.use("/api", paymentRoute);
 app.use("/api", profileRoute);
 app.use("/api", deliveryRoute);
 app.use("/api", reviewRoute);
-
 // 404 handler
 // Q: What happens if we do not have this middleware?
 // A: If you do not have this middleware, requests for unknown resources (those that do not match any route or file in your application) will not be handled explicitly. Without a 404 handler middleware, the server would typically respond with a default response, such as a generic 404 error page or a minimal response indicating that the resource was not found.
