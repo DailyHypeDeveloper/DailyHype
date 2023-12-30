@@ -7,6 +7,7 @@ import { Button, Divider, Image, Link } from "@nextui-org/react";
 const getLatestProducts = () => {
   return fetch(`${process.env.BACKEND_URL}/api/latestproduct/6`, {
     method: "GET",
+    credentials: "include",
   })
     .then((response) => response.json())
     .then((data) => {

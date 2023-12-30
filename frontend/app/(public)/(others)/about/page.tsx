@@ -1,9 +1,7 @@
 "use client";
 
-import { CurrentActivePage } from "@/app/_enums/global-enums";
-import { useAppState } from "@/app/app-provider";
 import { Image, Modal, ModalContent, ModalBody, ModalFooter, useDisclosure, Button, ModalHeader } from "@nextui-org/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTheme } from "next-themes";
 
 const teams = [
@@ -52,14 +50,9 @@ const teams = [
 ];
 
 export default function Page() {
-  const { setCurrentActivePage } = useAppState();
   const { theme } = useTheme();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
-
-  useEffect(() => {
-    setCurrentActivePage(CurrentActivePage.None);
-  }, []);
 
   return (
     <>
@@ -97,7 +90,7 @@ export default function Page() {
                     onOpen();
                   }}
                 >
-                  <Image src={!team.image ? (theme === "dark" ? "icons/user-dark.svg" : "/icons/user.svg") : team.image} width={150} alt={team.name} />
+                  <Image src={!team.image ? (theme === "dark" ? "/icons/user-dark.svg" : "/icons/user.svg") : team.image} width={150} alt={team.name} />
                 </div>
                 <label className="mt-3 font-semibold">{team.name}</label>
                 <label className="mt-2 text-small text-slate-700 dark:text-slate-300" dangerouslySetInnerHTML={{ __html: team.position }}></label>
