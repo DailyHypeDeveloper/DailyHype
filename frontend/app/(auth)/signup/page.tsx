@@ -1,5 +1,4 @@
 "use client";
-import { SignUp } from "@clerk/nextjs";
 import React, { useEffect, useRef, useState } from "react";
 import { Input, Link } from "@nextui-org/react";
 import Image from "next/image";
