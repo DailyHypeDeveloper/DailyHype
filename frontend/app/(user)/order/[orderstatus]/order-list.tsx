@@ -4,13 +4,12 @@
 
 "use client";
 
-import { OrderStatusValue, MonthValue } from "@/app/_enums/order-enums";
+import { OrderStatusValue, MonthValue } from "@/enums/order-enums";
 import { Button, Divider, Image, Link, Skeleton, Tooltip } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { capitaliseWord, formatDateByMonthDayYear, formatMoney } from "@/app/_functions/formatter";
-import { mapStringToOrderStatusValue } from "@/app/_functions/order-utils";
-import { useAppState } from "@/app/app-provider";
+import { capitaliseWord, formatDateByMonthDayYear, formatMoney } from "@/functions/formatter";
+import { mapStringToOrderStatusValue } from "@/functions/order-utils";
 
 interface OrderFilterDataProps {
   searchOrder: string;
@@ -55,9 +54,7 @@ const getOrders = (filterOptions: FilterOptions, offset: number, limit: number, 
   offset = (offset - 1) * limit;
   return fetch(`${process.env.BACKEND_URL}/api/orders?limit=${limit}&offset=${offset}&search=${searchText}&status=${status}&month=${month}&year=${year}`, {
     method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    credentials: "include",
   })
     .then((response) => {
       if (response.status === 403) {
@@ -75,9 +72,7 @@ const getOrderCount = (filterOptions: FilterOptions, token: string | null) => {
 
   return fetch(`${process.env.BACKEND_URL}/api/orderCount?status=${status}&year=${year}&month=${month}&search=${searchText}`, {
     method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    credentials: "include",
   })
     .then((response) => {
       if (response.status === 403) {
@@ -102,13 +97,12 @@ const getOrderData = (filterOptions: FilterOptions, offset: number, limit: numbe
 };
 
 export default function OrderList({ searchOrder, orderStatus, searchMonth, searchYear, showOrderNo, isLoading, orderCount, setOrderCount, setIsLoading, currentPage }: OrderFilterDataProps) {
-  const { token, setToken } = useAppState();
   const { theme } = useTheme();
   const [orderData, setOrderData] = useState<any>([]);
 
   useEffect(() => {
     if (isLoading)
-      getOrderData({ searchText: searchOrder, status: mapStringToOrderStatusValue(orderStatus), month: searchMonth, year: searchYear }, currentPage, showOrderNo, token).then((result) => {
+      getOrderData({ searchText: searchOrder, status: mapStringToOrderStatusValue(orderStatus), month: searchMonth, year: searchYear }, currentPage, showOrderNo, "").then((result) => {
         setOrderData(result[0]);
         setOrderCount(result[1].count);
         console.log(result);

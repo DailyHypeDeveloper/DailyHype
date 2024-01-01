@@ -6,8 +6,8 @@
 
 import { Image, Input, Link, Select, SelectItem, Divider, Button, Pagination } from "@nextui-org/react";
 import { useTheme } from "next-themes";
-import { OrderStatusValue, MonthValue } from "@/app/_enums/order-enums";
-import { mapStringToMonthValue, mapStringToNoOfOrder, mapStringToOrderStatusValue } from "@/app/_functions/order-utils";
+import { OrderStatusValue, MonthValue } from "@/enums/order-enums";
+import { mapStringToMonthValue, mapStringToNoOfOrder, mapStringToOrderStatusValue } from "@/functions/order-utils";
 import { useEffect } from "react";
 
 interface OrderStatus {

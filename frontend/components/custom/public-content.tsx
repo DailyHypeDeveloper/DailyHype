@@ -4,18 +4,18 @@
 
 "use client";
 
-import { useAppState } from "../app-provider";
-import Header from "./header";
-import Footer from "./footer";
+import { useAppState } from "@/app/app-provider";
+import Header from "@/components/custom/header";
+import Footer from "@/components/custom/footer";
 
 // this is the user view with header and footer
 // don't change this unless necessary
 export default function PublicContent({ children }: { children: React.ReactNode }) {
   // isLoading is used to check whether the token is retrieved
-  const { isLoading } = useAppState();
+  const { headerCanLoad } = useAppState();
 
   return (
-    !isLoading && (
+    headerCanLoad && (
       <>
         <Header></Header>
         <main>{children}</main>

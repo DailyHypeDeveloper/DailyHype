@@ -1,7 +1,7 @@
 "use client";
 
-import { MonthValue } from "@/app/_enums/order-enums";
-import { mapStringToMonthValue, mapStringToNoOfOrder } from "@/app/_functions/order-utils";
+import { MonthValue } from "@/enums/order-enums";
+import { mapStringToMonthValue, mapStringToNoOfOrder } from "@/functions/order-utils";
 import { Tabs, Tab, Select, SelectItem } from "@nextui-org/react";
 import { useEffect } from "react";
 
