@@ -82,10 +82,12 @@ export default function Page({ params }: { params: { orderstatus: string } }) {
 
   useEffect(() => {
     setIsLoading(true);
+    setCurrentPage(1);
   }, [searchOrder, searchMonth, searchYear, showOrderNo]);
 
   useEffect(() => {
     setIsLoading(true);
+    if (orderDivRef.current) orderDivRef.current.scrollIntoView();
   }, [currentPage]);
 
   if (!token) return <></>;
@@ -94,7 +96,7 @@ export default function Page({ params }: { params: { orderstatus: string } }) {
     <div ref={orderDivRef} className="flex flex-col w-full">
       <OrderFilter {...orderFilterProps} selectedTab={orderStatus} />
       <div className="flex justify-between mb-4 items-center">
-        {!isLoading && <label className="mb-2 ms-2">{orderCount} orders found</label>}
+        {!isLoading && <label className="mb-2 ms-2">{orderCount <= 1 ? orderCount + " order " : orderCount + " orders "}found</label>}
         <Input
           isClearable
           type="text"
@@ -114,7 +116,7 @@ export default function Page({ params }: { params: { orderstatus: string } }) {
         />
       </div>
       <OrderList {...orderFilterDataProps} />
-      {orderCount > 0 && <CustomPagination initialPage={currentPage} total={Math.ceil(orderCount / showOrderNo)} onChange={(current) => setCurrentPage(current)} />}
+      {!isLoading && orderCount > 0 && Math.ceil(orderCount / showOrderNo) > 1 && <CustomPagination currentPage={currentPage} total={Math.ceil(orderCount / showOrderNo)} onChange={(current) => setCurrentPage(current)} />}
       {showScrollButton && (
         <Button
           className="fixed bottom-10 right-10 min-w-0 min-h-0 p-0 w-12 h-12 outline-none rounded-full"

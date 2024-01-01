@@ -1,17 +1,11 @@
 "use client";
 
-import { CurrentActivePage, URL } from "@/app/_enums/global-enums";
-import { useAppState } from "@/app/app-provider";
+import { URL } from "@/app/_enums/global-enums";
 import { Accordion, AccordionItem, Input, Link } from "@nextui-org/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function Page() {
-  const { setCurrentActivePage } = useAppState();
   const [searchText, setSearchText] = useState<string>("");
-
-  useEffect(() => {
-    setCurrentActivePage(CurrentActivePage.None);
-  }, []);
 
   return (
     <div className="flex flex-col w-full items-center my-8">
@@ -33,7 +27,9 @@ export default function Page() {
         <label className="text-xl font-semibold mb-4">Frequently Asked Questions</label>
         <Accordion variant="splitted" className="mt-4 w-[700px]">
           <AccordionItem key="1" aria-label="Question 1" title="How long does it take for my order to ship?">
-            <p className="pe-8 mb-3">Normally, it will take 1-3 working days to prepare the item. After preparing, we will ship out your order. You can track your order in <Link href={URL.AllOrder}>order list</Link>. If it takes longer than estimated delivery date, please contact us for more information.</p>
+            <p className="pe-8 mb-3">
+              Normally, it will take 1-3 working days to prepare the item. After preparing, we will ship out your order. You can track your order in <Link href={URL.AllOrder}>order list</Link>. If it takes longer than estimated delivery date, please contact us for more information.
+            </p>
             <Link href="" className="mb-4">
               View More
             </Link>

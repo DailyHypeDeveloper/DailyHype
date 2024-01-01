@@ -31,6 +31,7 @@ export default function SignIn() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ email, password }),
+      credentials: "include",
     })
       .then((response) => {
         if (response.status === 403) {
@@ -44,7 +45,11 @@ export default function SignIn() {
         setUserInfo({ name: user.name, email: user.email, image: user.url, role: user.role });
         localStorage.setItem("token", token);
         setToken(token);
-        router.push(URL.Home);
+        if (user.role === "admin") {
+          router.push(URL.Dashboard);
+        } else {
+          router.push(URL.Home);
+        }
       })
       .catch((error) => {
         console.error("Login failed:", error.message);

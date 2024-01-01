@@ -21,6 +21,7 @@ export enum CurrentActivePage {
   AllDelivery = "all deliveries",
   Dashboard = "dashboard",
   UserForm = "user form",
+  OrderList = "order list",
   None = "none",
 }
 
@@ -49,6 +50,7 @@ export enum URL {
   SiteMap = "/sitemap",
   Dashboard = "/dashboard",
   UserForm = "/form/user",
+  OrderList = "/list/order",
   ProductForm = "/form/product"
 }
 

@@ -4,17 +4,7 @@
 
 "use client";
 
-import { CurrentActivePage } from "@/app/_enums/global-enums";
-import { useAppState } from "@/app/app-provider";
-import { useEffect } from "react";
-
 export default function Cart() {
-  const { cart, setCart, setCurrentActivePage } = useAppState();
-
-  useEffect(() => {
-    setCurrentActivePage(CurrentActivePage.None);
-  }, []);
-
   return (
     <>
       <div>

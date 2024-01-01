@@ -18,9 +18,10 @@ export default function Header() {
   // this will validate the token
   useEffect(() => {
     if (token) {
-      validateUserToken(token).then((result) => {
+      validateUserToken().then((result) => {
         if (!result) {
-          validateAdminToken(token).then((result) => {
+          console.log(result);
+          validateAdminToken().then((result) => {
             if (!result) {
               alert("Token Expired!");
               localStorage.removeItem("token");
@@ -96,7 +97,7 @@ export default function Header() {
                   <p className="font-medium">Signed in as</p>
                   <p className="font-medium">{userInfo.email}</p>
                 </DropdownItem>
-                <DropdownItem aria-label="Profile" href={URL.Profile}key="profile">
+                <DropdownItem aria-label="Profile" href={URL.Profile} key="profile">
                   Profile
                 </DropdownItem>
                 <DropdownItem aria-label="Order" href={URL.AllOrder} key="order">
@@ -108,9 +109,7 @@ export default function Header() {
                 <DropdownItem
                   aria-label="Sign Out"
                   onClick={() => {
-                    localStorage.removeItem("token");
-                    setToken(null);
-                    router.replace(URL.Home);
+                    router.push("/signout");
                   }}
                   key="logout"
                   color="danger"

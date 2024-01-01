@@ -5,12 +5,10 @@
  * @param token (string)
  * @returns Promise (boolean)
  */
-export async function validateUserToken(token: string): Promise<boolean> {
+export async function validateUserToken(): Promise<boolean> {
   return fetch(`${process.env.BACKEND_URL}/api/validateToken`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    credentials: "include",
   })
     .then((response) => {
       if (response.status === 403) {
@@ -32,23 +30,20 @@ export async function validateUserToken(token: string): Promise<boolean> {
  * @param token (string)
  * @returns Promise (boolean)
  */
-export async function validateAdminToken(token: string): Promise<boolean> {
+export async function validateAdminToken(): Promise<boolean> {
   return fetch(`${process.env.BACKEND_URL}/api/validateAdminToken`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
+    credentials: "include",
   })
-  .then((response) => {
-    if(response.status === 403) {
+    .then((response) => {
+      if (response.status === 403) {
+        return false;
+      } else {
+        return true;
+      }
+    })
+    .catch((error) => {
+      console.error(error);
       return false;
-    }
-    else {
-      return true;
-    }
-  })
-  .catch((error) => {
-    console.error(error);
-    return false;
-  })
+    });
 }

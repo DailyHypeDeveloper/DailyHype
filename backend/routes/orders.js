@@ -208,6 +208,45 @@ router.get("/orders", validationFn.validateToken, function (req, res) {
     });
 });
 
+router.get("/orderDetail/:orderid", validationFn.validateToken, function (req, res) {
+  const id = req.body.id;
+  const email = req.body.email;
+  const role = req.body.role;
+  const orderid = req.params.orderid;
+
+  // checking whether the user token is valid
+  if (!id || isNaN(id) || !role || !email || role != "customer") {
+    return res.status(403).send({ error: "Unauthorized Access" });
+  }
+
+  if (!orderid || isNaN(orderid)) {
+    return res.status(400).send({ error: "Invalid OrderID" });
+  }
+
+  return Promise.all([ordersModel.getOrderByIDAdmin(orderid), ordersModel.getOrderDetailByAdmin(orderid)])
+    .then(function ([order, orderDetail]) {
+      const productIDArr = [];
+      orderDetail.forEach((detail) => {
+        if (!productIDArr.includes(detail.productid)) productIDArr.push(detail.productid);
+      });
+      return productsModel.getProductImageByProductIDArr(productIDArr).then((productImages) => {
+        for (let i = 0; i < orderDetail.length; i++) {
+          for (let j = 0; j < productImages.length; j++) {
+            if (orderDetail[i].productid === productImages[j].productid) {
+              orderDetail[i].image = productImages[j].url;
+              break;
+            }
+          }
+        }
+        return res.json({ order: order, orderdetail: orderDetail });
+      });
+    })
+    .catch(function (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Unknown Error" });
+    });
+});
+
 router.get("/ordersCountAdmin", validationFn.validateToken, function (req, res) {
   const id = req.body.id;
   const email = req.body.email;
