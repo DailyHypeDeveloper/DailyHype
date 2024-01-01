@@ -5,13 +5,15 @@
  * @returns string
  */
 export function capitaliseWord(str: string) {
-  if (str.length > 0) {
-    let splitStr = str.toLowerCase().split(" ");
+  if (str) {
+    if (str.length > 0) {
+      let splitStr = str.toLowerCase().split(" ");
 
-    splitStr.forEach((word, index) => {
-      splitStr[index] = splitStr[index].charAt(0).toUpperCase() + splitStr[index].slice(1);
-    });
-    return splitStr.join(" ");
+      splitStr.forEach((word, index) => {
+        splitStr[index] = splitStr[index].charAt(0).toUpperCase() + splitStr[index].slice(1);
+      });
+      return splitStr.join(" ");
+    }
   }
   return "";
 }
@@ -39,6 +41,6 @@ export function formatDateByMonthDayYear(date: string) {
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-    second: "2-digit"
+    second: "2-digit",
   });
 }

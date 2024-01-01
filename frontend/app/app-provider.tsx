@@ -24,7 +24,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
 
   // for showing current active page ui
   // refer to the global-enums.ts
-  const [currentActivePage, setCurrentActivePage] = useState<CurrentActivePage>(CurrentActivePage.Home);
+  const [currentActivePage, setCurrentActivePage] = useState<CurrentActivePage>(CurrentActivePage.None);
 
   // for loading header based on token (verfiy token)
   // don't change this loading state unless necessary

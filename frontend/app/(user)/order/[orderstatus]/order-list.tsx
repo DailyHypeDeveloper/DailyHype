@@ -119,31 +119,51 @@ export default function OrderList({ searchOrder, orderStatus, searchMonth, searc
   return (
     <>
       {isLoading && (
-        <div className="flex flex-col max-w-full mb-8 border-1 rounded-xl">
-          <div className="flex py-4 border-b-1">
-            <Skeleton className="flex basis-4/5 mx-8 rounded-lg h-12" />
-            <Skeleton className="flex ms-auto basis-1/5 me-8 rounded-lg w-full h-12" />
-          </div>
-          <div className="flex flex-col mx-8 my-4">
-            <div className="flex justify-start">
-              <div className="me-5">
-                <Skeleton className="flex w-[120px] rounded-lg h-[150px]" />
-              </div>
-              <div className="flex flex-col">
-                <Skeleton className="flex w-80 h-8 rounded-lg" />
-                <Skeleton className="mt-3 flex w-52 h-6 rounded-lg" />
-                <Skeleton className="mt-3 flex w-32 h-6 rounded-lg" />
+        <>
+          <div className="flex flex-col max-w-full mb-8 border-1 rounded-xl">
+            <div className="flex py-4 border-b-1">
+              <Skeleton className="flex basis-3/5 mx-8 rounded-lg h-6" />
+              <Skeleton className="flex ms-auto basis-2/5 me-8 rounded-lg w-full h-6" />
+            </div>
+            <div className="flex flex-col mx-8 my-4">
+              <div className="flex justify-start">
+                <div className="me-5">
+                  <Skeleton className="flex w-[80px] rounded-lg h-[100px]" />
+                </div>
+                <div className="flex flex-col">
+                  <Skeleton className="flex w-80 h-8 rounded-lg" />
+                  <Skeleton className="mt-3 flex w-52 h-6 rounded-lg" />
+                  <Skeleton className="mt-3 flex w-32 h-6 rounded-lg" />
+                </div>
               </div>
             </div>
           </div>
-        </div>
+          <div className="flex flex-col max-w-full mb-8 border-1 rounded-xl">
+            <div className="flex py-4 border-b-1">
+              <Skeleton className="flex basis-3/5 mx-8 rounded-lg h-6" />
+              <Skeleton className="flex ms-auto basis-2/5 me-8 rounded-lg w-full h-6" />
+            </div>
+            <div className="flex flex-col mx-8 my-4">
+              <div className="flex justify-start">
+                <div className="me-5">
+                  <Skeleton className="flex w-[80px] rounded-lg h-[100px]" />
+                </div>
+                <div className="flex flex-col">
+                  <Skeleton className="flex w-80 h-8 rounded-lg" />
+                  <Skeleton className="mt-3 flex w-52 h-6 rounded-lg" />
+                  <Skeleton className="mt-3 flex w-32 h-6 rounded-lg" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
       )}
       {!isLoading &&
         orderData.map((order: any, index: number) => {
           return (
             <div className="flex flex-col mb-8" key={order.orderid}>
               <div className="flex justify-start py-4 items-center border-1 rounded-tl-lg rounded-tr-lg px-8">
-                <Link href="" className="me-8 text-small cursor-pointer underline text-black dark:text-white">
+                <Link href={`/order/orderdetail/${order.orderid}`} className="me-8 text-small cursor-pointer underline text-black dark:text-white">
                   #{order.orderid}
                 </Link>
                 <label className="me-auto text-small">{formatDateByMonthDayYear(order.createdat)}</label>
