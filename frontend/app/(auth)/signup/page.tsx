@@ -5,6 +5,7 @@ import { Input,Button,Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,u
 import Image from "next/image";
 import { URL } from "@/app/_enums/global-enums";
 
+
 export default function Page() {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
@@ -16,11 +17,11 @@ export default function Page() {
   const [gender, setGender] = useState<string>("");
   const [address, setAddress] = useState<string>("");
   const [region, setRegion] = useState<string>("");
-  const [verificationCode, setVerificationCode] = useState("");
   const [showVerification, setShowVerification] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [timer, setTimer] = useState<number>(300); 
-  const {isOpen, onOpen, onOpenChange} = useDisclosure();
+  const {isOpen, onOpenChange} = useDisclosure();
+
 
   const handleNextButtonClick = () => {
     if (name && email && password && confirmPassword) {
@@ -83,19 +84,19 @@ export default function Page() {
           <h2 className="text-3xl text-center">Create your account</h2>
           <div className="w-full">
             <div className="mb-12">
-              <Input type="email" label="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full sm:w-[85%] h-10 border-none rounded-md text-base px-4 sm:px-24 block mx-auto " />
+              <Input isRequired type="email" label="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full sm:w-[85%] h-10 border-none rounded-md text-base px-4 sm:px-24 block mx-auto " />
             </div>
             <div className="mb-12">
-              <Input type="name" label="Name" value={name} onChange={(e) => setName(e.target.value)} className="w-full sm:w-[85%] h-10 border-none rounded-md text-base px-4 sm:px-24 block mx-auto " />
+              <Input isRequired type="name" label="Name" value={name} onChange={(e) => setName(e.target.value)} className="w-full sm:w-[85%] h-10 border-none rounded-md text-base px-4 sm:px-24 block mx-auto " />
             </div>
             <div className="mb-12">
-              <Input type="password" label="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full sm:w-[85%] h-10 border-none rounded-md text-base px-4 sm:px-24 block mx-auto " />
+            <Input isRequired type="password" label="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full sm:w-[85%] h-10 border-none rounded-md text-base px-4 sm:px-24 block mx-auto " />
             </div>
             <div className="mb-16">
-              <Input type="password" label="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full sm:w-[85%] h-10 border-none rounded-md text-base px-4 sm:px-24 block mx-auto" />
+            <Input isRequired type="password" label="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full sm:w-[85%] h-10 border-none rounded-md text-base px-4 sm:px-24 block mx-auto " />
             </div>
 
-            <div className="w-full flex flex-col items-center sm:flex-row sm:justify-center">
+            <div className="mb-4 w-full flex flex-col items-center sm:flex-row sm:justify-center">
               <button className="bg-white text-black px-6 py-3 uppercase rounded-md hover:bg-gray-200 mb-2 sm:mb-0 sm:mr-4 md:mr-8 lg:mr-12 xl:mr-16 2xl:mr-48" onClick={handleNextButtonClick}>
                 Next
               </button>
@@ -103,7 +104,7 @@ export default function Page() {
                 Log in your account ➡
               </a>
             </div>
-            <div>{errorMessage}</div>
+            <div className="text-center 2xl:mr-72">{errorMessage}</div>
           </div>
         </div>
       )}

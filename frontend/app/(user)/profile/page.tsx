@@ -14,7 +14,6 @@ import {
   Button,
 } from "@nextui-org/react";
 import {UserIcon} from "@/app/_components/UserIcon";
-import {Elsie_Swash_Caps} from "next/font/google";
 
 interface UserData {
   email: string;
