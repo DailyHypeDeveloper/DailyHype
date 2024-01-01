@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { Input, Link } from "@nextui-org/react";
+import { Input, Link,Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,useDisclosure } from "@nextui-org/react";
 import Image from "next/image";
 import { URL } from "@/app/_enums/global-enums";
 
@@ -11,11 +11,15 @@ export default function Page() {
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [showAdditional, setShowAdditional] = useState<boolean>(false);
-
   const [phone, setPhone] = useState<string>("");
   const [gender, setGender] = useState<string>("");
   const [address, setAddress] = useState<string>("");
   const [region, setRegion] = useState<string>("");
+  const [verificationCode, setVerificationCode] = useState("");
+  const [showVerification, setShowVerification] = useState(false);
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [timer, setTimer] = useState<number>(300); 
+  const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
   const handleNextButtonClick = () => {
     if (name && email && password && confirmPassword) {
@@ -25,58 +29,56 @@ export default function Page() {
     }
   };
 
-  // useEffect(() => {
-  //   const nextButton = document.getElementById("nextButton") as HTMLButtonElement;
-  //   const handleNextButtonClick = (event: MouseEvent) => {
-  //     const nameInput = document.getElementById("name") as HTMLInputElement;
-  //     const emailInput = document.getElementById("email") as HTMLInputElement;
-  //     const passwordInput = document.getElementById("password") as HTMLInputElement;
-  //     const confirmPasswordInput = document.getElementById("confirmPassword") as HTMLInputElement;
-  //     const emailWarningText = document.getElementById("emailWarning") as HTMLDivElement;
-  //     const additionalFields = document.getElementById("additionalFields") as HTMLDivElement;
-  //     const initialFields = document.getElementById("initialFields") as HTMLDivElement;
+  const startTimer = () => {
+    const intervalId = setInterval(() => {
+      setTimer((prevTimer) => {
+        if (prevTimer === 0) {
+          clearInterval(intervalId);
+          setShowVerification(false); // Close the modal when the timer reaches 0
+        }
+        return prevTimer - 1;
+      });
+    }, 1000);
+  };
 
-  //     const name = nameInput.value;
-  //     const email = emailInput.value;
-  //     const password = passwordInput.value;
-  //     const confirmPassword = confirmPasswordInput.value;
+  const handleVerification = () => {
+    const payload = {
+      email: email,
+    };
+  fetch(`${process.env.BACKEND_URL}/api/sendmail`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      // Handle the response as needed
+      console.log("Sendmail response:", data);
 
-  //     if (
-  //       name.trim() === "" ||
-  //       email.trim() === "" ||
-  //       password.trim() === "" ||
-  //       confirmPassword.trim() === ""
-  //     ) {
-  //       emailWarningText.innerText = "Please fill in all fields.";
-  //       event.preventDefault();
-  //       return;
-  //     } /* else if (!isValidEmail(email)) {
-  //       emailWarningText.innerText = "Please enter a valid email address.";
-  //       event.preventDefault();
-  //       return;
-  //     }  */else if (password !== confirmPassword) {
-  //       emailWarningText.innerText = "Passwords do not match.";
-  //       event.preventDefault();
-  //       return;
-  //     } else {
-  //       emailWarningText.innerText = "";
-  //       initialFields.style.display = "none";
-  //       additionalFields.style.display = "block";
-  //     }
-  //   };
-
-  //   nextButton.addEventListener("click", handleNextButtonClick);
-
-  //   // Cleanup the event listener when the component unmounts
-  //   return () => {
-  //     nextButton.removeEventListener("click", handleNextButtonClick);
-  //   };
-  // }, []);
+      // Assuming you want to show the verification modal after sending the email
+      setShowVerificationModal(true);
+      startTimer(); // Start the timer for verification code
+    })
+    .catch((error) => {
+      console.error("Error sending email:", error.message);
+      // Handle the error, show an error message, etc.
+    });
+    setShowVerification(false); // Close the modal
+    clearInterval(timer); // Stop the timer
+};
 
   return (
     <div className="w-full min-h-screen grid grid-cols-1 sm:grid-cols-2">
       {!showAdditional && (
         <div className="left w-full min-h-screen flex flex-col justify-center items-center gap-10 bg-[#FB6050] text-white" id="initialFields">
+          
           <h2 className="text-3xl text-center">Create your account</h2>
           <div className="w-full">
             <div className="mb-12">
@@ -108,6 +110,11 @@ export default function Page() {
       {showAdditional && (
         <div className="left w-full min-h-screen flex  justify-center  gap-10 bg-[#FB6050] text-white" id="additionalFields">
           <div className="additional w-full flex flex-col justify-center items-center mt-25vh gap-10">
+          <div className="left w-full flex flex-col justify-start items-start gap-10">
+            <button onClick={() => setShowAdditional(false)} className="text-white">
+              &lt; Back
+            </button>
+          </div>
             <h2 className="text-3xl text-center">Additional Information</h2>
             <div className="w-full">
               <div className="mb-12">
@@ -146,7 +153,7 @@ export default function Page() {
               </div>
 
               <div className="w-full flex flex-col items-center sm:flex-row sm:justify-center">
-                <button className="bg-white text-black px-6 py-3 uppercase rounded-md hover:bg-gray-200 mb-2 sm:mb-0 sm:mr-4 md:mr-8 lg:mr-12 xl:mr-16 2xl:mr-48">Create</button>
+                <button className="bg-white text-black px-6 py-3 uppercase rounded-md hover:bg-gray-200 mb-2 sm:mb-0 sm:mr-4 md:mr-8 lg:mr-12 xl:mr-16 2xl:mr-48" onClick={()=>{handleVerification(); onOpenChange(); setShowVerificationModal(true)}}>Create</button>
                 <a href={URL.SignIn} className="mt-2 sm:mt-0 hover:text-gray-200">
                   Log in your account ➡
                 </a>
@@ -155,6 +162,29 @@ export default function Page() {
           </div>
         </div>
       )}
+
+        {showVerificationModal && (
+           <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+           <ModalContent>
+             {(onClose) => (
+               <>
+                 <ModalHeader className="flex flex-col gap-1">Verify your account</ModalHeader>
+                 <ModalBody>
+                   <p> 
+                   6-digit code has been sent to your email account 
+                   </p>
+                   <Input type="code" label="Code" />
+                 </ModalBody>
+                 <ModalFooter>
+                   <Button color="primary" onPress={onClose}>
+                     Verify
+                   </Button>
+                 </ModalFooter>
+               </>
+             )}
+           </ModalContent>
+         </Modal>
+        )}
 
       <div className="right w-full h-screen flex flex-col justify-center items-center bg-[#0c0f38] text-white">
         <a href="/signup" className="logo-box">
