@@ -6,13 +6,13 @@
 "use client";
 
 import { Accordion, AccordionItem, Divider, Link, Selection } from "@nextui-org/react";
-import { useAppState } from "../app-provider";
-import { CurrentActivePage, URL } from "../_enums/global-enums";
+import { useAppState } from "@/app/app-provider";
+import { CurrentActivePage, URL } from "@/enums/global-enums";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function UserSideBar() {
-  const { token, setToken, currentActivePage } = useAppState();
+  const { currentActivePage } = useAppState();
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set());
   const router = useRouter();
 
@@ -26,8 +26,6 @@ export default function UserSideBar() {
   useEffect(() => {
     localStorage.setItem("selectedKeys", JSON.stringify(Array.from(selectedKeys)));
   }, [selectedKeys]);
-
-  if (!token) return null;
 
   return (
     <div className="flex flex-col basis-1/5 items-start">
@@ -104,9 +102,7 @@ export default function UserSideBar() {
       <Divider />
       <label
         onClick={() => {
-          localStorage.removeItem("token");
-          setToken(null);
-          router.replace(URL.Home);
+          router.push(URL.SignOut);
         }}
         className="my-2 cursor-pointer text-medium text-black font-semibold dark:text-white"
       >

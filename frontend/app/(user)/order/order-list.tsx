@@ -4,12 +4,11 @@
 
 "use client";
 
-import { OrderStatusValue, MonthValue } from "@/app/_enums/order-enums";
+import { OrderStatusValue, MonthValue } from "@/enums/order-enums";
 import { Button, Divider, Image, Link, Skeleton, Tooltip } from "@nextui-org/react";
-import { useAppState } from "@/app/app-provider";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { capitaliseWord, formatDateByMonthDayYear, formatMoney } from "@/app/_functions/formatter";
+import { capitaliseWord, formatDateByMonthDayYear, formatMoney } from "@/functions/formatter";
 
 export const dynamic = "force-dynamic";
 
@@ -103,13 +102,12 @@ const getOrderData = (filterOptions: FilterOptions, offset: number, limit: numbe
 };
 
 export default function OrderList({ searchOrder, searchStatus, searchMonth, searchYear, showOrderNo, isLoading, orderCount, setOrderCount, setIsLoading, currentPage }: OrderFilterDataProps) {
-  const { token } = useAppState();
   const { theme } = useTheme();
   const [orderData, setOrderData] = useState<any>([]);
 
   useEffect(() => {
     if (isLoading)
-      getOrderData({ searchText: searchOrder, status: searchStatus, month: searchMonth, year: searchYear }, currentPage, showOrderNo, token).then((result) => {
+      getOrderData({ searchText: searchOrder, status: searchStatus, month: searchMonth, year: searchYear }, currentPage, showOrderNo, "").then((result) => {
         setOrderData(result[0]);
         setOrderCount(Math.ceil(result[1].count / showOrderNo));
         console.log(result);

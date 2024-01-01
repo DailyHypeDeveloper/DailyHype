@@ -4,26 +4,27 @@
 
 "use client";
 
-import { useAppState } from "../app-provider";
-import Header from "./header";
-import Footer from "./footer";
-import UserSideBar from "./user-sidebar";
+import { useAppState } from "@/app/app-provider";
+import Header from "@/components/custom/header";
+import Footer from "@/components/custom/footer";
+import UserSideBar from "@/components/custom/user-sidebar";
 import { BreadcrumbItem, Breadcrumbs } from "@nextui-org/react";
-import { capitaliseWord } from "../_functions/formatter";
+import { capitaliseWord } from "@/functions/formatter";
+import { URL } from "@/enums/global-enums";
 
 // this is the user view with header and footer
 // don't change this unless necessary
 export default function UserContent({ children }: { children: React.ReactNode }) {
   // isLoading is used to check whether the token is retrieved
-  const { isLoading, currentActivePage } = useAppState();
+  const { headerCanLoad, currentActivePage } = useAppState();
 
   return (
     <>
-      {!isLoading && (
+      {headerCanLoad && (
         <>
           <Header></Header>
           <Breadcrumbs className="mx-10 mt-10">
-            <BreadcrumbItem href="/">Home</BreadcrumbItem>
+            <BreadcrumbItem href={URL.Home}>Home</BreadcrumbItem>
             <BreadcrumbItem>{capitaliseWord(currentActivePage)}</BreadcrumbItem>
           </Breadcrumbs>
           <div className="flex max-w-full mx-10 my-10">

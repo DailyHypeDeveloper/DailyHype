@@ -41,6 +41,7 @@ export enum URL {
   Delivery = "/delivery",
   SignIn = "/signin",
   SignUp = "/signup",
+  SignOut = "/signout",
   About = "/about",
   Contact = "/contact",
   Feedback = "/feedback",
@@ -51,7 +52,7 @@ export enum URL {
   Dashboard = "/dashboard",
   UserForm = "/form/user",
   OrderList = "/list/order",
-  ProductForm = "/form/product"
+  ProductForm = "/form/product",
 }
 
 /**

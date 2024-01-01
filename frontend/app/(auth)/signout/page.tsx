@@ -1,10 +1,12 @@
 "use client";
 
-import LoadingIcon from "@/app/_icons/loading-icon";
+import { useAppState } from "@/app/app-provider";
+import LoadingIcon from "@/icons/loading-icon";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function Page() {
+  const { setUserInfo, setIsAuthenticated } = useAppState();
   const router = useRouter();
 
   useEffect(() => {
@@ -16,8 +18,9 @@ export default function Page() {
       .then((result) => {
         if (result) {
           if (localStorage) {
-            localStorage.removeItem("token");
             localStorage.removeItem("user");
+            setIsAuthenticated(false);
+            setUserInfo({ name: "", email: "", image: "", role: "" });
           }
           router.replace("/");
         }

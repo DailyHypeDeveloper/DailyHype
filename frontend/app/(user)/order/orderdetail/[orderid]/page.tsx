@@ -1,18 +1,17 @@
 "use client";
 
-import { URL } from "@/app/_enums/global-enums";
-import { capitaliseWord, formatDateByMonthDayYear, formatMoney } from "@/app/_functions/formatter";
 import { useAppState } from "@/app/app-provider";
+import { CurrentActivePage, URL } from "@/enums/global-enums";
+import { capitaliseWord, formatDateByMonthDayYear, formatMoney } from "@/functions/formatter";
 import { Divider, Image } from "@nextui-org/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const fetchOrderDetail = (orderid: number, token: string) => {
+const fetchOrderDetail = (orderid: number) => {
   return fetch(`${process.env.BACKEND_URL}/api/orderDetail/${orderid}`, {
     method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    credentials: "include",
   })
     .then((response) => response.json())
     .then((result) => {
@@ -26,29 +25,28 @@ const fetchOrderDetail = (orderid: number, token: string) => {
 };
 
 export default function Page({ params }: { params: { orderid: number } }) {
+  const router = useRouter();
+  const { setCurrentActivePage } = useAppState();
   const { orderid } = params;
-  const { token } = useAppState();
   const [orderData, setOrderData] = useState<any>(null);
   const [orderDetail, setOrderDetail] = useState<any>([]);
 
   useEffect(() => {
-    if (token)
-      fetchOrderDetail(orderid, token).then((data) => {
-        setOrderData(data.order);
-        setOrderDetail(data.orderdetail);
-      });
+    setCurrentActivePage(CurrentActivePage.AllOrder);
+    fetchOrderDetail(orderid).then((data) => {
+      setOrderData(data.order);
+      setOrderDetail(data.orderdetail);
+    });
   }, []);
-
-  if (!token) return null;
 
   if (!orderData) return null;
 
   return (
     <div className="flex flex-col w-full">
-      <div className="flex justify-start items-center w-full rounded-tr-lg rounded-tl-lg bg-zinc-100 px-8 py-4">
-        <Link href={URL.AllOrder} className="text-small">
+      <div className="flex justify-start items-center w-full rounded-tr-lg rounded-tl-lg bg-zinc-300 dark:bg-zinc-700 px-8 py-4">
+        <label onClick={() => router.back()} className="text-small cursor-pointer text-blue-700 dark:text-blue-300">
           <span className="text-medium">&lt;</span> Back
-        </Link>
+        </label>
         <label className="text-small ms-auto">Order #{orderid}</label>
         <label className="ms-4"> | </label>
         <label className="text-small ms-4">{capitaliseWord(orderData.orderstatus)}</label>

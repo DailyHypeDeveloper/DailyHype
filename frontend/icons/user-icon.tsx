@@ -1,5 +1,6 @@
 import React from "react";
-export const UserIcon = () => {
+
+export default function UserIcon () {
   return (
     <svg data-name="Iconly/Curved/Profile" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width={24} height={24}>
       <g fill="none" stroke={"currentColor"} strokeLinecap="round" strokeLinejoin="round" strokeMiterlimit={10} strokeWidth={1.5}>

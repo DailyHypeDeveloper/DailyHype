@@ -2,14 +2,14 @@
 import React, { useState } from "react";
 import { Input } from "@nextui-org/react";
 import Image from "next/image";
-import { useAppState } from "@/app/app-provider";
 import { useRouter } from "next/navigation";
-import { ErrorMessage, URL } from "@/app/_enums/global-enums";
+import { ErrorMessage, URL } from "@/enums/global-enums";
+import { useAppState } from "@/app/app-provider";
 
 export default function SignIn() {
+  const { setUserInfo, setHeaderCanLoad } = useAppState();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { setToken, setUserInfo } = useAppState();
   const router = useRouter();
 
   const isValidEmail = (email: string) => {
@@ -42,9 +42,9 @@ export default function SignIn() {
       .then((result) => {
         const token = result.token;
         const user = result.user;
+        localStorage.setItem("user", JSON.stringify({ name: user.name, email: user.email, image: user.url, role: user.role }));
+        setHeaderCanLoad(false);
         setUserInfo({ name: user.name, email: user.email, image: user.url, role: user.role });
-        localStorage.setItem("token", token);
-        setToken(token);
         if (user.role === "admin") {
           router.push(URL.Dashboard);
         } else {

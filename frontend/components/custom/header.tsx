@@ -1,40 +1,17 @@
 "use client";
 
-import React, { useEffect } from "react";
 import { Image, Link, Button, Input, Avatar, Badge, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
-import { useAppState } from "../app-provider";
+import { useAppState } from "@/app/app-provider";
 import { useTheme } from "next-themes";
-import { validateAdminToken, validateUserToken } from "../_functions/common-functions";
-import { URL } from "../_enums/global-enums";
+import { URL } from "@/enums/global-enums";
+import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
 
 // header component for user
 export default function Header() {
-  const { token, setToken, userInfo, currentActivePage, cart } = useAppState();
+  const { isAuthenticated, userInfo, currentActivePage, cart } = useAppState();
   const { theme, setTheme } = useTheme();
   const router = useRouter();
-
-  // when the token is changed, this useEffect will run
-  // this will validate the token
-  useEffect(() => {
-    if (token) {
-      validateUserToken().then((result) => {
-        if (!result) {
-          console.log(result);
-          validateAdminToken().then((result) => {
-            if (!result) {
-              alert("Token Expired!");
-              localStorage.removeItem("token");
-              setToken(null);
-              router.replace(URL.SignIn);
-            } else {
-              router.replace(URL.Dashboard);
-            }
-          });
-        }
-      });
-    }
-  }, [token]);
 
   return (
     <header className="flex items-center h-[75px] px-12 justify-start dark:bg-slate-900 bg-slate-50 border-b-2 border-slate-300">
@@ -59,38 +36,18 @@ export default function Header() {
             Baby
           </Link>
         </nav>
-        <nav className="flex flex-1 justify-end items-center">
+        <nav className="flex flex-1 justify-end items-center select-none">
           <Input type="text" placeholder="Search Product" className="max-w-[300px] me-6" size="sm" variant="bordered" radius="sm" startContent={theme === "dark" ? <Image width={20} src="/icons/search-dark.svg" className="flex items-center justify-center" alt="Search Icon" /> : <Image width={20} src="/icons/search.svg" className="flex items-center justify-center" alt="Search Icon" />} />
           <Badge content={cart ? cart.length : 0} className="bg-custom-color2 text-white" size="md">
             <Link href={URL.Cart} className="px-2 py-1 hover:dark:bg-slate-700 hover:bg-slate-200 rounded-md cursor-pointer" title="Shopping Bag">
               {theme === "dark" ? <Image src="/icons/shopping-bag-dark.svg" radius="none" width={25} alt="Shopping Cart Icon" /> : <Image src="/icons/shopping-bag.svg" radius="none" width={25} alt="Shopping Cart Icon" />}
             </Link>
           </Badge>
-          {theme === "light" ? (
-            <Image
-              title="Change to Dark Mode"
-              onClick={() => {
-                setTheme("dark");
-              }}
-              className="cursor-pointer ms-8"
-              src="/icons/moon.svg"
-              alt="Moon Icon"
-            />
-          ) : (
-            <Image
-              title="Change to Light Mode"
-              onClick={() => {
-                setTheme("light");
-              }}
-              className="cursor-pointer ms-8"
-              src="/icons/sun.svg"
-              alt="Sun Icon"
-            />
-          )}
-          {token && (
-            <Dropdown placement="bottom-end">
+          {theme === "dark" ? <MoonIcon className="cursor-pointer ms-8 w-[20px] h-[20px]" onClick={() => setTheme("light")} /> : <SunIcon className="cursor-pointer ms-8 w-[20px] h-[20px]" onClick={() => setTheme("dark")} />}
+          {isAuthenticated && (
+            <Dropdown placement="bottom-end" className="select-none">
               <DropdownTrigger>
-                <Avatar as="button" className="transition-transform ms-8 border-2 border-gray-400" src={userInfo.image ? userInfo.image : theme === "light" ? "/icons/user.svg" : "/icons/user-dark.svg"} />
+                <Avatar as="button" className="transition-transform ms-8 border-2 select-none border-gray-400" src={userInfo.image ? userInfo.image : theme === "light" ? "/icons/user.svg" : "/icons/user-dark.svg"} />
               </DropdownTrigger>
               <DropdownMenu aria-label="Profile Actions" variant="flat">
                 <DropdownItem aria-label="User Information" href={URL.Personal} key="info" className="h-14 gap-2">
@@ -109,7 +66,7 @@ export default function Header() {
                 <DropdownItem
                   aria-label="Sign Out"
                   onClick={() => {
-                    router.push("/signout");
+                    router.push(URL.SignOut);
                   }}
                   key="logout"
                   color="danger"
@@ -119,7 +76,7 @@ export default function Header() {
               </DropdownMenu>
             </Dropdown>
           )}
-          {!token && (
+          {!isAuthenticated && (
             <>
               <Button
                 onClick={() => {
