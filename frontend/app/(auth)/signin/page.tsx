@@ -60,7 +60,7 @@ export default function SignIn() {
     <div className="w-full min-h-screen grid grid-cols-1 sm:grid-cols-2">
       <div className="left w-full sm:min-h-full flex justify-center items-center flex-col p-8">
         <a href={URL.Home} className="logo-box">
-          <Image src="/images/logo.png" alt="Logo" width={300} height={150} />
+          <Image src="/images/logo.png" alt="Logo" className="w-auto h-auto" priority={true} width={300} height={150} />
         </a>
         <p className="text-center mt-4">Stay Tuned, stay Hyped!</p>
       </div>

@@ -290,7 +290,7 @@ router.post("/validateToken", validationFn.validateToken, function (req, res) {
   const id = req.body.id;
   const email = req.body.email;
   if (id && email && !isNaN(id) && role && (role === "customer" || role === "admin")) {
-    res.status(200).json({message: "validation success", role: role});
+    res.status(200).json({ message: "validation success", role: role });
   } else {
     return res.status(403).send({error: "Unauthorized Access"});
   }

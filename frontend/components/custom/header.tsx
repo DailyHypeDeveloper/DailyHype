@@ -4,14 +4,30 @@ import { Image, Link, Button, Input, Avatar, Badge, Dropdown, DropdownTrigger, D
 import { useRouter } from "next/navigation";
 import { useAppState } from "@/app/app-provider";
 import { useTheme } from "next-themes";
-import { URL } from "@/enums/global-enums";
+import { ErrorMessage, URL } from "@/enums/global-enums";
 import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
+import { useEffect } from "react";
 
 // header component for user
 export default function Header() {
-  const { isAuthenticated, userInfo, currentActivePage, cart } = useAppState();
+  const { isAuthenticated, headerCanLoad, userInfo, redirectPage, currentActivePage, cart } = useAppState();
   const { theme, setTheme } = useTheme();
   const router = useRouter();
+
+  useEffect(() => {
+    let authCheckFinish = false;
+    if (redirectPage == URL.SignOut) {
+      alert("Invalid Token");
+      authCheckFinish = true;
+      router.push(URL.SignOut);
+    }
+    if (!authCheckFinish && userInfo.role !== "customer" && headerCanLoad) {
+      if (isAuthenticated) {
+        alert(ErrorMessage.Unauthorized);
+        router.push(URL.SignOut);
+      }
+    }
+  }, [redirectPage]);
 
   return (
     <header className="flex items-center h-[75px] px-12 justify-start dark:bg-slate-900 bg-slate-50 border-b-2 border-slate-300">
@@ -44,7 +60,7 @@ export default function Header() {
             </Link>
           </Badge>
           {theme === "dark" ? <MoonIcon className="cursor-pointer ms-8 w-[20px] h-[20px]" onClick={() => setTheme("light")} /> : <SunIcon className="cursor-pointer ms-8 w-[20px] h-[20px]" onClick={() => setTheme("dark")} />}
-          {isAuthenticated && (
+          {isAuthenticated && headerCanLoad && (
             <Dropdown placement="bottom-end" className="select-none">
               <DropdownTrigger>
                 <Avatar as="button" className="transition-transform ms-8 border-2 select-none border-gray-400" src={userInfo.image ? userInfo.image : theme === "light" ? "/icons/user.svg" : "/icons/user-dark.svg"} />
@@ -76,7 +92,7 @@ export default function Header() {
               </DropdownMenu>
             </Dropdown>
           )}
-          {!isAuthenticated && (
+          {!isAuthenticated && headerCanLoad && (
             <>
               <Button
                 onClick={() => {
