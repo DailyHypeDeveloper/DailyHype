@@ -15,10 +15,10 @@ import {URL} from "@/enums/global-enums";
 import {useGoogleLogin, TokenResponse} from "@react-oauth/google";
 import axios from "axios";
 import {useRouter} from "next/navigation";
-import { useAppState } from "@/app/app-provider";
+import {useAppState} from "@/app/app-provider";
 
 export default function Page() {
-  const { setToken, setUserInfo } = useAppState();
+  const {setUserInfo, setHeaderCanLoad} = useAppState();
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -129,7 +129,7 @@ export default function Page() {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({res_id, res_name, res_email, res_verified_email}),
-            credentials: 'include'
+            credentials: "include",
           })
             .then((response) => {
               if (!response.ok) {
@@ -138,9 +138,20 @@ export default function Page() {
               return response.json();
             })
             .then((data) => {
-              console.log("hello")
+              console.log("hello");
               console.log(data);
-              setUserInfo({ name: data.name, email:data.email, image: data.url, role: data.role });
+              const user = data.user;
+              localStorage.setItem(
+                "user",
+                JSON.stringify({
+                  name: user.name,
+                  email: user.email,
+                  image: user.url,
+                  role: user.role,
+                })
+              );
+              setHeaderCanLoad(false);
+              setUserInfo({name: user.name, email: user.email, image: user.url, role: user.role});
               router.push(URL.Home);
             })
             .catch((error) => {

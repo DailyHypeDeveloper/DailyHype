@@ -13,36 +13,40 @@ const {EMPTY_RESULT_ERROR, DUPLICATE_ENTRY_ERROR} = require("../errors");
 const cloudinary = require("../cloudinary");
 const multer = require("multer");
 const sendVerificationEmail = require("../nodemailer/sendmail");
-const { serialize } = require("cookie");
+const {serialize} = require("cookie");
 
 router.post("/login", function (req, res) {
-  const { email, password } = req.body;
+  const {email, password} = req.body;
   userModel
     .checkLogin(email, password)
     .then(function (user) {
       if (!user) {
-        res.status(401).json({ error: "Invalid email or password" });
+        res.status(401).json({error: "Invalid email or password"});
       } else {
         delete user.password;
         console.log(user);
-        const token = jwt.sign({ email: user.email, userId: user.userid, role: user.role }, process.env.JWT_SECRET_KEY, { expiresIn: "1h" });
+        const token = jwt.sign(
+          {email: user.email, userId: user.userid, role: user.role},
+          process.env.JWT_SECRET_KEY,
+          {expiresIn: "1h"}
+        );
         const cookieValue = serialize("authToken", token, {
           httpOnly: true,
           sameSite: "strict",
           path: "/",
         });
         res.setHeader("Set-Cookie", cookieValue);
-        res.status(200).json({ token: token, user: user });
+        res.status(200).json({user: user});
       }
     })
     .catch(function (error) {
       console.error(error);
       if (error instanceof EMPTY_RESULT_ERROR) {
-        res.status(401).json({ error: "User not found" });
+        res.status(401).json({error: "User not found"});
       } else if (error instanceof DUPLICATE_ENTRY_ERROR) {
-        res.status(409).json({ error: "Duplicate entry" });
+        res.status(409).json({error: "Duplicate entry"});
       } else {
-        res.status(500).json({ error: "Unknown Error" });
+        res.status(500).json({error: "Unknown Error"});
       }
     });
 });
@@ -92,22 +96,27 @@ router.post("/signupGoogle", function (req, res) {
       } else {
         userModel
           .signupGoogle(id, name, email, verified_email)
-          .then(function (newUser) {
-
-        const token = jwt.sign(
-          {email: newUser.email, userId: newUser.id, role: newUser.role},
-          process.env.JWT_SECRET_KEY,
-          {expiresIn: "1h"}
-        );
-        console.log(token);
-        const cookieValue = serialize("authToken", token, {
-          httpOnly: true,
-          sameSite: "strict",
-          path: "/",
-        });
-        res.setHeader("Set-Cookie", cookieValue);
-        res.status(200).json({token: token, user: newUser});
-
+          .then(function () {
+            const newUser = {
+              email: email,
+              id: id,
+              role: "customer",
+              url: "",
+              name: name,
+            };
+            const token = jwt.sign(
+              {email: newUser.email, userId: newUser.id, role: newUser.role},
+              process.env.JWT_SECRET_KEY,
+              {expiresIn: "1h"}
+            );
+            console.log(token);
+            const cookieValue = serialize("authToken", token, {
+              httpOnly: true,
+              sameSite: "strict",
+              path: "/",
+            });
+            res.setHeader("Set-Cookie", cookieValue);
+            res.status(200).json({user: newUser});
           })
           .catch(function (error) {
             console.error(error);
@@ -126,10 +135,10 @@ router.post("/sendmail", async (req, res) => {
     const email = req.body.email;
     console.log(email);
     const info = await sendVerificationEmail.sendEmail(email);
-    res.status(200).json({ message: "Email sent successfully", info });
+    res.status(200).json({message: "Email sent successfully", info});
   } catch (error) {
     console.error("Error sending verification email:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({error: "Internal server error"});
   }
 });
 
@@ -281,7 +290,7 @@ router.post("/validateToken", validationFn.validateToken, function (req, res) {
   const id = req.body.id;
   const email = req.body.email;
   if (id && email && !isNaN(id) && role && (role === "customer" || role === "admin")) {
-    res.status(200).json({ message: "validation success", role: role });
+    res.status(200).json({message: "validation success", role: role});
   } else {
     return res.status(403).send({error: "Unauthorized Access"});
   }
