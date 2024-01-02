@@ -3,7 +3,7 @@
 import { Image } from "@nextui-org/react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { URL } from "../_enums/global-enums";
+import { URL } from "@/enums/global-enums";
 
 export default function Footer() {
   const { theme } = useTheme();

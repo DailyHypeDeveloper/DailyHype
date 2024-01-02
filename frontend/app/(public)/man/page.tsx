@@ -1,11 +1,11 @@
 "use client";
 
-import { CurrentActivePage } from "@/app/_enums/global-enums";
+import { CurrentActivePage } from "@/enums/global-enums";
 import { useAppState } from "@/app/app-provider";
 import { useEffect, useState } from "react";
 import React from "react";
 import { Listbox, ListboxItem, Switch, Card, CardBody, CardFooter, Image, Tooltip, Input } from "@nextui-org/react";
-import CustomPagination from "@/app/_components/custom-pagination";
+import CustomPagination from "@/components/custom/custom-pagination";
 
 interface Image {
   imageid: string;

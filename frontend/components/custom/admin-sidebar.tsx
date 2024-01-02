@@ -1,13 +1,13 @@
 "use client";
 
 import { Image } from "@nextui-org/react";
-import { useAppState } from "../app-provider";
+import { useAppState } from "@/app/app-provider";
 import { useRouter } from "next/navigation";
-import { CurrentActivePage, URL } from "../_enums/global-enums";
+import { CurrentActivePage, URL } from "@/enums/global-enums";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import SideBarDropDown from "./admin-sidebar-dropdown";
-import SideBarItem from "./admin-sidebar-item";
+import SideBarDropDown from "@/components/custom/admin-sidebar-dropdown";
+import SideBarItem from "@/components/custom/admin-sidebar-item";
 
 interface DropDownOpen {
   dropDownKey: number;
@@ -15,7 +15,7 @@ interface DropDownOpen {
 }
 
 export default function SideBar({ children }: { children: React.ReactNode }) {
-  const { isLoading, setToken, currentActivePage } = useAppState();
+  const { headerCanLoad, currentActivePage } = useAppState();
   const [dropDownOpen, setDropDownOpen] = useState<DropDownOpen[]>([]);
   const router = useRouter();
   const { theme, setTheme } = useTheme();
@@ -36,7 +36,7 @@ export default function SideBar({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      {!isLoading && theme === "light" && (
+      {!headerCanLoad && theme === "light" && (
         <div className="flex max-w-full select-none">
           <div className="flex flex-col py-4 w-[300px] bg-slate-100 dark:bg-slate-900 items-start max-h-screen h-screen fixed top-0 left-0 overflow-hidden">
             <div className="px-4 mt-2 mb-4 flex items-center justify-between w-full">
@@ -71,9 +71,7 @@ export default function SideBar({ children }: { children: React.ReactNode }) {
             <div className="fixed bottom-0 pb-3 left-0 w-[300px] z-10 bg-slate-100">
               <div
                 onClick={() => {
-                  localStorage.removeItem("token");
-                  setToken(null);
-                  router.replace(URL.Home);
+                  router.push(URL.SignOut);
                 }}
                 className="mx-4 mt-auto items-center hover:bg-logo-color-lighter cursor-pointer w-[88%]  px-4 rounded-lg py-3 flex"
               >

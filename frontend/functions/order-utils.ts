@@ -1,4 +1,4 @@
-import { MonthValue, OrderStatusValue } from "../_enums/order-enums";
+import { MonthValue, OrderStatusValue } from "@/enums/order-enums";
 
 /**
  *

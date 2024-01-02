@@ -1,6 +1,6 @@
 "use client";
 
-import { CurrentActivePage } from "@/app/_enums/global-enums";
+import { CurrentActivePage } from "@/enums/global-enums";
 import { useAppState } from "@/app/app-provider";
 import { useEffect } from "react";
 

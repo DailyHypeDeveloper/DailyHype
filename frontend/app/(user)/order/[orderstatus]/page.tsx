@@ -1,22 +1,22 @@
 "use client";
 
-import { CurrentActivePage, URL } from "@/app/_enums/global-enums";
+import { CurrentActivePage, URL } from "@/enums/global-enums";
 import { useAppState } from "@/app/app-provider";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import OrderFilter from "./order-filter";
-import { MonthValue, OrderStatusValue } from "@/app/_enums/order-enums";
+import { MonthValue, OrderStatusValue } from "@/enums/order-enums";
 import OrderList from "./order-list";
 import { Button, Image, Input } from "@nextui-org/react";
 import { useTheme } from "next-themes";
-import CustomPagination from "@/app/_components/custom-pagination";
+import CustomPagination from "@/components/custom/custom-pagination";
 
 export default function Page({ params }: { params: { orderstatus: string } }) {
   const orderDivRef = useRef<HTMLDivElement>(null);
   const orderStatus = params.orderstatus;
   const router = useRouter();
   const { theme } = useTheme();
-  const { token, setToken, setCurrentActivePage } = useAppState();
+  const { setCurrentActivePage } = useAppState();
   const [searchOrder, setSearchOrder] = useState<string>("");
   const [searchMonth, setSearchMonth] = useState<MonthValue>(MonthValue.All);
   const [searchYear, setSearchYear] = useState<string>("0");
@@ -49,35 +49,28 @@ export default function Page({ params }: { params: { orderstatus: string } }) {
   };
 
   useEffect(() => {
-    if (token) {
-      const handleScroll = () => {
-        const scrollY = window.scrollY || document.documentElement.scrollTop;
-        const triggerScroll = 200; // Adjust this value based on when you want the button to appear
-        setShowScrollButton(scrollY > triggerScroll);
-      };
-      window.addEventListener("scroll", handleScroll);
+    const handleScroll = () => {
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      const triggerScroll = 200; // Adjust this value based on when you want the button to appear
+      setShowScrollButton(scrollY > triggerScroll);
+    };
+    window.addEventListener("scroll", handleScroll);
 
-      if (orderStatus === OrderStatusValue.All) setCurrentActivePage(CurrentActivePage.AllOrder);
-      else if (orderStatus === OrderStatusValue.InProgress) setCurrentActivePage(CurrentActivePage.InProgressOrder);
-      else if (orderStatus === OrderStatusValue.Confirmed) setCurrentActivePage(CurrentActivePage.ConfirmedOrder);
-      else if (orderStatus === OrderStatusValue.Delivered) setCurrentActivePage(CurrentActivePage.DeliveredOrder);
-      else if (orderStatus === OrderStatusValue.Received) setCurrentActivePage(CurrentActivePage.ReceivedOrder);
-      else if (orderStatus === OrderStatusValue.Cancelled) setCurrentActivePage(CurrentActivePage.CancelledOrder);
-      else if (orderStatus === OrderStatusValue.Returned) setCurrentActivePage(CurrentActivePage.ReturnedOrder);
-      else {
-        alert("Invalid Order Status!");
-        router.replace("/personal");
-      }
-
-      return () => {
-        window.removeEventListener("scroll", handleScroll);
-      };
-    } else {
-      alert("Unauthorized Access!");
-      localStorage.removeItem("token");
-      setToken(null);
-      router.replace(URL.SignIn);
+    if (orderStatus === OrderStatusValue.All) setCurrentActivePage(CurrentActivePage.AllOrder);
+    else if (orderStatus === OrderStatusValue.InProgress) setCurrentActivePage(CurrentActivePage.InProgressOrder);
+    else if (orderStatus === OrderStatusValue.Confirmed) setCurrentActivePage(CurrentActivePage.ConfirmedOrder);
+    else if (orderStatus === OrderStatusValue.Delivered) setCurrentActivePage(CurrentActivePage.DeliveredOrder);
+    else if (orderStatus === OrderStatusValue.Received) setCurrentActivePage(CurrentActivePage.ReceivedOrder);
+    else if (orderStatus === OrderStatusValue.Cancelled) setCurrentActivePage(CurrentActivePage.CancelledOrder);
+    else if (orderStatus === OrderStatusValue.Returned) setCurrentActivePage(CurrentActivePage.ReturnedOrder);
+    else {
+      alert("Invalid Order Status!");
+      router.replace("/personal");
     }
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -89,8 +82,6 @@ export default function Page({ params }: { params: { orderstatus: string } }) {
     setIsLoading(true);
     if (orderDivRef.current) orderDivRef.current.scrollIntoView();
   }, [currentPage]);
-
-  if (!token) return <></>;
 
   return (
     <div ref={orderDivRef} className="flex flex-col w-full">

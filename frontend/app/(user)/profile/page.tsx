@@ -1,19 +1,13 @@
 "use client";
 
-import {CurrentActivePage, URL} from "@/app/_enums/global-enums";
-import {useAppState} from "@/app/app-provider";
-import {ChangeEvent, useEffect, useState} from "react";
-import {useRouter} from "next/navigation";
+import { CurrentActivePage, URL } from "@/enums/global-enums";
+import { useAppState } from "@/app/app-provider";
+import { ChangeEvent, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
-import {
-  Input,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Button,
-} from "@nextui-org/react";
-import {UserIcon} from "@/app/_components/UserIcon";
+import { Input, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@nextui-org/react";
+import UserIcon from "@/icons/user-icon";
+import { Elsie_Swash_Caps } from "next/font/google";
 
 interface UserData {
   email: string;
@@ -25,7 +19,7 @@ interface UserData {
 }
 
 export default function Profile() {
-  const {token, setToken, setCurrentActivePage} = useAppState();
+  const { setCurrentActivePage } = useAppState();
   const router = useRouter();
   const [selectedColor, setSelectedColor] = useState("default");
   const [userData, setUserData] = useState<UserData>({
@@ -37,25 +31,15 @@ export default function Profile() {
     imageid: "",
   });
   const [selectedRegion, setSelectedRegion] = useState("Region");
-  const [selectedImage, setSelectedImage] = useState<string>(
-    "http://ssl.gstatic.com/accounts/ui/avatar_2x.png"
-  );
+  const [selectedImage, setSelectedImage] = useState<string>("http://ssl.gstatic.com/accounts/ui/avatar_2x.png");
   const regions = ["East", "West", "North", "South", "Central"];
   const variants: Array<"flat"> = ["flat"];
 
   useEffect(() => {
     setCurrentActivePage(CurrentActivePage.Profile);
-    if (!token) {
-      alert("Unauthorized Access!");
-      localStorage.removeItem("token");
-      setToken(null);
-      router.replace(URL.SignIn);
-    } else {
-      fetchUserProfile();
-    }
-  }, []);
 
-  if (!token) return <></>;
+    fetchUserProfile();
+  }, []);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     console.log("File input changed");
@@ -95,9 +79,7 @@ export default function Profile() {
   const fetchUserProfile = () => {
     fetch(`${process.env.BACKEND_URL}/api/profile`, {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: "include",
     })
       .then((response) => {
         if (response.status === 403) {
@@ -115,7 +97,7 @@ export default function Profile() {
       });
   };
 
-  const DropdownContent = ({variant}: {variant: "flat"}) => (
+  const DropdownContent = ({ variant }: { variant: "flat" }) => (
     <Dropdown>
       <DropdownTrigger>
         <Button variant={variant} className="capitalize w-80 dark:bg-default-100">
@@ -137,33 +119,9 @@ export default function Profile() {
       <div className="flex">
         <div className="w-1/4 p-4">
           <div className="text-center mb-4">
-            {userData.imageid ? (
-              <Image
-                src={`https://res.cloudinary.com/dcrv5rnoy/image/upload/${userData.imageid}`}
-                className="rounded-full border-2 border-gray-300"
-                alt="avatar"
-                width={200}
-                height={200}
-                style={{width: "200px", height: "200px"}}
-              />
-            ) : (
-              <Image
-                src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png"
-                className="rounded-full border-2 border-gray-300"
-                alt="avatar"
-                width={200}
-                height={200}
-                style={{width: "200px", height: "200px"}}
-              />
-            )}
+            {userData.imageid ? <Image src={`https://res.cloudinary.com/dcrv5rnoy/image/upload/${userData.imageid}`} className="rounded-full border-2 border-gray-300" alt="avatar" width={200} height={200} style={{ width: "200px", height: "200px" }} /> : <Image src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" className="rounded-full border-2 border-gray-300" alt="avatar" width={200} height={200} style={{ width: "200px", height: "200px" }} />}
             <br />
-            <input
-              type="file"
-              className="text-center center-block file-upload"
-              id="photoInput"
-              accept="image/*"
-              onChange={handleFileChange}
-            />
+            <input type="file" className="text-center center-block file-upload" id="photoInput" accept="image/*" onChange={handleFileChange} />
           </div>
           <hr className="my-4" />
         </div>
@@ -175,60 +133,22 @@ export default function Profile() {
             <div className="form-group">
               <div className="col-xs-6">
                 <label htmlFor="name"></label>
-                <Input
-                  isRequired
-                  type="email"
-                  label="Email"
-                  value={userData.email}
-                  className="max-w-xs mb-8"
-                />
+                <Input isRequired type="email" label="Email" value={userData.email} className="max-w-xs mb-8" />
 
-                <Input
-                  isRequired
-                  type="name"
-                  label="Name"
-                  value={userData.name}
-                  className="max-w-xs mb-8"
-                />
-                <Input
-                  isRequired
-                  type="phone"
-                  label="Phone"
-                  value={userData.phone}
-                  className="max-w-xs mb-8"
-                />
+                <Input isRequired type="name" label="Name" value={userData.name} className="max-w-xs mb-8" />
+                <Input isRequired type="phone" label="Phone" value={userData.phone} className="max-w-xs mb-8" />
 
-                <Input
-                  isRequired
-                  type="address"
-                  label="Address"
-                  value={userData.address}
-                  className="max-w-xs mb-8"
-                />
+                <Input isRequired type="address" label="Address" value={userData.address} className="max-w-xs mb-8" />
 
                 <div className="mb-12">
                   <div className="flex items-center space-x-4 text-black dark:text-white">
                     <label className="flex items-center">
-                      <input
-                        type="radio"
-                        id="male"
-                        name="gender"
-                        value="M"
-                        checked={userData.gender === "M"}
-                        className="form-radio text-white"
-                      />
+                      <input type="radio" id="male" name="gender" value="M" checked={userData.gender === "M"} className="form-radio text-white" />
                       <span className="ml-2">Male</span>
                     </label>
 
                     <label className="flex items-center">
-                      <input
-                        type="radio"
-                        id="female"
-                        name="gender"
-                        value="F"
-                        checked={userData.gender === "F"}
-                        className="form-radio text-white"
-                      />
+                      <input type="radio" id="female" name="gender" value="F" checked={userData.gender === "F"} className="form-radio text-white" />
                       <span className="ml-2">Female</span>
                     </label>
                   </div>
@@ -240,26 +160,11 @@ export default function Profile() {
                   ))}
                 </div>
 
-                <Input
-                  isRequired
-                  type="password"
-                  label="Old Password"
-                  className="max-w-xs mb-8"
-                />
+                <Input isRequired type="password" label="Old Password" className="max-w-xs mb-8" />
 
-                <Input
-                  isRequired
-                  type="password"
-                  label="New Password"
-                  className="max-w-xs mb-8"
-                />
+                <Input isRequired type="password" label="New Password" className="max-w-xs mb-8" />
 
-                <Input
-                  isRequired
-                  type="password"
-                  label="Confirm Password"
-                  className="max-w-xs mb-8"
-                />
+                <Input isRequired type="password" label="Confirm Password" className="max-w-xs mb-8" />
               </div>
             </div>
 
@@ -271,13 +176,7 @@ export default function Profile() {
                 Reset
               </Button>
               <div className="flex-grow" />
-              <Button
-                onClick={handleDeleteAccount}
-                color="danger"
-                variant="bordered"
-                startContent={<UserIcon />}
-                className="ml-4"
-              >
+              <Button onClick={handleDeleteAccount} color="danger" variant="bordered" startContent={<UserIcon />} className="ml-4">
                 Delete user
               </Button>
             </div>

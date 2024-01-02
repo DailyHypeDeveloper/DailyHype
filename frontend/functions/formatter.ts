@@ -1,8 +1,10 @@
 /**
  *
  * This will return the capitalised words from input string
- * @param str(string)
+ * @param str input string which must not be null
  * @returns string
+ * @example
+ * capitaliseWord("hello world");
  */
 export function capitaliseWord(str: string) {
   if (str) {
@@ -10,7 +12,8 @@ export function capitaliseWord(str: string) {
       let splitStr = str.toLowerCase().split(" ");
 
       splitStr.forEach((word, index) => {
-        splitStr[index] = splitStr[index].charAt(0).toUpperCase() + splitStr[index].slice(1);
+        splitStr[index] =
+          splitStr[index].charAt(0).toUpperCase() + splitStr[index].slice(1);
       });
       return splitStr.join(" ");
     }
@@ -21,11 +24,13 @@ export function capitaliseWord(str: string) {
 /**
  *
  * This will return money format (e.g. 23.50)
- * @param value (string)
+ * @param value input string which must not be null
  * @returns string
+ * formatMoney("20"); // 20.00
  */
 export function formatMoney(value: string) {
-  return parseFloat(value).toFixed(2).toString();
+  if (value) return parseFloat(value).toFixed(2).toString();
+  else return "";
 }
 
 /**

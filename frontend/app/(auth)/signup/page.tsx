@@ -11,7 +11,7 @@ import {
   Button,
 } from "@nextui-org/react";
 import Image from "next/image";
-import {URL} from "@/app/_enums/global-enums";
+import {URL} from "@/enums/global-enums";
 import {useGoogleLogin, TokenResponse} from "@react-oauth/google";
 import axios from "axios";
 import {useRouter} from "next/navigation";
