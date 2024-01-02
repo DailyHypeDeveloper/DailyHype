@@ -83,8 +83,18 @@ module.exports.signupGoogle = function signupGoogle(id, name, email, verified_em
     throw error;
   });
 };
+
+module.exports.loginGoogle = function loginGoogle(email){
+    const sql = "SELECT * FROM appuser WHERE email = $1";
+    return query(sql, [email]).catch(function(error){
+        throw error;
+    })
+
+}
 module.exports.checkExistingUser = function checkExistingUser(email) {
-  const sql = "SELECT * FROM appuser WHERE email = $1";
+  const sql = `SELECT u.*, i.url FROM appuser u
+            LEFT JOIN image i ON i.imageid= u.imageid
+            WHERE email = $1`;
   return query(sql, [email])
     .then(function (result) {
       const rows = result.rows;

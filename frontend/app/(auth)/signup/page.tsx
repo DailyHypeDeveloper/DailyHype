@@ -102,7 +102,7 @@ export default function Page() {
 
   useEffect(() => {
     if (user.length > 0) {
-      const currentUser = user[0]; // Assuming there is only one user in the array
+      const currentUser = user[0];
 
       axios
         .get(

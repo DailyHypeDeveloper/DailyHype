@@ -86,14 +86,24 @@ router.post("/signupGoogle", function (req, res) {
   const name = res_name;
   const verified_email = res_verified_email;
   const picture = res_picture;
-  console.log(req.body.res_email);
-  console.log("HELLO");
 
   userModel
     .checkExistingUser(email)
     .then(function (existingUser) {
+
       if (existingUser) {
-        res.status(409).json({error: "User already exists"});
+        const existingUserToken = jwt.sign(
+          { email: existingUser.email, userId: existingUser.userid, role: existingUser.role },
+          process.env.JWT_SECRET_KEY,
+          { expiresIn: "1h" }
+        );
+        const cookieValue = serialize("authToken", existingUserToken, {
+          httpOnly: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        res.setHeader("Set-Cookie", cookieValue);
+          res.status(200).json({user: existingUser});
       } else {
         userModel
           .signupGoogle(id, name, email, verified_email,picture)
