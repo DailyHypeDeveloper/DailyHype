@@ -11,12 +11,14 @@ import {
   Button,
 } from "@nextui-org/react";
 import Image from "next/image";
-import {URL} from "@/app/_enums/global-enums";
-import { useGoogleLogin,TokenResponse } from '@react-oauth/google';
-import axios from 'axios';
-import { useRouter } from "next/navigation";
+import {URL} from "@/enums/global-enums";
+import {useGoogleLogin, TokenResponse} from "@react-oauth/google";
+import axios from "axios";
+import {useRouter} from "next/navigation";
+import {useAppState} from "@/app/app-provider";
 
 export default function Page() {
+  const {setUserInfo, setHeaderCanLoad} = useAppState();
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -81,55 +83,88 @@ export default function Page() {
         console.error("Error sending email:", error.message);
         // Handle the error, show an error message, etc.
       });
-    setShowVerification(false); 
-    clearInterval(timer); 
+    setShowVerification(false);
+    clearInterval(timer);
   };
 
   const router = useRouter();
   const login = useGoogleLogin({
-      onSuccess: (codeResponse:TokenResponse) => setUser([codeResponse]),
-      onError: (error) => console.log('Login Failed:', error)
+    onSuccess: (codeResponse: TokenResponse) => setUser([codeResponse]),
+    onError: (error) => console.log("Login Failed:", error),
   });
 
   useEffect(() => {
-      let token = localStorage.getItem('token');
-      if (token) {
-        router.push(URL.Dashboard);
-      }
+    let token = localStorage.getItem("token");
+    if (token) {
+      router.push(URL.Dashboard);
+    }
   }, []);
 
   useEffect(() => {
     if (user.length > 0) {
       const currentUser = user[0]; // Assuming there is only one user in the array
-  
-      axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${currentUser.access_token}`, {
-        headers: {
-          "Authorization": `Bearer ${currentUser.access_token}`,
-          Accept: 'application/json'
-        }
-      })
-      .then((res) => {
-        console.log("This is profile");
-        console.log(res.data);
-  
-        axios.post(`${process.env.BACKEND_URL}/api/login`, { ...res.data, method: "google" })
-          .then((response) => {
-            console.log(response);
-            localStorage.setItem('token', response.data.token);
-            router.push(URL.Dashboard);
+
+      axios
+        .get(
+          `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${currentUser.access_token}`,
+          {
+            headers: {
+              Authorization: `Bearer ${currentUser.access_token}`,
+              Accept: "application/json",
+            },
+          }
+        )
+        .then((res) => {
+          console.log("This is profile");
+          console.log(res.data);
+
+          const res_id = res.data.id;
+          const res_name = res.data.name;
+          const res_email = res.data.email;
+          const res_verified_email = res.data.verified_email;
+
+          fetch(`${process.env.BACKEND_URL}/api/signupGoogle`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({res_id, res_name, res_email, res_verified_email}),
+            credentials: "include",
           })
-          .catch((error) => {
-            console.error("Error posting user data:", error);
-            alert('Sign In failed!');
-          });
-      })
-      .catch((err) => {
-        console.error("Error fetching user info:", err);
-        alert('Sign In failed!');
-      });
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+              }
+              return response.json();
+            })
+            .then((data) => {
+              console.log("hello");
+              console.log(data);
+              const user = data.user;
+              localStorage.setItem(
+                "user",
+                JSON.stringify({
+                  name: user.name,
+                  email: user.email,
+                  image: user.url,
+                  role: user.role,
+                })
+              );
+              setHeaderCanLoad(false);
+              setUserInfo({name: user.name, email: user.email, image: user.url, role: user.role});
+              router.push(URL.Home);
+            })
+            .catch((error) => {
+              console.error("Error posting user data:", error);
+              alert("Sign In failed!");
+            });
+        })
+        .catch((err) => {
+          console.error("Error fetching user info:", err);
+          alert("Sign In failed!");
+        });
     }
   }, [user, router]);
-  
 
   return (
     <div className="w-full min-h-screen grid grid-cols-1 sm:grid-cols-2">
@@ -195,29 +230,50 @@ export default function Page() {
             <div className="text-center 2xl:mr-72">{errorMessage}</div>
           </div>
           <div className="grid ">
-              <button onClick={() => login()} className="group  h-12 px-9 border-2 border-gray-300 rounded-full transition duration-300 hover:border-blue-400 focus:bg-blue-50 active:bg-blue-100 bg-white">
-                <div className="relative flex items-center space-x-6 justify-center">
-                  <img src="https://tailus.io/sources/blocks/social/preview/images/google.svg" className="w-5" alt="google logo"/>
-                  <span className="block w-max font-semibold tracking-wide text-gray-700 text-sm transition duration-300 group-hover:text-blue-600 sm:text-base">
-                    Continue with Google
-                  </span>
-                </div>
-              </button>
-            </div>
+            <button
+              onClick={() => login()}
+              className="group  h-12 px-9 border-2 border-gray-300 rounded-full transition duration-300 hover:border-blue-400 focus:bg-blue-50 active:bg-blue-100 bg-white"
+            >
+              <div className="relative flex items-center space-x-6 justify-center">
+                <img
+                  src="https://tailus.io/sources/blocks/social/preview/images/google.svg"
+                  className="w-5"
+                  alt="google logo"
+                />
+                <span className="block w-max font-semibold tracking-wide text-gray-700 text-sm transition duration-300 group-hover:text-blue-600 sm:text-base">
+                  Continue with Google
+                </span>
+              </div>
+            </button>
+          </div>
 
-            <div className="grid ">
-              <button className="group w-68 h-12 px-6 border-2 border-gray-300 rounded-full transition duration-300 hover:border-blue-400 focus:bg-blue-50 active:bg-blue-100 bg-white">
-                <div className="relative flex items-center justify-center">
-                  <img src="https://www.logo.wine/a/logo/Facebook/Facebook-f_Logo-Blue-Logo.wine.svg" className="w-12" alt="facebook logo" />
-                  <span className="block w-max font-semibold tracking-wide text-gray-700 text-sm transition duration-300 group-hover:text-blue-600 sm:text-base">
-                    Continue with Facebook
-                  </span>
-                </div>
-              </button>
-            </div>
+          <div className="grid ">
+            <button className="group w-68 h-12 px-6 border-2 border-gray-300 rounded-full transition duration-300 hover:border-blue-400 focus:bg-blue-50 active:bg-blue-100 bg-white">
+              <div className="relative flex items-center justify-center">
+                <img
+                  src="https://www.logo.wine/a/logo/Facebook/Facebook-f_Logo-Blue-Logo.wine.svg"
+                  className="w-12"
+                  alt="facebook logo"
+                />
+                <span className="block w-max font-semibold tracking-wide text-gray-700 text-sm transition duration-300 group-hover:text-blue-600 sm:text-base">
+                  Continue with Facebook
+                </span>
+              </div>
+            </button>
+          </div>
 
           <div className="space-y-3 text-black text-center sm:-mb-8">
-            <p className="text-xs">By proceeding, you agree to our <a href="#" className="underline text-color-white">Terms of Use</a> and confirm you have read our <a href="#" className="underline">Privacy and Cookie Statement</a>.</p>
+            <p className="text-xs">
+              By proceeding, you agree to our{" "}
+              <a href="#" className="underline text-color-white">
+                Terms of Use
+              </a>{" "}
+              and confirm you have read our{" "}
+              <a href="#" className="underline">
+                Privacy and Cookie Statement
+              </a>
+              .
+            </p>
           </div>
         </div>
       )}
