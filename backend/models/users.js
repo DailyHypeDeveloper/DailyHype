@@ -49,6 +49,13 @@ module.exports.signup = function signup(name, email, password, phone, gender, ad
         });
 };
 
+module.exports.signupGoogle = function signupGoogle(id,name,email,verified_email){
+    const sql = `INSERT INTO appuser(createdat,userid,name,email,verified_email,role) VALUES(NOW(),$1,$2,$3,$4,'customer') RETURNING *`;
+    return query(sql, [id,name,email,verified_email])
+    .catch(function (error) {
+        throw error;
+    })
+}
 module.exports.checkExistingUser = function checkExistingUser(email) {
     const sql = 'SELECT * FROM appuser WHERE email = $1';
     return query(sql, [email])
