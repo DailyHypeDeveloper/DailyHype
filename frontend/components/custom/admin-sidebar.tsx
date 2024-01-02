@@ -3,7 +3,7 @@
 import { Image } from "@nextui-org/react";
 import { useAppState } from "@/app/app-provider";
 import { useRouter } from "next/navigation";
-import { CurrentActivePage, URL } from "@/enums/global-enums";
+import { CurrentActivePage, ErrorMessage, URL } from "@/enums/global-enums";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import SideBarDropDown from "@/components/custom/admin-sidebar-dropdown";
@@ -15,28 +15,47 @@ interface DropDownOpen {
 }
 
 export default function SideBar({ children }: { children: React.ReactNode }) {
-  const { headerCanLoad, currentActivePage } = useAppState();
+  const { headerCanLoad, currentActivePage, userInfo, isAuthenticated, redirectPage } = useAppState();
   const [dropDownOpen, setDropDownOpen] = useState<DropDownOpen[]>([]);
   const router = useRouter();
   const { theme, setTheme } = useTheme();
 
   useEffect(() => {
-    setTheme("light");
+    if (headerCanLoad) setTheme("light");
   }, []);
 
   useEffect(() => {
-    if (currentActivePage === CurrentActivePage.Dashboard) {
-      setDropDownOpen([]);
-    } else if (currentActivePage === CurrentActivePage.UserForm) {
-      setDropDownOpen([{ dropDownKey: 1, itemKey: 1 }]);
-    } else if (currentActivePage === CurrentActivePage.OrderList) {
-      setDropDownOpen([{ dropDownKey: 2, itemKey: 5 }]);
+    let authCheckFinish = false;
+    if (redirectPage == URL.SignOut && headerCanLoad) {
+      alert("Invalid Token");
+      authCheckFinish = true;
+      router.push(URL.SignOut);
     }
+    if (!authCheckFinish && !isAuthenticated && headerCanLoad) {
+      alert(ErrorMessage.Unauthorized);
+      authCheckFinish = true;
+      router.push(URL.SignOut);
+    }
+    if (!authCheckFinish && userInfo.role !== "admin" && headerCanLoad) {
+      alert(ErrorMessage.Unauthorized);
+      router.push(URL.SignOut);
+    }
+  }, [redirectPage, headerCanLoad, isAuthenticated]);
+
+  useEffect(() => {
+    if (isAuthenticated && headerCanLoad)
+      if (currentActivePage === CurrentActivePage.Dashboard) {
+        setDropDownOpen([]);
+      } else if (currentActivePage === CurrentActivePage.UserForm) {
+        setDropDownOpen([{ dropDownKey: 1, itemKey: 1 }]);
+      } else if (currentActivePage === CurrentActivePage.OrderList) {
+        setDropDownOpen([{ dropDownKey: 2, itemKey: 5 }]);
+      }
   }, [currentActivePage]);
 
   return (
     <>
-      {!headerCanLoad && theme === "light" && (
+      {isAuthenticated && headerCanLoad && theme === "light" && (
         <div className="flex max-w-full select-none">
           <div className="flex flex-col py-4 w-[300px] bg-slate-100 dark:bg-slate-900 items-start max-h-screen h-screen fixed top-0 left-0 overflow-hidden">
             <div className="px-4 mt-2 mb-4 flex items-center justify-between w-full">

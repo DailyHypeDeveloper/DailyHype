@@ -3,7 +3,6 @@
 import { useState, useContext, createContext, useEffect } from "react";
 import { CurrentActivePage, URL } from "@/enums/global-enums";
 import { validateToken } from "@/functions/auth-functions";
-// import Router from "next/router";
 
 export const AppState = createContext<any>(null);
 
@@ -22,6 +21,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
   const [userInfo, setUserInfo] = useState<UserBasicInfoInterface>({ name: "", email: "", image: "", role: "" });
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [redirectPage, setRedirectPage] = useState<URL | null>(null);
 
   // for showing current active page ui
   // refer to the global-enums.ts
@@ -45,25 +45,20 @@ export default function AppProvider({ children }: { children: React.ReactNode })
     if (user) {
       const userObj = JSON.parse(user) as UserBasicInfoInterface;
       setUserInfo(userObj);
-      try {
-        if (userObj.role === "customer" || userObj.role === "admin")
-          validateToken(userObj.role).then((result) => {
-            if (result) {
-              setIsAuthenticated(true);
-            } else {
-              setIsAuthenticated(false);
-              // Router.push(URL.SignOut);
-            }
-          });
-        else {
-          setIsAuthenticated(false);
-          // Router.push(URL.SignOut);
-        }
-      } catch (error) {
-        console.error(error);
+
+      if (userObj.role === "customer" || userObj.role === "admin")
+        validateToken(userObj.role).then((result) => {
+          if (result) {
+            setIsAuthenticated(true);
+          } else {
+            setIsAuthenticated(false);
+            setRedirectPage(URL.SignOut);
+          }
+          setHeaderCanLoad(true);
+        });
+      else {
         setIsAuthenticated(false);
-        // Router.push(URL.SignOut);
-      } finally {
+        setRedirectPage(URL.SignOut);
         setHeaderCanLoad(true);
       }
     } else {
@@ -72,27 +67,20 @@ export default function AppProvider({ children }: { children: React.ReactNode })
   }, []);
 
   useEffect(() => {
-    if (userInfo.email && userInfo.image && userInfo.name && userInfo.role) {
-      try {
-        validateToken(userInfo.role).then((result) => {
-          if (result) {
-            setIsAuthenticated(true);
-          } else {
-            setIsAuthenticated(false);
-            // Router.push(URL.SignOut);
-          }
-        });
-      } catch (error) {
-        console.error(error);
-        setIsAuthenticated(false);
-        // Router.push(URL.SignOut);
-      } finally {
+    if (userInfo.email && userInfo.name && userInfo.role) {
+      validateToken(userInfo.role).then((result) => {
+        if (result) {
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+          setRedirectPage(URL.SignOut);
+        }
         setHeaderCanLoad(true);
-      }
+      });
     }
   }, [userInfo]);
 
-  return <AppState.Provider value={{ userInfo, setUserInfo, currentActivePage, setCurrentActivePage, cart, setCart, headerCanLoad, setHeaderCanLoad, isAuthenticated, setIsAuthenticated }}>{children}</AppState.Provider>;
+  return <AppState.Provider value={{ userInfo, setUserInfo, currentActivePage, setCurrentActivePage, cart, setCart, headerCanLoad, setHeaderCanLoad, isAuthenticated, setIsAuthenticated, redirectPage, setRedirectPage }}>{children}</AppState.Provider>;
 }
 
 /**
