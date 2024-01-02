@@ -42,9 +42,9 @@ export default function SignIn() {
       .then((result) => {
         const token = result.token;
         const user = result.user;
-        localStorage.setItem("user", JSON.stringify({ name: user.name, email: user.email, image: user.url, role: user.role }));
+        localStorage.setItem("user", JSON.stringify({ id: user.userid, name: user.name, email: user.email, image: user.url, role: user.role }));
         setHeaderCanLoad(false);
-        setUserInfo({ name: user.name, email: user.email, image: user.url, role: user.role });
+        setUserInfo({ id: user.userid, name: user.name, email: user.email, image: user.url, role: user.role });
         if (user.role === "admin") {
           router.push(URL.Dashboard);
         } else {

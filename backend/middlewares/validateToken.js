@@ -21,6 +21,7 @@ module.exports.validateToken = (req, res, next) => {
         req.body.id = data.userId;
         req.body.role = data.role;
         req.body.email = data.email;
+        req.body.lastCheckTime = data.lastCheckTime;
 
         next();
       }
@@ -28,4 +29,4 @@ module.exports.validateToken = (req, res, next) => {
   } else {
     res.status(403).send({ error: "Unauthorized Access" });
   }
-}; //End of checkForValidUserRoleUser
+};

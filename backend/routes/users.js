@@ -8,59 +8,59 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/users");
+const imageModel = require("../models/images");
 const validationFn = require("../middlewares/validateToken");
-const {EMPTY_RESULT_ERROR, DUPLICATE_ENTRY_ERROR} = require("../errors");
+const { EMPTY_RESULT_ERROR, DUPLICATE_ENTRY_ERROR } = require("../errors");
 const cloudinary = require("../cloudinary");
 const multer = require("multer");
 const sendVerificationEmail = require("../nodemailer/sendmail");
-const {serialize} = require("cookie");
+const { serialize } = require("cookie");
 
 router.post("/login", function (req, res) {
-  const {email, password} = req.body;
-  userModel
+  const { email, password } = req.body;
+  return userModel
     .checkLogin(email, password)
     .then(function (user) {
       if (!user) {
-        res.status(401).json({error: "Invalid email or password"});
+        res.status(401).json({ error: "Invalid email or password" });
       } else {
         delete user.password;
         console.log(user);
-        const token = jwt.sign(
-          {email: user.email, userId: user.userid, role: user.role},
-          process.env.JWT_SECRET_KEY,
-          {expiresIn: "1h"}
-        );
-        const cookieValue = serialize("authToken", token, {
-          httpOnly: true,
-          sameSite: "strict",
-          path: "/",
+        const access_token = jwt.sign({ email: user.email, userId: user.userid, role: user.role, lastCheckTime: new Date().toISOString() }, process.env.JWT_SECRET_KEY, { expiresIn: "1h" });
+        const refresh_token = jwt.sign({ lastcreatedat: new Date().toISOString() }, process.env.JWT_REFRESH_KEY, { expiresIn: "7d" });
+        return userModel.storeRefreshToken(user.userid, refresh_token).then((result) => {
+          const cookieValue = serialize("authToken", access_token, {
+            httpOnly: true,
+            sameSite: "strict",
+            path: "/",
+          });
+          res.setHeader("Set-Cookie", cookieValue);
+          return res.status(200).json({ user: user });
         });
-        res.setHeader("Set-Cookie", cookieValue);
-        res.status(200).json({user: user});
       }
     })
     .catch(function (error) {
       console.error(error);
       if (error instanceof EMPTY_RESULT_ERROR) {
-        res.status(401).json({error: "User not found"});
+        return res.status(401).json({ error: "User not found" });
       } else if (error instanceof DUPLICATE_ENTRY_ERROR) {
-        res.status(409).json({error: "Duplicate entry"});
+        return res.status(409).json({ error: "Duplicate entry" });
       } else {
-        res.status(500).json({error: "Unknown Error"});
+        return res.status(500).json({ error: "Unknown Error" });
       }
     });
 });
 //ok
 
 router.post("/signup", function (req, res) {
-  const {name, email, password, phone, gender, address, region, role, verified_email} = req.body;
+  const { name, email, password, phone, gender, address, region, role, verified_email } = req.body;
 
   //Sequential Reequests
   userModel
     .checkExistingUser(email)
     .then(function (existingUser) {
       if (existingUser) {
-        res.status(409).json({error: "User already exists"});
+        res.status(409).json({ error: "User already exists" });
       } else {
         userModel
           .signup(name, email, password, phone, gender, address, region, role, verified_email)
@@ -69,30 +69,28 @@ router.post("/signup", function (req, res) {
           })
           .catch(function (error) {
             console.error(error);
-            res.status(500).json({error: "Error creating user"});
+            res.status(500).json({ error: "Error creating user" });
           });
       }
     })
     .catch(function (error) {
       console.error(error);
-      res.status(500).json({error: "Unknown Error"});
+      res.status(500).json({ error: "Unknown Error" });
     });
 });
 
 router.post("/signupGoogle", function (req, res) {
-  const {res_id, res_name, res_email, res_verified_email} = req.body;
+  const { res_id, res_name, res_email, res_verified_email, image } = req.body;
   const email = res_email;
   const id = res_id;
   const name = res_name;
   const verified_email = res_verified_email;
-  console.log(req.body.res_email);
-  console.log("HELLO");
 
   userModel
     .checkExistingUser(email)
     .then(function (existingUser) {
       if (existingUser) {
-        res.status(409).json({error: "User already exists"});
+        res.status(409).json({ error: "User already exists" });
       } else {
         userModel
           .signupGoogle(id, name, email, verified_email)
@@ -101,14 +99,10 @@ router.post("/signupGoogle", function (req, res) {
               email: email,
               id: id,
               role: "customer",
-              url: "",
+              url: image,
               name: name,
             };
-            const token = jwt.sign(
-              {email: newUser.email, userId: newUser.id, role: newUser.role},
-              process.env.JWT_SECRET_KEY,
-              {expiresIn: "1h"}
-            );
+            const token = jwt.sign({ email: newUser.email, userId: newUser.id, role: newUser.role, lastCheckTime: new Date().toISOString() }, process.env.JWT_SECRET_KEY, { expiresIn: "1h" });
             console.log(token);
             const cookieValue = serialize("authToken", token, {
               httpOnly: true,
@@ -116,17 +110,17 @@ router.post("/signupGoogle", function (req, res) {
               path: "/",
             });
             res.setHeader("Set-Cookie", cookieValue);
-            res.status(200).json({user: newUser});
+            res.status(200).json({ user: newUser });
           })
           .catch(function (error) {
             console.error(error);
-            res.status(500).json({error: "Error creating user"});
+            res.status(500).json({ error: "Error creating user" });
           });
       }
     })
     .catch(function (error) {
       console.error(error);
-      res.status(500).json({error: "Unknown Error"});
+      res.status(500).json({ error: "Unknown Error" });
     });
 });
 
@@ -135,10 +129,10 @@ router.post("/sendmail", async (req, res) => {
     const email = req.body.email;
     console.log(email);
     const info = await sendVerificationEmail.sendEmail(email);
-    res.status(200).json({message: "Email sent successfully", info});
+    res.status(200).json({ message: "Email sent successfully", info });
   } catch (error) {
     console.error("Error sending verification email:", error);
-    res.status(500).json({error: "Internal server error"});
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -153,14 +147,14 @@ router.get("/getAllUserByAdmin", validationFn.validateToken, (req, res) => {
   userModel
     .getUserByAdmin(offset)
     .then(function (users) {
-      return res.json({users});
+      return res.json({ users });
     })
     .catch(function (error) {
       console.error(error);
       if (error instanceof EMPTY_RESULT_ERROR) {
-        return res.status(404).json({error: error.message});
+        return res.status(404).json({ error: error.message });
       }
-      return res.status(500).json({error: "Unknown Error"});
+      return res.status(500).json({ error: "Unknown Error" });
     });
 });
 
@@ -170,15 +164,15 @@ router.delete("/deleteUser/:userid", validationFn.validateToken, (req, res) => {
   userModel
     .deleteUser(userId)
     .then(() => {
-      res.status(200).json({message: "User deleted successfully"});
+      res.status(200).json({ message: "User deleted successfully" });
     })
     .catch((error) => {
       console.error("Error deleting user:", error);
 
       if (error instanceof EMPTY_RESULT_ERROR) {
-        res.status(404).json({error: "User not found"});
+        res.status(404).json({ error: "User not found" });
       } else {
-        res.status(500).json({error: "Error deleting user"});
+        res.status(500).json({ error: "Error deleting user" });
       }
     });
 });
@@ -191,11 +185,11 @@ const storage = multer.diskStorage({
     cb(null, file.originalname); // Set the file name
   },
 });
-const upload = multer({storage: storage});
+const upload = multer({ storage: storage });
 
 router.post("/create-user", validationFn.validateToken, upload.single("photo"), (req, res) => {
   try {
-    const {name, email, password, phone, address, region} = req.body;
+    const { name, email, password, phone, address, region } = req.body;
     const file = req.file;
 
     const uploadPhoto = () => {
@@ -203,25 +197,25 @@ router.post("/create-user", validationFn.validateToken, upload.single("photo"), 
         return Promise.resolve(null);
       }
 
-      return cloudinary.uploader.upload(file.path, {folder: "Design"});
+      return cloudinary.uploader.upload(file.path, { folder: "Design" });
     };
 
     const createUserInDatabase = (photoResult) => {
       const photoUrl = photoResult ? photoResult.secure_url : null;
-      return userModel.createUser({name, email, password, phone, address, region, photoUrl});
+      return userModel.createUser({ name, email, password, phone, address, region, photoUrl });
     };
 
     Promise.all([uploadPhoto(), createUserInDatabase()])
       .then(([photoResult]) => {
-        res.status(201).json({message: "User created successfully"});
+        res.status(201).json({ message: "User created successfully" });
       })
       .catch((error) => {
         console.error("Error creating user:", error);
-        res.status(500).json({error: "Error creating user"});
+        res.status(500).json({ error: "Error creating user" });
       });
   } catch (error) {
     console.error("Error in create-user endpoint:", error);
-    res.status(500).json({error: "Error creating user"});
+    res.status(500).json({ error: "Error creating user" });
   }
 });
 
@@ -233,18 +227,18 @@ router.get("/getTotalUserByAdmin", validationFn.validateToken, (req, res) => {
     userModel
       .getTotalUserByAdmin(startDate, endDate)
       .then((users) => {
-        return res.json({users});
+        return res.json({ users });
       })
       .catch((error) => {
         console.error(error);
         if (error instanceof EMPTY_RESULT_ERROR) {
-          return res.status(404).json({error: error.message});
+          return res.status(404).json({ error: error.message });
         }
-        return res.status(500).json({error: "Unknown Error"});
+        return res.status(500).json({ error: "Unknown Error" });
       });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({error: "Unknown Error"});
+    return res.status(500).json({ error: "Unknown Error" });
   }
 });
 
@@ -263,20 +257,20 @@ router.get("/getUserCreationData", validationFn.validateToken, (req, res) => {
       .catch((error) => {
         console.error(error);
         if (error instanceof EMPTY_RESULT_ERROR) {
-          return res.status(404).json({error: error.message});
+          return res.status(404).json({ error: error.message });
         }
-        return res.status(500).json({error: "Unknown Error"});
+        return res.status(500).json({ error: "Unknown Error" });
       });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({error: "Unknown Error"});
+    return res.status(500).json({ error: "Unknown Error" });
   }
 });
 
 router.get("/getgenderStatistics", (req, res) => {
   userModel.getGenderStatistics((error, statistics) => {
     if (error) {
-      return res.status(500).json({error: "Internal Server Error"});
+      return res.status(500).json({ error: "Internal Server Error" });
     }
 
     res.json(statistics);
@@ -285,14 +279,22 @@ router.get("/getgenderStatistics", (req, res) => {
 
 // Name: Zay Yar Tun
 // to check whether the token is customer
-router.post("/validateToken", validationFn.validateToken, function (req, res) {
+router.post("/validateToken/:userid", validationFn.validateToken, function (req, res) {
   const role = req.body.role;
   const id = req.body.id;
   const email = req.body.email;
+  const userID = req.params.userid;
+  const lastCheckTime = req.body.lastCheckTime;
+  if (lastCheckTime) {
+    const newCheckTime = new Date();
+    const diff = Math.floor((newCheckTime - new Date(lastCheckTime)) / (1000 * 60));
+    if (diff > 10) {
+    }
+  }
   if (id && email && !isNaN(id) && role && (role === "customer" || role === "admin")) {
     res.status(200).json({ message: "validation success", role: role });
   } else {
-    return res.status(403).send({error: "Unauthorized Access"});
+    return res.status(403).send({ error: "Unauthorized Access" });
   }
 });
 
@@ -302,7 +304,7 @@ router.post("/signout", (req, res) => {
     sameSite: "strict",
     path: "/",
   });
-  return res.status(200).json({success: true});
+  return res.status(200).json({ success: true });
 });
 // Name: Zay Yar Tun
 

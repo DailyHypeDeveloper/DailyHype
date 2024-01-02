@@ -4,7 +4,18 @@ const nextConfig = {
     BACKEND_URL: process.env.BACKEND_URL || "http://localhost:5001",
   },
   images: {
-    domains: ["ssl.gstatic.com", "res.cloudinary.com"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "**",
+      },
+      {
+        protocol: "https",
+        hostname: "ssl.gstatic.com",
+        pathname: "**",
+      },
+    ],
   },
   reactStrictMode: false,
 };
