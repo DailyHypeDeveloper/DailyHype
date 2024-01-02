@@ -80,11 +80,12 @@ router.post("/signup", function (req, res) {
 });
 
 router.post("/signupGoogle", function (req, res) {
-  const {res_id, res_name, res_email, res_verified_email} = req.body;
+  const {res_id, res_name, res_email, res_verified_email, res_picture} = req.body;
   const email = res_email;
   const id = res_id;
   const name = res_name;
   const verified_email = res_verified_email;
+  const picture = res_picture;
   console.log(req.body.res_email);
   console.log("HELLO");
 
@@ -95,13 +96,13 @@ router.post("/signupGoogle", function (req, res) {
         res.status(409).json({error: "User already exists"});
       } else {
         userModel
-          .signupGoogle(id, name, email, verified_email)
+          .signupGoogle(id, name, email, verified_email,picture)
           .then(function () {
             const newUser = {
               email: email,
               id: id,
               role: "customer",
-              url: "",
+              url: picture,
               name: name,
             };
             const token = jwt.sign(

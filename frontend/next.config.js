@@ -4,7 +4,7 @@ const nextConfig = {
     BACKEND_URL: process.env.BACKEND_URL || "http://localhost:5001",
   },
   images: {
-    domains: ["ssl.gstatic.com", "res.cloudinary.com"],
+    domains: ["ssl.gstatic.com", "res.cloudinary.com","lh3.googleusercontent.com"],
   },
   reactStrictMode: false,
 };

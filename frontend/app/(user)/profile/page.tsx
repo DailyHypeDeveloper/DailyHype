@@ -15,7 +15,7 @@ interface UserData {
   phone: string;
   address: string;
   gender: "M" | "F";
-  imageid: string;
+  url: string;
 }
 
 export default function Profile() {
@@ -28,7 +28,7 @@ export default function Profile() {
     phone: "",
     address: "",
     gender: "M",
-    imageid: "",
+    url: "",
   });
   const [selectedRegion, setSelectedRegion] = useState("Region");
   const [selectedImage, setSelectedImage] = useState<string>("http://ssl.gstatic.com/accounts/ui/avatar_2x.png");
@@ -119,7 +119,7 @@ export default function Profile() {
       <div className="flex">
         <div className="w-1/4 p-4">
           <div className="text-center mb-4">
-            {userData.imageid ? <Image src={`https://res.cloudinary.com/dcrv5rnoy/image/upload/${userData.imageid}`} className="rounded-full border-2 border-gray-300" alt="avatar" width={200} height={200} style={{ width: "200px", height: "200px" }} /> : <Image src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" className="rounded-full border-2 border-gray-300" alt="avatar" width={200} height={200} style={{ width: "200px", height: "200px" }} />}
+            {userData.url ? <Image src={`${userData.url}`} className="rounded-full border-2 border-gray-300" alt="avatar" width={200} height={200} style={{ width: "200px", height: "200px" }} /> : <Image src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" className="rounded-full border-2 border-gray-300" alt="avatar" width={200} height={200} style={{ width: "200px", height: "200px" }} />}
             <br />
             <input type="file" className="text-center center-block file-upload" id="photoInput" accept="image/*" onChange={handleFileChange} />
           </div>
