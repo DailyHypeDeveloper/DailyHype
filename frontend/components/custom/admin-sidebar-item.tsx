@@ -2,7 +2,7 @@
 
 import { Image } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
-import { URL } from "../_enums/global-enums";
+import { URL } from "@/enums/global-enums";
 import clsx from "clsx";
 import { useState } from "react";
 

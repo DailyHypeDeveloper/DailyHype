@@ -16,7 +16,6 @@ import { useGoogleLogin,TokenResponse } from '@react-oauth/google';
 import axios from 'axios';
 import { useRouter } from "next/navigation";
 
-
 export default function Page() {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");

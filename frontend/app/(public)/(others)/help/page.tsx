@@ -1,6 +1,6 @@
 "use client";
 
-import { URL } from "@/app/_enums/global-enums";
+import { URL } from "@/enums/global-enums";
 import { Accordion, AccordionItem, Input, Link } from "@nextui-org/react";
 import { useState } from "react";
 

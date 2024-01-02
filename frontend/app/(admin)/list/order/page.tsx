@@ -1,6 +1,6 @@
 "use client";
 
-import { CurrentActivePage } from "@/app/_enums/global-enums";
+import { CurrentActivePage } from "@/enums/global-enums";
 import { useAppState } from "@/app/app-provider";
 import { useEffect } from "react";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, Selection, ChipProps, SortDescriptor } from "@nextui-org/react";
