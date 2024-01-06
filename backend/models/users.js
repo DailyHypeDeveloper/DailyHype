@@ -218,6 +218,17 @@ module.exports.getGenderStatistics = function (callback) {
 
 // Name: Zay Yar Tun
 
+module.exports.getUserByUserID = function getUserByUserID(userID) {
+  const sql = `
+    SELECT * FROM appuser WHERE userid = $1
+  `;
+
+  return query(sql, [userID]).then((result) => {
+    const rows = result.rows;
+    return rows[0];
+  });
+};
+
 module.exports.getUserAddressByIdEmail = function getUserAddressByIdEmail(userID, email) {
   const sql = `
         SELECT address FROM AppUser WHERE userid = $1 AND email = $2

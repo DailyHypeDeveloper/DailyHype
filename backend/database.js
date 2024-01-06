@@ -16,7 +16,7 @@ const pool = new pg.Pool({
 const oldQuery = pool.query;
 pool.query = function (...args) {
     const [sql, params] = args;
-    console.log(`EXECUTING QUERY |`, sql, params);
+    console.log(`\nEXECUTING QUERY |`, sql, params);
     return oldQuery.apply(pool, args);
 };
 
