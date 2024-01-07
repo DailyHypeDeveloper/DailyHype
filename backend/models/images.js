@@ -65,7 +65,6 @@ module.exports.uploadCloudinaryPhotos = function uploadCloudinaryPhotos(file) {
 };
 
 module.exports.createProductImage = function createProductImage(imageid, imagename, url) {
-
   const sql = `
         INSERT INTO image (imageid, imagename, url) VALUES ($1, $2, $3);
     `;
@@ -91,12 +90,11 @@ module.exports.getImageIDByProductID = function getImageIDByProductID(productid)
     AND pi.productid = $1
   `;
 
-  return query(sql, [productid])
-    .then((result) => {
-      const rows = result.rows;
-      return rows[0];
-    })
-}
+  return query(sql, [productid]).then((result) => {
+    const rows = result.rows;
+    return rows[0];
+  });
+};
 
 module.exports.deleteProductImage = function deleteProductImage(productid) {
   const sql = `
@@ -110,7 +108,7 @@ module.exports.deleteProductImage = function deleteProductImage(productid) {
     }
     return rows;
   });
-}
+};
 
 module.exports.deleteCloudinaryImage = function deleteCloudinaryImage(public_id) {
   return cloudinary.uploader
@@ -147,12 +145,11 @@ module.exports.getImageIDByProductID = function getImageIDByProductID(productid)
     AND pi.productid = $1
   `;
 
-  return query(sql, [productid])
-    .then((result) => {
-      const rows = result.rows;
-      return rows[0];
-    })
-}
+  return query(sql, [productid]).then((result) => {
+    const rows = result.rows;
+    return rows[0];
+  });
+};
 
 module.exports.deleteProductImage = function deleteProductImage(productid) {
   const sql = `
@@ -166,4 +163,35 @@ module.exports.deleteProductImage = function deleteProductImage(productid) {
     }
     return rows;
   });
-}
+};
+
+// Name: Zay Yar Tun
+
+// CA2
+
+/**
+ * get image by product id
+ * @param {*} productIDArr array of productid (int[]) 
+ * @returns Promise(array of objects) - [{productid, url}]
+ * @example
+ * getImageByProductIDArr
+ * .then((data) => {
+ *    data.forEach((item) => {
+ *      console.log(item.url)     // this is image url
+ *    })
+ * })
+ */
+module.exports.getImageByProductIDArr = async (productIDArr) => {
+  const sql = `
+      SELECT p.productid, i.url
+      FROM product p, productimage pi, image i
+      WHERE p.productid = pi.productid
+      AND i.imageid = pi.imageid
+      AND p.productid IN (SELECT UNNEST($1::int[]))
+      ORDER BY p.productid
+  `;
+
+  return query(sql, [productIDArr]).then((result) => result.rows);
+};
+
+// Name: Zay Yar Tun

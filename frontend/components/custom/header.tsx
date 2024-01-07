@@ -1,13 +1,11 @@
 "use client";
 
-import { Button, Input, Avatar, Badge, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
+import { Button, Input, Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { useAppState } from "@/app/app-provider";
 import { useTheme } from "next-themes";
 import { ErrorMessage, URL } from "@/enums/global-enums";
-import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
 import { useEffect } from "react";
-import Image from "next/image";
 import BagIcon from "@/icons/bag-icon";
 import ThemeIcon from "@/icons/theme-icon";
 import Link from "next/link";

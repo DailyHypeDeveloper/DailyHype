@@ -6,17 +6,16 @@ Description: Login Page  */
 const express = require("express");
 
 const router = express.Router();
-const jwt = require("jsonwebtoken");
+const multer = require("multer");
+const cookieFunctions = require("../functions/cookies");
 const userModel = require("../models/users");
-const imageModel = require("../models/images");
 const validationFn = require("../middlewares/validateToken");
 const { EMPTY_RESULT_ERROR, DUPLICATE_ENTRY_ERROR } = require("../errors");
 const cloudinary = require("../cloudinary");
-const multer = require("multer");
-const sendVerificationEmail = require("../nodemailer/sendmail");
-const { serialize } = require("cookie");
+const jwtFunctions = require("../functions/jwt-token");
+const mailFunctions = require("../functions/send-mail");
 
-router.post("/login", function (req, res) {
+router.post("/login", (req, res) => {
   const { email, password } = req.body;
   return userModel
     .checkLogin(email, password)
@@ -25,16 +24,11 @@ router.post("/login", function (req, res) {
         res.status(401).json({ error: "Invalid email or password" });
       } else {
         delete user.password;
-        console.log(user);
-        const access_token = jwt.sign({ email: user.email, userId: user.userid, role: user.role, lastCheckTime: new Date().toISOString() }, process.env.JWT_SECRET_KEY, { expiresIn: "1h" });
-        const refresh_token = jwt.sign({ lastcreatedat: new Date().toISOString() }, process.env.JWT_REFRESH_KEY, { expiresIn: "7d" });
-        return userModel.storeRefreshToken(user.userid, refresh_token).then((result) => {
-          const cookieValue = serialize("authToken", access_token, {
-            httpOnly: true,
-            sameSite: "strict",
-            path: "/",
-          });
-          res.setHeader("Set-Cookie", cookieValue);
+        // console.log(user);
+        const authToken = jwtFunctions.generateAuthToken({ email: user.email, userId: user.userid, role: user.role }, process.env.JWT_SECRET_KEY);
+        const refreshToken = jwtFunctions.generateRefreshToken({ lastcreatedat: new Date().toISOString() }, process.env.JWT_REFRESH_KEY);
+        return userModel.storeRefreshToken(user.userid, refreshToken).then((result) => {
+          cookieFunctions.setHttpOnlyCookieHeader("authToken", authToken, res);
           return res.status(200).json({ user: user });
         });
       }
@@ -50,7 +44,6 @@ router.post("/login", function (req, res) {
       }
     });
 });
-//ok
 
 router.post("/signup", function (req, res) {
   const { name, email, password, phone, gender, address, region, role, verified_email } = req.body;
@@ -80,55 +73,58 @@ router.post("/signup", function (req, res) {
 });
 
 router.post("/signupGoogle", function (req, res) {
-  const { res_id, res_name, res_email, res_verified_email, image } = req.body;
+  const { res_id, res_name, res_email, res_verified_email, res_picture } = req.body;
   const email = res_email;
   const id = res_id;
   const name = res_name;
   const verified_email = res_verified_email;
+  const picture = res_picture;
 
-  userModel
+  return userModel
     .checkExistingUser(email)
     .then(function (existingUser) {
       if (existingUser) {
-        res.status(409).json({ error: "User already exists" });
+        const authToken = jwtFunctions.generateAuthToken({ email: existingUser.email, userId: existingUser.userid, role: existingUser.role }, process.env.JWT_SECRET_KEY);
+        const refreshToken = jwtFunctions.generateRefreshToken({ lastcreatedat: new Date().toISOString() }, process.env.JWT_REFRESH_KEY);
+        return userModel.storeRefreshToken(existingUser.userid, refreshToken).then((result) => {
+          cookieFunctions.setHttpOnlyCookieHeader("authToken", authToken, res);
+          return res.status(200).json({ user: existingUser });
+        });
       } else {
         userModel
-          .signupGoogle(id, name, email, verified_email)
+          .signupGoogle(id, name, email, verified_email, picture)
           .then(function () {
-            const newUser = {
-              email: email,
-              id: id,
-              role: "customer",
-              url: image,
-              name: name,
-            };
-            const token = jwt.sign({ email: newUser.email, userId: newUser.id, role: newUser.role, lastCheckTime: new Date().toISOString() }, process.env.JWT_SECRET_KEY, { expiresIn: "1h" });
-            console.log(token);
-            const cookieValue = serialize("authToken", token, {
-              httpOnly: true,
-              sameSite: "strict",
-              path: "/",
+            const newUser = { email: email, id: id, role: "customer", url: picture, name: name };
+            const authToken = jwtFunctions.generateAuthToken({ email: newUser.email, userId: newUser.userid, role: newUser.role }, process.env.JWT_SECRET_KEY);
+            const refreshToken = jwtFunctions.generateRefreshToken({ lastcreatedat: new Date().toISOString() }, process.env.JWT_REFRESH_KEY);
+            return userModel.storeRefreshToken(newUser.userid, refreshToken).then((result) => {
+              cookieFunctions.setHttpOnlyCookieHeader("authToken", authToken, res);
+              return res.status(200).json({ user: newUser });
             });
-            res.setHeader("Set-Cookie", cookieValue);
-            res.status(200).json({ user: newUser });
           })
           .catch(function (error) {
             console.error(error);
-            res.status(500).json({ error: "Error creating user" });
+            return res.status(500).json({ error: "Error creating user" });
           });
       }
     })
     .catch(function (error) {
       console.error(error);
-      res.status(500).json({ error: "Unknown Error" });
+      return res.status(500).json({ error: "Unknown Error" });
     });
 });
 
 router.post("/sendmail", async (req, res) => {
+  let IPAddress = req.ip;
+  if (IPAddress === "::1") {
+    IPAddress = "127.0.0.1";
+  }
+
   try {
     const email = req.body.email;
     console.log(email);
-    const info = await sendVerificationEmail.sendEmail(email);
+    const generatedCode = Math.floor(100000 + Math.random() * 900000);
+    const info = await mailFunctions.sendEmailVerificationCode(IPAddress, generatedCode, email);
     res.status(200).json({ message: "Email sent successfully", info });
   } catch (error) {
     console.error("Error sending verification email:", error);
@@ -277,33 +273,59 @@ router.get("/getgenderStatistics", (req, res) => {
   });
 });
 
+// CA2
 // Name: Zay Yar Tun
-// to check whether the token is customer
+// to check whether the token is valid
 router.post("/validateToken/:userid", validationFn.validateToken, function (req, res) {
   const role = req.body.role;
   const id = req.body.id;
   const email = req.body.email;
   const userID = req.params.userid;
-  const lastCheckTime = req.body.lastCheckTime;
-  if (lastCheckTime) {
-    const newCheckTime = new Date();
-    const diff = Math.floor((newCheckTime - new Date(lastCheckTime)) / (1000 * 60));
-    if (diff > 10) {
-    }
-  }
-  if (id && email && !isNaN(id) && role && (role === "customer" || role === "admin")) {
-    res.status(200).json({ message: "validation success", role: role });
+  const tokenExpired = req.body.tokenExpired;
+
+  if (tokenExpired) {
+    return Promise.all([userModel.getRefreshToken(userID), userModel.getUserByUserID(userID)]).then(([result1, result2]) => {
+      jwtFunctions.verifyJWTToken(result1.refreshtoken, process.env.JWT_REFRESH_KEY, (err, data) => {
+        if (err) {
+          if (err.name === "TokenExpiredError") {
+            return res.status(403).send({ error: "Token Expired" });
+          } else {
+            return res.status(403).send({ error: "Unauthorized Access" });
+          }
+        } else {
+          const currentDate = new Date();
+          const lastCreatedAt = new Date(data.lastcreatedat);
+          lastCreatedAt.setDate(lastCreatedAt.getDate() + 7);
+          const diff = Math.floor((lastCreatedAt - currentDate) / (1000 * 60));
+          const newAuthToken = jwtFunctions.generateAuthToken({ email: result2.email, userId: result2.userid, role: result2.role }, process.env.JWT_SECRET_KEY);
+
+          if (diff > 0 && diff < 60 * 24) {
+            // generate a new refresh token if two days left
+            const newRefreshToken = jwtFunctions.generateRefreshToken({ lastcreatedat: new Date().toISOString() }, process.env.JWT_REFRESH_KEY);
+            return userModel.storeRefreshToken(result2.userid, newRefreshToken).then((result) => {
+              cookieFunctions.setHttpOnlyCookieHeader("authToken", newAuthToken, res);
+              return res.status(200).json({ message: "validation success", role: result2.role });
+            });
+          } else if (diff < 0) {
+            return res.status(403).send({ error: "Token Expired" });
+          } else {
+            cookieFunctions.setHttpOnlyCookieHeader("authToken", newAuthToken, res);
+            return res.status(200).json({ message: "validation success", role: result2.role });
+          }
+        }
+      });
+    });
   } else {
-    return res.status(403).send({ error: "Unauthorized Access" });
+    if (id && email && !isNaN(id) && role && (role === "customer" || role === "admin")) {
+      res.status(200).json({ message: "validation success", role: role });
+    } else {
+      return res.status(403).send({ error: "Unauthorized Access" });
+    }
   }
 });
 
 router.post("/signout", (req, res) => {
-  res.clearCookie("authToken", {
-    httpOnly: true,
-    sameSite: "strict",
-    path: "/",
-  });
+  cookieFunctions.clearHttpOnlyCookieHeader("authToken", res);
   return res.status(200).json({ success: true });
 });
 // Name: Zay Yar Tun

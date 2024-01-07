@@ -1,14 +1,20 @@
+// Name: Zay Yar Tun
+// Admin No: 2235035
+// Class: DIT/FT/2B/02
+
 "use client";
 
 import { useState, useContext, createContext, useEffect } from "react";
 import { CurrentActivePage, URL } from "@/enums/global-enums";
 import { validateToken } from "@/functions/auth-functions";
+import { CartDataLocalStorage } from "@/enums/global-interfaces";
+import { removeDuplicateCartData } from "@/functions/cart-functions";
 
 export const AppState = createContext<any>(null);
 
 type UserRole = "" | "customer" | "admin";
 
-interface UserBasicInfoInterface {
+interface UserBasicInfo {
   id: number;
   name: string;
   email: string;
@@ -19,7 +25,7 @@ interface UserBasicInfoInterface {
 // this is the context provider component
 export default function AppProvider({ children }: { children: React.ReactNode }) {
   // this will store user basic info such as name, email, image url
-  const [userInfo, setUserInfo] = useState<UserBasicInfoInterface>({ id: 0, name: "", email: "", image: "", role: "" });
+  const [userInfo, setUserInfo] = useState<UserBasicInfo>({ id: 0, name: "", email: "", image: "", role: "" });
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [redirectPage, setRedirectPage] = useState<URL | null>(null);
@@ -36,30 +42,54 @@ export default function AppProvider({ children }: { children: React.ReactNode })
 
   // for storing cart data
   // cart will store array of objects got from local storage
-  const [cart, setCart] = useState<object[]>([]);
+  const [cart, setCart] = useState<CartDataLocalStorage[]>([]);
 
   // retrieveing token from local storage
-  // set loading state to false
+  // set headerCanLoad to true
   useEffect(() => {
-    setCart(JSON.parse(localStorage.getItem("cart") ?? "[]"));
+    try {
+      const tempCart = JSON.parse(localStorage.getItem("cart") ?? "[]") as CartDataLocalStorage[];
+      const isValid = tempCart.every((item: any) => {
+        return item.productdetailid && item.qty && !isNaN(item.productdetailid) && !isNaN(item.qty);
+      });
+      if (!isValid) {
+        localStorage.removeItem("cart");
+        setCart([]);
+      } else {
+        const tempCartProcessed = removeDuplicateCartData(tempCart);
+        setCart(tempCartProcessed);
+        localStorage.setItem("cart", JSON.stringify(tempCartProcessed));
+      }
+    } catch (error) {
+      localStorage.removeItem("cart");
+      console.error(error);
+      setCart([]);
+    }
     const user = localStorage.getItem("user");
     if (user) {
-      const userObj = JSON.parse(user) as UserBasicInfoInterface;
-      setUserInfo(userObj);
-
-      if (userObj.role === "customer" || userObj.role === "admin")
-        validateToken(userObj.role, userObj.id).then((result) => {
-          if (result) {
-            setIsAuthenticated(true);
-          } else {
-            setIsAuthenticated(false);
-            setRedirectPage(URL.SignOut);
-          }
+      try {
+        const userObj = JSON.parse(user) as UserBasicInfo;
+        setUserInfo(userObj);
+        if (userObj.role === "customer" || userObj.role === "admin")
+          validateToken(userObj.role, userObj.id).then((result) => {
+            if (result) {
+              setIsAuthenticated(true);
+            } else {
+              setIsAuthenticated(false);
+              setRedirectPage(URL.SignOut);
+            }
+            setHeaderCanLoad(true);
+          });
+        else {
+          setIsAuthenticated(false);
+          setRedirectPage(URL.SignOut);
           setHeaderCanLoad(true);
-        });
-      else {
-        setIsAuthenticated(false);
+        }
+      } catch (error) {
+        console.error(error);
+        setUserInfo({ id: 0, name: "", email: "", image: "", role: "" });
         setRedirectPage(URL.SignOut);
+        setIsAuthenticated(false);
         setHeaderCanLoad(true);
       }
     } else {
@@ -86,8 +116,13 @@ export default function AppProvider({ children }: { children: React.ReactNode })
 
 /**
  *
- * This will return states and setState stored in context
- * @returns context (token, setToken, userInfo, setUserInfo, currentActivePage, setCurrentActivePage, cart, setCart, isLoading, setIsLoading)
+ * This will return states and setState functiosn stored in context
+ * @returns context - {userInfo, setUserInfo, currentActivePage, setCurrentActivePage, cart, setCart, headerCanLoad, setHeaderCanLoad, isAuthenticated, setIsAuthenticated, redirectPage, setRedirectPage}
+ * @example
+ * const {isAuthenticated, headerCanLoad} = useAppState();
+ * if(isAuthenticated && headerCanLoad) {
+ *    // call some api
+ * }
  */
 export function useAppState() {
   const context = useContext(AppState);

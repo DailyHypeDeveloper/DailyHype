@@ -93,7 +93,7 @@ export default function Page() {
 
   useEffect(() => {
     if (user.length > 0) {
-      const currentUser = user[0]; // Assuming there is only one user in the array
+      const currentUser = user[0];
 
       axios
         .get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${currentUser.access_token}`, {
@@ -110,13 +110,14 @@ export default function Page() {
           const res_name = res.data.name;
           const res_email = res.data.email;
           const res_verified_email = res.data.verified_email;
+          const res_picture = res.data.picture;
 
           fetch(`${process.env.BACKEND_URL}/api/signupGoogle`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ res_id, res_name, res_email, res_verified_email }),
+            body: JSON.stringify({res_id, res_name, res_email, res_verified_email, res_picture}),
             credentials: "include",
           })
             .then((response) => {
@@ -137,6 +138,7 @@ export default function Page() {
                   email: user.email,
                   image: user.url,
                   role: user.role,
+                  picture : user.picture
                 })
               );
               setHeaderCanLoad(false);
@@ -153,7 +155,7 @@ export default function Page() {
           alert("Sign In failed!");
         });
     }
-  }, [user, router]);
+  }, [user]);
 
   return (
     <div className="w-full min-h-screen grid grid-cols-1 sm:grid-cols-2">
@@ -187,7 +189,7 @@ export default function Page() {
           <div className="grid ">
             <button onClick={() => login()} className="group  h-12 px-9 border-2 border-gray-300 rounded-full transition duration-300 hover:border-blue-400 focus:bg-blue-50 active:bg-blue-100 bg-white">
               <div className="relative flex items-center space-x-6 justify-center">
-                <img src="https://tailus.io/sources/blocks/social/preview/images/google.svg" className="w-5" alt="google logo" />
+                <Image src="https://tailus.io/sources/blocks/social/preview/images/google.svg" width={20} height={20} alt="Google Logo" />
                 <span className="block w-max font-semibold tracking-wide text-gray-700 text-sm transition duration-300 group-hover:text-blue-600 sm:text-base">Continue with Google</span>
               </div>
             </button>
@@ -196,7 +198,7 @@ export default function Page() {
           <div className="grid ">
             <button className="group w-68 h-12 px-6 border-2 border-gray-300 rounded-full transition duration-300 hover:border-blue-400 focus:bg-blue-50 active:bg-blue-100 bg-white">
               <div className="relative flex items-center justify-center">
-                <img src="https://www.logo.wine/a/logo/Facebook/Facebook-f_Logo-Blue-Logo.wine.svg" className="w-12" alt="facebook logo" />
+                <Image src="https://www.logo.wine/a/logo/Facebook/Facebook-f_Logo-Blue-Logo.wine.svg" width={45} height={45} alt="Facebook Logo" />
                 <span className="block w-max font-semibold tracking-wide text-gray-700 text-sm transition duration-300 group-hover:text-blue-600 sm:text-base">Continue with Facebook</span>
               </div>
             </button>
@@ -219,7 +221,7 @@ export default function Page() {
       )}
 
       {showAdditional && (
-        <div className="left w-full min-h-screen flex  justify-center  gap-10 bg-[#FB6050] text-white" id="additionalFields">
+        <div className="left w-full min-h-screen flex justify-center  gap-10 bg-[#FB6050] text-white" id="additionalFields">
           <div className="additional w-full flex flex-col justify-center items-center mt-25vh gap-10">
             <div className="left w-full flex flex-col justify-start items-start gap-10">
               <button onClick={() => setShowAdditional(false)} className="text-white">
@@ -305,7 +307,7 @@ export default function Page() {
       )}
 
       <div className="right w-full h-screen flex flex-col justify-center items-center bg-[#0c0f38] text-white">
-        <a href="/signup" className="logo-box">
+        <a href={URL.Home} className="logo-box">
           <Image src="/images/logo-light.png" priority={true} alt="Logo" width={300} height={150} />
         </a>
         <p className="text-center mt-4">True comfort in style!!</p>

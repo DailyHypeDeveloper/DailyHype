@@ -6,6 +6,11 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
+        protocol: "http",
+        hostname: "res.cloudinary.com",
+        pathname: "**",
+      },
+      {
         protocol: "https",
         hostname: "res.cloudinary.com",
         pathname: "**",
@@ -13,6 +18,12 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "ssl.gstatic.com",
+        pathname: "**",
+      },
+      {
+        protocol: "https",
+        hostname: "*.googleusercontent.com",
+        port: "",
         pathname: "**",
       },
     ],

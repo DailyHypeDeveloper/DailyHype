@@ -7,7 +7,7 @@ const { query } = require("../database");
 const bcrypt = require('bcrypt');
 
 module.exports.retrieveProfileData = function retrieveProfileData(email) {
-  const sql = `SELECT email, name, gender, phone, address, region,imageid FROM appuser WHERE email = $1`;
+  const sql = `SELECT a.email, a.name, a.gender, a.phone, a.address, a.region,i.url FROM appuser a JOIN image i ON a.imageid = i.imageid WHERE email = $1`;
   
   return query(sql, [email]).then(function (result) {
     const rows = result.rows;
@@ -23,7 +23,7 @@ module.exports.retrieveProfileData = function retrieveProfileData(email) {
       phone: rows[0].phone,
       address: rows[0].address,
       region: rows[0].region,
-      imageid: rows[0].imageid
+      url: rows[0].url
     };
     
     return userData;

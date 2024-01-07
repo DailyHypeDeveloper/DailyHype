@@ -38,20 +38,54 @@ module.exports.signup = function signup(name, email, password, phone, gender, ad
   return bcrypt.hash(password, 10).then(function (hashedPassword) {
     const sql = `
             INSERT INTO appuser (createdat,name, email, password, phone, gender,address,region,role) VALUES (NOW(),$1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`;
-    return query(sql, [name, email, hashedPassword, phone, gender, address, region, role]).catch(function (error) {
-      throw error;
-    });
+    return query(sql, [name, email, hashedPassword, phone, gender, address, region, role]).catch(
+      function (error) {
+        throw error;
+      }
+    );
   });
 };
 
-module.exports.signupGoogle = function signupGoogle(id, name, email, verified_email) {
-  const sql = `INSERT INTO appuser(createdat,userid,name,email,verified_email,role) VALUES(NOW(),$1,$2,$3,$4,'customer') RETURNING *`;
-  return query(sql, [id, name, email, verified_email]).catch(function (error) {
+module.exports.signupGoogle = function signupGoogle(id, name, email, verified_email, picture) {
+    function getCurrentDateTime() {
+        const now = new Date();
+      
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+      
+        const formattedDateTime = `${year}${month}${day}${hours}${minutes}${seconds}`;
+        
+        return formattedDateTime;
+      }
+      const currentDateTime = getCurrentDateTime();      
+  const sql = `WITH inserted_user AS (
+        INSERT INTO appuser(createdat, userid, name, email, verified_email, role, imageid)
+        VALUES(NOW(), $1, $2, $3, $4, 'customer', $5)
+        RETURNING *
+      )
+      INSERT INTO image(imageid, imagename, url)
+      VALUES ($5, 'Google Photo' , $6)
+      RETURNING *;`;
+  return query(sql, [id, name, email, verified_email, currentDateTime, picture]).catch(function (error) {
     throw error;
   });
 };
+
+module.exports.loginGoogle = function loginGoogle(email){
+    const sql = "SELECT * FROM appuser WHERE email = $1";
+    return query(sql, [email]).catch(function(error){
+        throw error;
+    })
+
+}
 module.exports.checkExistingUser = function checkExistingUser(email) {
-  const sql = "SELECT * FROM appuser WHERE email = $1";
+  const sql = `SELECT u.*, i.url FROM appuser u
+            LEFT JOIN image i ON i.imageid= u.imageid
+            WHERE email = $1`;
   return query(sql, [email])
     .then(function (result) {
       const rows = result.rows;
@@ -86,10 +120,10 @@ module.exports.getUserByAdmin = function getUserByAdmin(offset) {
 };
 
 function createUser(user) {
-  const { name, email, password, phone, address, region, photo } = user;
+  const {name, email, password, phone, address, region, photo} = user;
 
   return cloudinary.uploader
-    .upload(photo.path, { folder: "user-photos" })
+    .upload(photo.path, {folder: "user-photos"})
     .then((photoResult) => {
       const photoUrl = photoResult.secure_url;
 
@@ -218,9 +252,20 @@ module.exports.getGenderStatistics = function (callback) {
 
 // Name: Zay Yar Tun
 
+module.exports.getUserByUserID = function getUserByUserID(userID) {
+  const sql = `
+    SELECT * FROM appuser WHERE userid = $1
+  `;
+
+  return query(sql, [userID]).then((result) => {
+    const rows = result.rows;
+    return rows[0];
+  });
+};
+
 module.exports.getUserAddressByIdEmail = function getUserAddressByIdEmail(userID, email) {
   const sql = `
-        SELECT address FROM AppUser WHERE userid = $1 AND email = $2
+        SELECT address FROM AppUser WHERE userID = $1 AND email = $2
     `;
 
   return query(sql, [userID, email])
