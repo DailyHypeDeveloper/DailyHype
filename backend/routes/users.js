@@ -97,7 +97,7 @@ router.post("/signupGoogle", function (req, res) {
             const newUser = { email: email, id: id, role: "customer", url: picture, name: name };
             const authToken = jwtFunctions.generateAuthToken({ email: newUser.email, userId: newUser.userid, role: newUser.role }, process.env.JWT_SECRET_KEY);
             const refreshToken = jwtFunctions.generateRefreshToken({ lastcreatedat: new Date().toISOString() }, process.env.JWT_REFRESH_KEY);
-            return userModel.storeRefreshToken(existingUser.userid, refreshToken).then((result) => {
+            return userModel.storeRefreshToken(newUser.userid, refreshToken).then((result) => {
               cookieFunctions.setHttpOnlyCookieHeader("authToken", authToken, res);
               return res.status(200).json({ user: newUser });
             });
