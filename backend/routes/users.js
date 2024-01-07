@@ -12,8 +12,8 @@ const userModel = require("../models/users");
 const validationFn = require("../middlewares/validateToken");
 const { EMPTY_RESULT_ERROR, DUPLICATE_ENTRY_ERROR } = require("../errors");
 const cloudinary = require("../cloudinary");
-const sendVerificationEmail = require("../nodemailer/sendmail");
 const jwtFunctions = require("../functions/jwt-token");
+const mailFunctions = require("../functions/send-mail");
 
 router.post("/login", function (req, res) {
   const { email, password } = req.body;
@@ -112,10 +112,16 @@ router.post("/signupGoogle", function (req, res) {
 });
 
 router.post("/sendmail", async (req, res) => {
+  let IPAddress = req.ip;
+  if (IPAddress === "::1") {
+    IPAddress = "127.0.0.1";
+  }
+
   try {
     const email = req.body.email;
     console.log(email);
-    const info = await sendVerificationEmail.sendEmail(email);
+    const generatedCode = Math.floor(100000 + Math.random() * 900000);
+    const info = await mailFunctions.sendEmailVerificationCode(IPAddress, generatedCode, email);
     res.status(200).json({ message: "Email sent successfully", info });
   } catch (error) {
     console.error("Error sending verification email:", error);
@@ -264,6 +270,7 @@ router.get("/getgenderStatistics", (req, res) => {
   });
 });
 
+// CA2
 // Name: Zay Yar Tun
 // to check whether the token is valid
 router.post("/validateToken/:userid", validationFn.validateToken, function (req, res) {

@@ -1,3 +1,7 @@
+// Name: Zay Yar Tun
+// Admin No: 2235035
+// Class: DIT/FT/2B/02
+
 "use client";
 
 import { Image, Modal, ModalContent, ModalBody, ModalFooter, useDisclosure, Button, ModalHeader } from "@nextui-org/react";
