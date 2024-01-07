@@ -20,6 +20,12 @@ const nextConfig = {
         hostname: "ssl.gstatic.com",
         pathname: "**",
       },
+      {
+        protocol: "https",
+        hostname: "*.googleusercontent.com",
+        port: "",
+        pathname: "**",
+      },
     ],
   },
   reactStrictMode: false,
