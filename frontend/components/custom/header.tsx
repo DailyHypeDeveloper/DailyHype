@@ -31,7 +31,7 @@ export default function Header() {
 
   return (
     <header className="flex items-center h-[75px] px-12 justify-start dark:bg-slate-900 bg-slate-50 border-b-2 border-slate-300">
-      <Link href={URL.Home} className="flex dark:text-slate-200 uppercase font-semibold text-slate-900 tracking-wider ml-2 text-3xl">
+      <Link href={URL.Home} className="flex dark:text-slate-200 uppercase font-semibold text-slate-900 tracking-wider ml-2 text-2xl">
         dailyhype
       </Link>
       <div className="flex flex-1 justify-between items-center ms-4">

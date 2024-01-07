@@ -9,6 +9,7 @@ export const AppState = createContext<any>(null);
 type UserRole = "" | "customer" | "admin";
 
 interface UserBasicInfoInterface {
+  id: number;
   name: string;
   email: string;
   image: string;
@@ -18,7 +19,7 @@ interface UserBasicInfoInterface {
 // this is the context provider component
 export default function AppProvider({ children }: { children: React.ReactNode }) {
   // this will store user basic info such as name, email, image url
-  const [userInfo, setUserInfo] = useState<UserBasicInfoInterface>({ name: "", email: "", image: "", role: "" });
+  const [userInfo, setUserInfo] = useState<UserBasicInfoInterface>({ id: 0, name: "", email: "", image: "", role: "" });
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [redirectPage, setRedirectPage] = useState<URL | null>(null);
@@ -47,7 +48,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
       setUserInfo(userObj);
 
       if (userObj.role === "customer" || userObj.role === "admin")
-        validateToken(userObj.role).then((result) => {
+        validateToken(userObj.role, userObj.id).then((result) => {
           if (result) {
             setIsAuthenticated(true);
           } else {
@@ -68,7 +69,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     if (userInfo.email && userInfo.name && userInfo.role) {
-      validateToken(userInfo.role).then((result) => {
+      validateToken(userInfo.role, userInfo.id).then((result) => {
         if (result) {
           setIsAuthenticated(true);
         } else {

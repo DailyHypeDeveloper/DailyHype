@@ -13,8 +13,8 @@ import { ErrorMessage } from "@/enums/global-enums";
  *      else          // is not customer
  * })
  */
-export async function validateToken(role: "customer" | "admin"): Promise<boolean> {
-  return fetch(`${process.env.BACKEND_URL}/api/validateToken`, {
+export async function validateToken(role: "customer" | "admin", userid: number): Promise<boolean> {
+  return fetch(`${process.env.BACKEND_URL}/api/validateToken/${userid}`, {
     method: "POST",
     credentials: "include",
   })

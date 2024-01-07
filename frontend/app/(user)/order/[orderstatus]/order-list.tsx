@@ -105,7 +105,7 @@ export default function OrderList({ searchOrder, orderStatus, searchMonth, searc
       getOrderData({ searchText: searchOrder, status: mapStringToOrderStatusValue(orderStatus), month: searchMonth, year: searchYear }, currentPage, showOrderNo, "").then((result) => {
         setOrderData(result[0]);
         setOrderCount(result[1].count);
-        console.log(result);
+        // console.log(result);
         setIsLoading(false);
       });
   }, [isLoading]);
@@ -113,7 +113,6 @@ export default function OrderList({ searchOrder, orderStatus, searchMonth, searc
   return (
     <>
       {isLoading && (
-        <>
           <div className="flex flex-col max-w-full mb-8 border-1 rounded-xl">
             <div className="flex py-4 border-b-1">
               <Skeleton className="flex basis-3/5 mx-8 rounded-lg h-6" />
@@ -132,25 +131,6 @@ export default function OrderList({ searchOrder, orderStatus, searchMonth, searc
               </div>
             </div>
           </div>
-          <div className="flex flex-col max-w-full mb-8 border-1 rounded-xl">
-            <div className="flex py-4 border-b-1">
-              <Skeleton className="flex basis-3/5 mx-8 rounded-lg h-6" />
-              <Skeleton className="flex ms-auto basis-2/5 me-8 rounded-lg w-full h-6" />
-            </div>
-            <div className="flex flex-col mx-8 my-4">
-              <div className="flex justify-start">
-                <div className="me-5">
-                  <Skeleton className="flex w-[80px] rounded-lg h-[100px]" />
-                </div>
-                <div className="flex flex-col">
-                  <Skeleton className="flex w-80 h-8 rounded-lg" />
-                  <Skeleton className="mt-3 flex w-52 h-6 rounded-lg" />
-                  <Skeleton className="mt-3 flex w-32 h-6 rounded-lg" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </>
       )}
       {!isLoading &&
         orderData.map((order: any, index: number) => {
@@ -175,7 +155,7 @@ export default function OrderList({ searchOrder, orderStatus, searchMonth, searc
               </div>
               <div className="border-1 pt-4">
                 {order.productdetails.map((item: any, index: number) => {
-                  console.log(item);
+                  // console.log(item);
                   return (
                     <div className="flex px-4 mb-4 items-start" key={index}>
                       <Image radius="lg" className="w-[80px] h-[100px] border-1" src={item.image} alt={item.productname} />

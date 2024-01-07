@@ -4,8 +4,8 @@ Date: 2.11.2023
 Description: Login Page  */
 
 const bcrypt = require("bcrypt");
-const {query} = require("../database");
-const {EMPTY_RESULT_ERROR, SQL_ERROR_CODE} = require("../errors");
+const { query } = require("../database");
+const { EMPTY_RESULT_ERROR, SQL_ERROR_CODE } = require("../errors");
 const cloudinary = require("../cloudinary");
 
 module.exports.checkLogin = function checkLogin(loginEmail, loginPassword) {
@@ -33,16 +33,7 @@ module.exports.checkLogin = function checkLogin(loginEmail, loginPassword) {
   });
 };
 
-module.exports.signup = function signup(
-  name,
-  email,
-  password,
-  phone,
-  gender,
-  address,
-  region,
-  role
-) {
+module.exports.signup = function signup(name, email, password, phone, gender, address, region, role) {
   // Hash the password before storing it in the database
   return bcrypt.hash(password, 10).then(function (hashedPassword) {
     const sql = `
@@ -261,6 +252,17 @@ module.exports.getGenderStatistics = function (callback) {
 
 // Name: Zay Yar Tun
 
+module.exports.getUserByUserID = function getUserByUserID(userID) {
+  const sql = `
+    SELECT * FROM appuser WHERE userid = $1
+  `;
+
+  return query(sql, [userID]).then((result) => {
+    const rows = result.rows;
+    return rows[0];
+  });
+};
+
 module.exports.getUserAddressByIdEmail = function getUserAddressByIdEmail(userID, email) {
   const sql = `
         SELECT address FROM AppUser WHERE userID = $1 AND email = $2
@@ -278,6 +280,28 @@ module.exports.getUserAddressByIdEmail = function getUserAddressByIdEmail(userID
       console.error(error);
       throw new Error("Unknown Error");
     });
+};
+
+module.exports.getRefreshToken = function getRefreshToken(userID) {
+  const sql = `
+        SELECT refreshtoken FROM appuser WHERE userid = $1
+    `;
+
+  return query(sql, [userID]).then((result) => {
+    const rows = result.rows;
+    return rows[0];
+  });
+};
+
+module.exports.storeRefreshToken = function storeRefreshToken(userID, refreshToken) {
+  const sql = `
+    UPDATE appuser SET refreshtoken = $1 WHERE userid = $2
+  `;
+
+  return query(sql, [refreshToken, userID]).then((result) => {
+    const rows = result.rowCount;
+    return rows;
+  });
 };
 
 // Name: Zay Yar Tun

@@ -21,7 +21,7 @@ export default function Page() {
           if (localStorage) {
             localStorage.removeItem("user");
             setIsAuthenticated(false);
-            setUserInfo({ name: "", email: "", image: "", role: "" });
+            setUserInfo({ id: 0, name: "", email: "", image: "", role: "" });
           }
           setRedirectPage(null);
           router.replace(URL.Home);

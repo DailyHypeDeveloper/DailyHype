@@ -1,15 +1,21 @@
-const jwt = require("jsonwebtoken");
+const jwtFunctions = require("../functions/jwt-token");
 const { parse } = require("cookie");
 
 module.exports.validateToken = (req, res, next) => {
+  let urlPath = req.route.path.split("/")[1];
   let token = parse(req.headers.cookie || "").authToken;
 
   if (token) {
-    jwt.verify(token, process.env.JWT_SECRET_KEY, (err, data) => {
+    jwtFunctions.verifyJWTToken(token, process.env.JWT_SECRET_KEY, (err, data) => {
       if (err) {
         console.error(err);
         if (err.name === "TokenExpiredError") {
-          return res.status(401).send({ error: "Token has expired" });
+          if (urlPath === "validateToken") {
+            req.body.tokenExpired = true;
+            next();
+          } else {
+            return res.status(401).send({ error: "Token has expired" });
+          }
         } else if (err.name === "JsonWebTokenError") {
           return res.status(401).send({ error: "Invalid token" });
         } else {
@@ -28,4 +34,4 @@ module.exports.validateToken = (req, res, next) => {
   } else {
     res.status(403).send({ error: "Unauthorized Access" });
   }
-}; //End of checkForValidUserRoleUser
+};
