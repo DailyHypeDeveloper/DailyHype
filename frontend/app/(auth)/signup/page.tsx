@@ -93,7 +93,7 @@ export default function Page() {
 
   useEffect(() => {
     if (user.length > 0) {
-      const currentUser = user[0]; // Assuming there is only one user in the array
+      const currentUser = user[0];
 
       axios
         .get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${currentUser.access_token}`, {
@@ -110,13 +110,14 @@ export default function Page() {
           const res_name = res.data.name;
           const res_email = res.data.email;
           const res_verified_email = res.data.verified_email;
+          const res_picture = res.data.picture;
 
           fetch(`${process.env.BACKEND_URL}/api/signupGoogle`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ res_id, res_name, res_email, res_verified_email }),
+            body: JSON.stringify({res_id, res_name, res_email, res_verified_email, res_picture}),
             credentials: "include",
           })
             .then((response) => {
@@ -137,6 +138,7 @@ export default function Page() {
                   email: user.email,
                   image: user.url,
                   role: user.role,
+                  picture : user.picture
                 })
               );
               setHeaderCanLoad(false);

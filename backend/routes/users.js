@@ -73,26 +73,39 @@ router.post("/signup", function (req, res) {
 });
 
 router.post("/signupGoogle", function (req, res) {
-  const { res_id, res_name, res_email, res_verified_email, image } = req.body;
+  const {res_id, res_name, res_email, res_verified_email, res_picture} = req.body;
   const email = res_email;
   const id = res_id;
   const name = res_name;
   const verified_email = res_verified_email;
+  const picture = res_picture;
 
   return userModel
     .checkExistingUser(email)
     .then(function (existingUser) {
+
       if (existingUser) {
-        return res.status(409).json({ error: "User already exists" });
+        const existingUserToken = jwt.sign(
+          { email: existingUser.email, userId: existingUser.userid, role: existingUser.role },
+          process.env.JWT_SECRET_KEY,
+          { expiresIn: "1h" }
+        );
+        const cookieValue = serialize("authToken", existingUserToken, {
+          httpOnly: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        res.setHeader("Set-Cookie", cookieValue);
+          res.status(200).json({user: existingUser});
       } else {
-        return userModel
-          .signupGoogle(id, name, email, verified_email)
+        userModel
+          .signupGoogle(id, name, email, verified_email,picture)
           .then(function () {
             const newUser = {
               email: email,
               id: id,
               role: "customer",
-              url: image,
+              url: picture,
               name: name,
             };
             const authToken = jwtFunctions.generateAuthToken({ email: newUser.email, userId: newUser.id, role: newUser.role }, process.env.JWT_SECRET_KEY);
