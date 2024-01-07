@@ -330,24 +330,22 @@ module.exports.getCategoriesByType = function getCategoriesByType(typeid) {
 //2.
 //get products by categoryid, offset, litmit, isinstock
 module.exports.getProductsByCategoryID = function getProductsByCategoryID(categoryid, limit, offset, isinstock) {
-
-    let sql = ``;
-    if (isinstock == "1") {
-        sql = `
+  let sql = ``;
+  if (isinstock == "1") {
+    sql = `
             SELECT P.*
             FROM product P
             WHERE P.categoryid=$1
             AND P.productid IN (SELECT PD.productid FROM productdetail PD WHERE qty>0)
             LIMIT $2 OFFSET $3;`;
-    }
-    else {
-        sql = `
+  } else {
+    sql = `
             SELECT P.*
             FROM product P
             WHERE P.categoryid=$1
             LIMIT $2 OFFSET $3;`;
-    }
-    /*SELECT P.*, ARRAY_AGG(I.url) AS productimg, ARRAY_AGG(DISTINCT  c.name) AS colour
+  }
+  /*SELECT P.*, ARRAY_AGG(I.url) AS productimg, ARRAY_AGG(DISTINCT  c.name) AS colour
     FROM product P, image I, productimage PI, productdetail PD, colour C
     WHERE P.categoryid=3
     AND P.productID = PI.productID 
@@ -356,46 +354,44 @@ module.exports.getProductsByCategoryID = function getProductsByCategoryID(catego
     AND PD.colourid = C.colourid
     GROUP BY P.*, P.productid
     LIMIT 2 OFFSET 0;*/
-    return query(sql, [categoryid, limit, offset])
-        .then(result => {
-            return result.rows;
-        })
-        .catch(error => {
-            throw new Error(`Error retrieving products by categoryid: ${error.message}`);
-        });
+  return query(sql, [categoryid, limit, offset])
+    .then((result) => {
+      return result.rows;
+    })
+    .catch((error) => {
+      throw new Error(`Error retrieving products by categoryid: ${error.message}`);
+    });
 };
 
 //3.
 //get productcount by categoryid and isinstock
 module.exports.getProductCountByCategoryID = function getProductCountByCategoryID(categoryid, isinstock) {
-
-    let sql = ``;
-    if (isinstock == "1") {
-        sql = `
+  let sql = ``;
+  if (isinstock == "1") {
+    sql = `
             SELECT COUNT(P.*) AS productcount
             FROM product P
             WHERE P.categoryid=$1
             AND P.productid IN (SELECT PD.productid FROM productdetail PD WHERE qty>0);`;
-    }
-    else {
-        sql = `
+  } else {
+    sql = `
             SELECT COUNT(P.*) AS productcount
             FROM product P
             WHERE P.categoryid=$1;`;
-    }
-    return query(sql, [categoryid])
-        .then(result => {
-            return result.rows;
-        })
-        .catch(error => {
-            throw new Error(`Error retrieving product count by categoryid: ${error.message}`);
-        });
+  }
+  return query(sql, [categoryid])
+    .then((result) => {
+      return result.rows;
+    })
+    .catch((error) => {
+      throw new Error(`Error retrieving product count by categoryid: ${error.message}`);
+    });
 };
 
 //4.
 //get image by productid
 module.exports.getImageByProductID = function getImageByProductID(productid) {
-    const sql = `
+  const sql = `
         SELECT I.*
         FROM
         product P, image I, productimage PI
@@ -403,37 +399,36 @@ module.exports.getImageByProductID = function getImageByProductID(productid) {
         AND P.productID = PI.productID 
         AND PI.imageID = I.imageID ;`;
 
-    return query(sql, [productid])
-        .then(result => {
-            return result.rows;
-        })
-        .catch(error => {
-            throw new Error(`Error retrieving image by productid: ${error.message}`);
-        });
+  return query(sql, [productid])
+    .then((result) => {
+      return result.rows;
+    })
+    .catch((error) => {
+      throw new Error(`Error retrieving image by productid: ${error.message}`);
+    });
 };
 
 //5.
 //get colours by productid
 module.exports.getColourByProductID = function getColourByProductID(productid) {
-    const sql = `
+  const sql = `
         SELECT DISTINCT C.*
         FROM
         productdetail PD, colour C
         WHERE PD.productid=$1
         AND PD.colourid = C.colourid;`;
 
-    return query(sql, [productid])
-        .then(result => {
-            return result.rows;
-        })
-        .catch(error => {
-            throw new Error(`Error retrieving image by productid: ${error.message}`);
-        });
+  return query(sql, [productid])
+    .then((result) => {
+      return result.rows;
+    })
+    .catch((error) => {
+      throw new Error(`Error retrieving image by productid: ${error.message}`);
+    });
 };
 //CA2-end
 
 // Name: Zay Yar Tun
-
 module.exports.getProductIDByOrderID = function getProductIDByOrderID(orderid) {
   const sql = `
         SELECT DISTINCT p.productid, poi.qty
@@ -488,16 +483,27 @@ module.exports.updateProductStatus = function updateProductStatus(productDetailI
   });
 };
 
-// this is to get productdetails data by an array of id
-// this will contain all product data except image
+/**
+ *
+ * To get product details by the array of productdetailid
+ * @param {*} productDetailIDArr an array of productdetailid
+ * @returns Promise(array of objects) - [{productdetailid, qty, productname, unitprice, size, sizeid, colourid, colour, productid, url}]
+ * @example
+ * getProductDetailByIds(IDArr)
+ * .then((detail) => {
+ *    // implment your logic here
+ * })
+ */
 module.exports.getProductDetailByIds = function getProductDetailByIds(productDetailIDArr) {
   const sql = `
-        SELECT PD.productDetailID, PD.qty, P.productName, P.unitPrice, S.name AS Size, C.name AS Colour, P.productid
-        FROM ProductDetail PD, Product P, Colour C, Size S
-        WHERE P.productID = PD.productID
-        AND C.colourID = PD.colourID
-        AND S.sizeID = PD.sizeID
-        AND PD.productDetailID IN (SELECT UNNEST($1::int[]))
+        SELECT pd.productdetailid, pd.qty, p.productname, p.unitprice, s.name AS size, s.sizeid, c.colourid, c.name AS colour, p.productid, i.url
+        FROM productdetail pd, product p, colour c, size s, productimage pi, image i
+        WHERE p.productid = pd.productid
+        AND pi.productid = p.productid
+        AND pi.imageid = i.imageid
+        AND c.colourid = pd.colourid
+        AND s.sizeid = pd.sizeid
+        AND pd.productdetailid IN (SELECT UNNEST($1::int[]))
     `;
 
   return query(sql, [productDetailIDArr]).then(function (result) {
@@ -581,5 +587,56 @@ module.exports.getLatestProducts = function getLatestProducts(limit) {
   return query(sql, [limit]).then((result) => {
     return result.rows;
   });
+};
+
+// CA2
+
+/**
+ * get product information by productdetailid
+ * @param {*} productDetailIDArr array of productdetailid (int[])
+ * @returns Promise(array of objects) - [{productid, productname, unitprice, categoryid}]
+ * @example
+ * getProductByProductDetailID(IDArr)
+ * .then((data) => {
+ *    data.forEach((item) => {
+ *      console.log(item.productid)   // this is productid
+ *    })
+ * })
+ */
+module.exports.getProductByProductDetailIDArr = async (productDetailIDArr) => {
+  const sql = `
+      SELECT p.productid, p.productname, p.unitprice, p.categoryid
+      FROM product p, productdetail pd
+      WHERE p.productid = pd.productid
+      AND pd.productdetailid IN (SELECT UNNEST ($1::int[]))
+  `;
+
+  return query(sql, [productDetailIDArr]).then((result) => result.rows);
+};
+
+/**
+ * get productdetail table data by productid
+ * @param {*} productIDArr array of productid (int[])
+ * @returns Promise(array of objects) - [{productdetailid, productid, sizeid, colourid, qty, productstatus, size, colour}]
+ * @example
+ * getProductDetailByProductIDArr(IDArr)
+ * .then((data) => {
+ *    data.forEach((item) => {
+ *      console.log(item.productdetailid);    // this is productdetailid
+ *    })
+ * })
+ */
+module.exports.getProductDetailByProductIDArr = async (productIDArr) => {
+  const sql = `
+      SELECT pd.productdetailid, pd.productid, pd.sizeid, pd.colourid, pd.qty, pd.productstatus, s.name as size, c.name as colour
+      FROM productdetail pd, product p, size s, colour c
+      WHERE pd.productid = p.productid
+      AND s.sizeid = pd.sizeid
+      AND c.colourid = pd.colourid
+      AND p.productid IN (SELECT UNNEST($1::int[]))
+      ORDER BY p.productid
+  `;
+
+  return query(sql, [productIDArr]).then((result) => result.rows);
 };
 // Name: Zay Yar Tun

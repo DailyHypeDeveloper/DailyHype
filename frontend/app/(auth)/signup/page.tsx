@@ -155,7 +155,7 @@ export default function Page() {
           alert("Sign In failed!");
         });
     }
-  }, [user, router]);
+  }, [user]);
 
   return (
     <div className="w-full min-h-screen grid grid-cols-1 sm:grid-cols-2">
@@ -189,7 +189,7 @@ export default function Page() {
           <div className="grid ">
             <button onClick={() => login()} className="group  h-12 px-9 border-2 border-gray-300 rounded-full transition duration-300 hover:border-blue-400 focus:bg-blue-50 active:bg-blue-100 bg-white">
               <div className="relative flex items-center space-x-6 justify-center">
-                <img src="https://tailus.io/sources/blocks/social/preview/images/google.svg" className="w-5" alt="google logo" />
+                <Image src="https://tailus.io/sources/blocks/social/preview/images/google.svg" width={20} height={20} alt="Google Logo" />
                 <span className="block w-max font-semibold tracking-wide text-gray-700 text-sm transition duration-300 group-hover:text-blue-600 sm:text-base">Continue with Google</span>
               </div>
             </button>
@@ -198,7 +198,7 @@ export default function Page() {
           <div className="grid ">
             <button className="group w-68 h-12 px-6 border-2 border-gray-300 rounded-full transition duration-300 hover:border-blue-400 focus:bg-blue-50 active:bg-blue-100 bg-white">
               <div className="relative flex items-center justify-center">
-                <img src="https://www.logo.wine/a/logo/Facebook/Facebook-f_Logo-Blue-Logo.wine.svg" className="w-12" alt="facebook logo" />
+                <Image src="https://www.logo.wine/a/logo/Facebook/Facebook-f_Logo-Blue-Logo.wine.svg" width={45} height={45} alt="Facebook Logo" />
                 <span className="block w-max font-semibold tracking-wide text-gray-700 text-sm transition duration-300 group-hover:text-blue-600 sm:text-base">Continue with Facebook</span>
               </div>
             </button>
@@ -221,7 +221,7 @@ export default function Page() {
       )}
 
       {showAdditional && (
-        <div className="left w-full min-h-screen flex  justify-center  gap-10 bg-[#FB6050] text-white" id="additionalFields">
+        <div className="left w-full min-h-screen flex justify-center  gap-10 bg-[#FB6050] text-white" id="additionalFields">
           <div className="additional w-full flex flex-col justify-center items-center mt-25vh gap-10">
             <div className="left w-full flex flex-col justify-start items-start gap-10">
               <button onClick={() => setShowAdditional(false)} className="text-white">
@@ -307,7 +307,7 @@ export default function Page() {
       )}
 
       <div className="right w-full h-screen flex flex-col justify-center items-center bg-[#0c0f38] text-white">
-        <a href="/signup" className="logo-box">
+        <a href={URL.Home} className="logo-box">
           <Image src="/images/logo-light.png" priority={true} alt="Logo" width={300} height={150} />
         </a>
         <p className="text-center mt-4">True comfort in style!!</p>

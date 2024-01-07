@@ -5,11 +5,11 @@ const createHttpError = require("http-errors");
 const usersRoute = require("./routes/users");
 const ordersRoute = require("./routes/orders");
 const productRoute = require("./routes/products");
+const cartRoute = require("./routes/carts");
 const paymentRoute = require("./routes/payments");
 const profileRoute = require("./routes/profile");
 const deliveryRoute = require("./routes/delivery");
 const reviewRoute = require("./routes/reviews");
-const sendmail = require("./nodemailer/sendmail");
 
 const app = express();
 
@@ -43,6 +43,7 @@ app.use(
 
 app.use("/api", usersRoute);
 app.use("/api", ordersRoute);
+app.use("/api", cartRoute);
 app.use("/api", productRoute);
 app.use("/api", paymentRoute);
 app.use("/api", profileRoute);
