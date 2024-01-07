@@ -4,12 +4,18 @@
 
 "use client";
 
-import { URL } from "@/enums/global-enums";
+import { useAppState } from "@/app/app-provider";
+import { CurrentActivePage, URL } from "@/enums/global-enums";
 import { Accordion, AccordionItem, Input, Link } from "@nextui-org/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Page() {
+  const { setCurrentActivePage } = useAppState();
   const [searchText, setSearchText] = useState<string>("");
+
+  useEffect(() => {
+    setCurrentActivePage(CurrentActivePage.None);
+  }, []);
 
   return (
     <div className="flex flex-col w-full items-center my-8">
@@ -29,19 +35,15 @@ export default function Page() {
       />
       <div className="flex flex-col items-center mt-20 mb-8">
         <label className="text-xl font-semibold mb-4">Frequently Asked Questions</label>
-        <Accordion variant="splitted" className="mt-4 w-[700px]">
+        <Accordion variant="splitted" className="mt-4 w-[700px]" itemClasses={{ title: "text-medium data-[open=true]:font-semibold" }}>
           <AccordionItem key="1" aria-label="Question 1" title="How long does it take for my order to ship?">
-            <p className="pe-8 mb-3">
-              Normally, it will take 1-3 working days to prepare the item. After preparing, we will ship out your order. You can track your order in <Link href={URL.AllOrder}>order list</Link>. If it takes longer than estimated delivery date, please contact us for more information.
-            </p>
+            <p className="pe-8 mb-3">Normally, it will take 1-3 working days to prepare the item. After preparing, we will ship out your order. You can track your order in order list. If it takes longer than estimated delivery date, please contact us for more information.</p>
             <Link href="" className="mb-4">
               View More
             </Link>
           </AccordionItem>
           <AccordionItem key="2" aria-label="Question 2" title="How to check my order status?">
-            <p className="pe-8 mb-3">
-              Generally, you can check your order status via &quot;<Link href={URL.AllOrder}>order</Link>&quot; under your image.
-            </p>
+            <p className="pe-8 mb-3">Generally, you can check your order status via &quot;order&quot; under your profile image.</p>
             <Link href="" className="mb-4">
               View More
             </Link>

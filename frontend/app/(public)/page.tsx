@@ -23,8 +23,14 @@ export default function Home() {
 
   return (
     <>
-      <div className="flex mx-40 justify-around max-w-full my-12">
-        <div className="flex flex-col justify-center pt-8">
+      <div className="flex mx-12 justify-start items-center max-w-full my-12">
+        <div className="flex flex-col">
+          <div className="w-2 h-6 border-1 mb-2 rounded-lg cursor-pointer bg-black"></div>
+          <div className="w-2 h-6 border-1 mb-2 rounded-lg cursor-pointer"></div>
+          <div className="w-2 h-6 border-1 mb-2 rounded-lg cursor-pointer"></div>
+          <div className="w-2 h-6 border-1 mb-2 rounded-lg cursor-pointer"></div>
+        </div>
+        <div className="flex flex-col mx-auto justify-center">
           <label className="before:border-2 before:me-3 before:border-black before:dark:border-white text-2xl font-semibold tracking-wider uppercase">Latest Arrival</label>
           <Link href="/woman" className="mt-4 w-fit text-black dark:text-white">
             {latestProduct.length > 0 ? latestProduct[0].productname : "Product Name"}
