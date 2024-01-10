@@ -1,8 +1,13 @@
+// Name: Zay Yar Tun
+// Admin No: 2235035
+// Class: DIT/FT/2B/02
+
 "use client";
 
-import { MonthValue } from "@/app/_enums/order-enums";
-import { mapStringToMonthValue, mapStringToNoOfOrder } from "@/app/_functions/order-utils";
+import { MonthValue } from "@/enums/order-enums";
+import { mapStringToMonthValue, mapStringToNoOfOrder } from "@/functions/order-utils";
 import { Tabs, Tab, Select, SelectItem } from "@nextui-org/react";
+import { useEffect } from "react";
 
 interface orderFilterProps {
   searchMonth: MonthValue;
@@ -28,7 +33,6 @@ const noOfOrderOptions: { value: string; label: string }[] = [
   { value: "5", label: "5 orders" },
   { value: "10", label: "10 orders" },
   { value: "15", label: "15 orders" },
-  { value: "20", label: "20 orders" },
 ];
 
 const monthOptions: Month[] = [

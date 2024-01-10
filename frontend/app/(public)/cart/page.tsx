@@ -2,24 +2,14 @@
 // Admin No: 2235035
 // Class: DIT/FT/2B/02
 
-"use client";
+import type { Metadata } from "next";
+import Cart from "@/app/(public)/cart/cart";
 
-import { CurrentActivePage } from "@/app/_enums/global-enums";
-import { useAppState } from "@/app/app-provider";
-import { useEffect } from "react";
+export const metadata: Metadata = {
+  title: "DailyHype | Cart",
+  description: "This is shopping cart page.",
+};
 
-export default function Cart() {
-  const { cart, setCart, setCurrentActivePage } = useAppState();
-
-  useEffect(() => {
-    setCurrentActivePage(CurrentActivePage.None);
-  }, []);
-
-  return (
-    <>
-      <div>
-        <label>This is cart page!</label>
-      </div>
-    </>
-  );
+export default function Page() {
+  return <Cart />;
 }

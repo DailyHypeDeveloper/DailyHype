@@ -1,11 +1,11 @@
 "use client";
 
-import { CurrentActivePage } from "@/app/_enums/global-enums";
+import { CurrentActivePage } from "@/enums/global-enums";
 import { useAppState } from "@/app/app-provider";
 import { useEffect, useState } from "react";
 import React from "react";
 import { Listbox, ListboxItem, Switch, Card, CardBody, CardFooter, Image, Tooltip, Input } from "@nextui-org/react";
-import CustomPagination from "@/app/_components/custom-pagination";
+import CustomPagination from "@/components/custom/custom-pagination";
 
 interface Image {
   imageid: string;
@@ -66,15 +66,14 @@ const getSidebarCategoryByType = () => {
 //2.
 //get products by categoryid, offset, litmit, isinstock
 const getProductData = (categoryid: number, noOfItems: number, currentPage: number, isInStock: boolean) => {
-
   const limit = noOfItems;
   const offset = currentPage - 1;
 
   const queryParams = new URLSearchParams();
-  queryParams.append('categoryid', categoryid.toString());
-  queryParams.append('limit', limit.toString());
-  queryParams.append('offset', offset.toString());
-  queryParams.append('isinstock', isInStock ? '1' : '0');
+  queryParams.append("categoryid", categoryid.toString());
+  queryParams.append("limit", limit.toString());
+  queryParams.append("offset", offset.toString());
+  queryParams.append("isinstock", isInStock ? "1" : "0");
 
   return fetch(`${process.env.BACKEND_URL}/api/productsByCategory?${queryParams}`)
     .then((response) => {
@@ -89,11 +88,9 @@ const getProductData = (categoryid: number, noOfItems: number, currentPage: numb
 //3.
 //get productcount by categoryid and isinstock
 const getTotalPages = (categoryid: number, isInStock: boolean, limit: number) => {
-
-
   const queryParams = new URLSearchParams();
-  queryParams.append('categoryid', categoryid.toString());
-  queryParams.append('isinstock', isInStock ? '1' : '0');
+  queryParams.append("categoryid", categoryid.toString());
+  queryParams.append("isinstock", isInStock ? "1" : "0");
 
   return fetch(`${process.env.BACKEND_URL}/api/productsCountByCategory?${queryParams}`)
     .then((response) => {
@@ -101,15 +98,14 @@ const getTotalPages = (categoryid: number, isInStock: boolean, limit: number) =>
     })
     .then((result) => {
       //console.log(result.productCount);
-      //result.productCount -> 
-      const totalPages = Math.ceil(result.productCount / limit)
+      //result.productCount ->
+      const totalPages = Math.ceil(result.productCount / limit);
       return totalPages;
     });
 };
 //4.
 //get image by productid
 const getProductImage = (productid: number) => {
-
   return fetch(`${process.env.BACKEND_URL}/api/productImage/${productid}`)
     .then((response) => {
       return response.json();
@@ -123,13 +119,11 @@ const getProductImage = (productid: number) => {
 //5.
 //get colours by productid
 const getProductColour = (productid: number) => {
-
   return fetch(`${process.env.BACKEND_URL}/api/productColour/${productid}`)
     .then((response) => {
       return response.json();
     })
     .then((result) => {
-
       //result.colour -> colourid, name
       return result.colour;
     });
@@ -140,28 +134,24 @@ const getProductWithImageAndColour = (categoryid: number, noOfItems: number, cur
     .then((productDataResult) => {
       //loop through productDataResult and, for each product, fetch its image and color using Promise.all
       const productDataArr = productDataResult.map((product: Product) => {
-
         const productid = product.productid;
         //CONCURRENT REQUEST --> getProductImage & getProductColour
         //concurrent request to fetch productimage and productcolour by productid
-        return Promise.all([getProductImage(productid), getProductColour(productid)])
-          .then(([imageResult, colorResult]) => {
-            product.image = imageResult;
-            product.colour = colorResult;
-            //add the product to product object array
-            //productArray.push(product);
-            return product;
-          });//end of concurrent request
-
-      })//end of productDataResult looping
-
+        return Promise.all([getProductImage(productid), getProductColour(productid)]).then(([imageResult, colorResult]) => {
+          product.image = imageResult;
+          product.colour = colorResult;
+          //add the product to product object array
+          //productArray.push(product);
+          return product;
+        }); //end of concurrent request
+      }); //end of productDataResult looping
 
       return Promise.all(productDataArr);
-
-    }).then((result) => {
-      console.log(result);
-      return result;
     })
+    .then((result) => {
+      // console.log(result);
+      return result;
+    });
 };
 
 export default function ManProduct() {
@@ -187,48 +177,48 @@ export default function ManProduct() {
 
   useEffect(() => {
     setCurrentActivePage(CurrentActivePage.Man);
-    getSidebarCategoryByType()
-      .then((categoryResult) => {
-        setSidebarCategory(categoryResult);
-        setSelectedCategoryID(new Set<string>([categoryResult[0].categoryid + ""]));
+    getSidebarCategoryByType().then((categoryResult) => {
+      setSidebarCategory(categoryResult);
+      setSelectedCategoryID(new Set<string>([categoryResult[0].categoryid + ""]));
 
-        //CONCURRENT REQUEST --> getProductData & getProductCount
-        //concurrent request to fetch productdata and productcount by categoryid 
-        Promise.all([
-          getProductWithImageAndColour(categoryResult[0].categoryid, noOfItems, currentPage, isInStock),
-          getTotalPages(categoryResult[0].categoryid, isInStock, noOfItems)
-        ])
-          .then(([productDataArray, totalPage]: [Product[], number]) => {
-            setProductArr(productDataArray)
-            setTotalPages(totalPage);
-          })
-          .catch((error) => {
-            console.log(error);
-          })
-      });
+      //CONCURRENT REQUEST --> getProductData & getProductCount
+      //concurrent request to fetch productdata and productcount by categoryid
+      Promise.all([getProductWithImageAndColour(categoryResult[0].categoryid, noOfItems, currentPage, isInStock), getTotalPages(categoryResult[0].categoryid, isInStock, noOfItems)])
+        .then(([productDataArray, totalPage]: [Product[], number]) => {
+          setProductArr(productDataArray);
+          setTotalPages(totalPage);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    });
   }, []);
 
   useEffect(() => {
     getProductWithImageAndColour(selectedCategoryID.values().next().value, noOfItems, currentPage, isInStock)
       .then((productDataArray: Product[]) => {
-        setProductArr(productDataArray);
+        if (productDataArray) setProductArr(productDataArray);
       })
       .catch((error) => {
         console.log(error);
-      })
-  }, [selectedCategoryID, currentPage, isInStock, noOfItems])
+      });
+  }, [selectedCategoryID, currentPage, isInStock, noOfItems]);
 
   useEffect(() => {
     getTotalPages(selectedCategoryID.values().next().value, isInStock, noOfItems)
-          .then((totalPage) => {
-            setCurrentPage(1);
-            setTotalPages(totalPage);
+      .then((totalPage = 1) => {
+        console.log(totalPage);
+        setCurrentPage(1);
+        if (!isNaN(totalPage)) setTotalPages(totalPage);
       })
       .catch((error) => {
         console.log(error);
-      })
-  }, [noOfItems])
+      });
+  }, [noOfItems]);
 
+  useEffect(() => {
+    console.log("Current " + currentPage);
+  }, [currentPage]);
 
   const handleItemsInputChange = (value: string) => {
     const newValue = parseInt(value, 10);
@@ -240,12 +230,11 @@ export default function ManProduct() {
     }
   };
 
-
   // const selectedValue = React.useMemo(
   //   () => Array.from(selectedCategoryID).join(", "),
   //   [selectedCategoryID]
   // );
-
+  // console.log(totalPages);
 
   return (
     <div className="flex">
@@ -255,7 +244,9 @@ export default function ManProduct() {
         disallowEmptySelection
         selectionMode="single"
         selectedKeys={selectedCategoryID}
-        onSelectionChange={(keys: any) => { setSelectedCategoryID(keys) }}
+        onSelectionChange={(keys: any) => {
+          setSelectedCategoryID(keys);
+        }}
         className=" p-0 gap-0 divide-y divide-default-300/50 dark:divide-default-100/80 bg-content1 max-w-[300px] overflow-visible shadow-small"
         itemClasses={{
           base: "px-3  rounded-none gap-3 h-12 data-[hover=true]:custom-color1",
@@ -263,12 +254,11 @@ export default function ManProduct() {
       >
         {sidebarCategory.map((item: any, index: number) => {
           return (
-            <ListboxItem className={selectedCategoryID.has(item.categoryid + "") ? 'bg-zinc-300' : ''} key={item.categoryid} endContent={<ItemCounter number={item.productcount} />}>
+            <ListboxItem className={selectedCategoryID.has(item.categoryid + "") ? "bg-zinc-300" : ""} key={item.categoryid} endContent={<ItemCounter number={item.productcount} />}>
               {item.categoryname as string}
             </ListboxItem>
           );
         })}
-
       </Listbox>
       <p className="text-small text-default-500">Selected value: {selectedCategoryID}</p>
 
@@ -328,8 +318,11 @@ export default function ManProduct() {
             />
           </div>
           <div className="flex flex-col items-center gap-3">
-            <p> page {currentPage} of {totalPages}</p>
-            <CustomPagination total={totalPages} initialPage={1} onChange={(page) => setCurrentPage(page)} />
+            <p>
+              {" "}
+              page {currentPage} of {totalPages}
+            </p>
+            <CustomPagination total={totalPages} currentPage={currentPage} onChange={(page) => setCurrentPage(page)} />
           </div>
         </div>
       </div>

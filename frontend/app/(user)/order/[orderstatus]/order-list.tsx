@@ -4,13 +4,12 @@
 
 "use client";
 
-import { OrderStatusValue, MonthValue } from "@/app/_enums/order-enums";
+import { OrderStatusValue, MonthValue } from "@/enums/order-enums";
 import { Button, Divider, Image, Link, Skeleton, Tooltip } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { capitaliseWord, formatDateByMonthDayYear, formatMoney } from "@/app/_functions/formatter";
-import { mapStringToOrderStatusValue } from "@/app/_functions/order-utils";
-import { useAppState } from "@/app/app-provider";
+import { capitaliseWord, formatDateByMonthDayYear, formatMoney } from "@/functions/formatter";
+import { mapStringToOrderStatusValue } from "@/functions/order-utils";
 
 interface OrderFilterDataProps {
   searchOrder: string;
@@ -55,9 +54,7 @@ const getOrders = (filterOptions: FilterOptions, offset: number, limit: number, 
   offset = (offset - 1) * limit;
   return fetch(`${process.env.BACKEND_URL}/api/orders?limit=${limit}&offset=${offset}&search=${searchText}&status=${status}&month=${month}&year=${year}`, {
     method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    credentials: "include",
   })
     .then((response) => {
       if (response.status === 403) {
@@ -75,9 +72,7 @@ const getOrderCount = (filterOptions: FilterOptions, token: string | null) => {
 
   return fetch(`${process.env.BACKEND_URL}/api/orderCount?status=${status}&year=${year}&month=${month}&search=${searchText}`, {
     method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    credentials: "include",
   })
     .then((response) => {
       if (response.status === 403) {
@@ -102,16 +97,15 @@ const getOrderData = (filterOptions: FilterOptions, offset: number, limit: numbe
 };
 
 export default function OrderList({ searchOrder, orderStatus, searchMonth, searchYear, showOrderNo, isLoading, orderCount, setOrderCount, setIsLoading, currentPage }: OrderFilterDataProps) {
-  const { token, setToken } = useAppState();
   const { theme } = useTheme();
   const [orderData, setOrderData] = useState<any>([]);
 
   useEffect(() => {
     if (isLoading)
-      getOrderData({ searchText: searchOrder, status: mapStringToOrderStatusValue(orderStatus), month: searchMonth, year: searchYear }, currentPage, showOrderNo, token).then((result) => {
+      getOrderData({ searchText: searchOrder, status: mapStringToOrderStatusValue(orderStatus), month: searchMonth, year: searchYear }, currentPage, showOrderNo, "").then((result) => {
         setOrderData(result[0]);
-        setOrderCount(Math.ceil(result[1].count / showOrderNo));
-        console.log(result);
+        setOrderCount(result[1].count);
+        // console.log(result);
         setIsLoading(false);
       });
   }, [isLoading]);
@@ -119,30 +113,98 @@ export default function OrderList({ searchOrder, orderStatus, searchMonth, searc
   return (
     <>
       {isLoading && (
-        <div className="flex flex-col max-w-full mb-8 border-1 rounded-xl">
-          <label>{}</label>
-          <div className="flex py-4 border-b-1">
-            <Skeleton className="flex basis-4/5 mx-8 rounded-lg h-12" />
-            <Skeleton className="flex ms-auto basis-1/5 me-8 rounded-lg w-full h-12" />
-          </div>
-          <div className="flex flex-col mx-8 my-4">
-            <div className="flex justify-start">
-              <div className="me-5">
-                <Skeleton className="flex w-[120px] rounded-lg h-[150px]" />
-              </div>
-              <div className="flex flex-col">
-                <Skeleton className="flex w-80 h-8 rounded-lg" />
-                <Skeleton className="mt-3 flex w-52 h-6 rounded-lg" />
-                <Skeleton className="mt-3 flex w-32 h-6 rounded-lg" />
+          <div className="flex flex-col max-w-full mb-8 border-1 rounded-xl">
+            <div className="flex py-4 border-b-1">
+              <Skeleton className="flex basis-3/5 mx-8 rounded-lg h-6" />
+              <Skeleton className="flex ms-auto basis-2/5 me-8 rounded-lg w-full h-6" />
+            </div>
+            <div className="flex flex-col mx-8 my-4">
+              <div className="flex justify-start">
+                <div className="me-5">
+                  <Skeleton className="flex w-[80px] rounded-lg h-[100px]" />
+                </div>
+                <div className="flex flex-col">
+                  <Skeleton className="flex w-80 h-8 rounded-lg" />
+                  <Skeleton className="mt-3 flex w-52 h-6 rounded-lg" />
+                  <Skeleton className="mt-3 flex w-32 h-6 rounded-lg" />
+                </div>
               </div>
             </div>
           </div>
-        </div>
       )}
       {!isLoading &&
         orderData.map((order: any, index: number) => {
           return (
-            <div key={index} className="flex flex-col max-w-full mb-8 border-1 rounded-xl">
+            <div className="flex flex-col mb-8" key={order.orderid}>
+              <div className="flex justify-start py-4 items-center border-1 rounded-tl-lg rounded-tr-lg px-8">
+                <Link href={`/order/orderdetail/${order.orderid}`} className="me-8 text-small cursor-pointer underline text-black dark:text-white">
+                  #{order.orderid}
+                </Link>
+                <label className="me-auto text-small">{formatDateByMonthDayYear(order.createdat)}</label>
+                <Divider orientation="vertical" />
+                <label className="capitalize ms-auto text-small">{order.orderstatus}</label>
+                {theme === "dark" ? (
+                  <Tooltip offset={12} content={<div className="px-2 py-2 ms-2">{orderStatusInfoText[order.orderstatus as keyof OrderStatusInfoText]}</div>}>
+                    <Image src="/icons/info-dark.svg" className="ms-2 cursor-pointer" width={15} alt="Info Icon" />
+                  </Tooltip>
+                ) : (
+                  <Tooltip offset={12} content={<div className="px-2 py-2 ms-2 max-w-lg text-small">{orderStatusInfoText[order.orderstatus as keyof OrderStatusInfoText]}</div>}>
+                    <Image src="/icons/info.svg" className="ms-2 cursor-pointer" width={15} alt="Info Icon" />
+                  </Tooltip>
+                )}
+              </div>
+              <div className="border-1 pt-4">
+                {order.productdetails.map((item: any, index: number) => {
+                  // console.log(item);
+                  return (
+                    <div className="flex px-4 mb-4 items-start" key={index}>
+                      <Image radius="lg" className="w-[80px] h-[100px] border-1" src={item.image} alt={item.productname} />
+                      <div className="flex flex-col ml-4">
+                        <Link className="text-black mt-1 dark:text-white text-medium cursor-pointer">{item.productname}</Link>
+                        <label className="text-small mt-3 text-slate-600 dark:text-slate-400">
+                          Color: {capitaliseWord(item.colour)}, Size: {item.size}
+                        </label>
+                        <label className="mt-2 text-small">x{item.qty}</label>
+                      </div>
+                      <label className="ms-auto self-center mr-3">${formatMoney(item.unitprice)}</label>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="py-3 flex-col rounded-br-lg rounded-bl-lg border-1 flex items-end">
+                <label className="mr-5 mb-5 font-semibold">Total: ${formatMoney("400")}</label>
+                <div className="flex justify-end">
+                  {order.orderstatus === "in progress" && (
+                    <Button className="mr-3" size="md" color="danger">
+                      Cancel Order
+                    </Button>
+                  )}
+                  {order.orderstatus === "delivered" && (
+                    <Button className="mr-3" size="md">
+                      Order Received
+                    </Button>
+                  )}
+                  {order.orderstatus === "received" && (
+                    <Button className="mr-3" size="md">
+                      View Invoice
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      {!isLoading && orderData.length <= 0 && (
+        <div className="flex flex-col max-w-full mb-16 py-4 border-1 rounded-xl">
+          <label className="text-small text-center text-red-700 dark:text-red-200 font-medium">No Order Found!</label>
+        </div>
+      )}
+    </>
+  );
+}
+
+{
+  /* <div key={index} className="flex flex-col max-w-full mb-8 border-1 rounded-xl">
               <div className="flex py-4 border-b-1">
                 <div className="flex justify-start basis-4/5">
                   <div className="flex flex-col ms-8 me-12">
@@ -174,8 +236,10 @@ export default function OrderList({ searchOrder, orderStatus, searchMonth, searc
                   </div>
                 </div>
                 <div className="flex justify-end basis-1/5 me-8">
-                  <div className="flex flex-col">
-                    <label className="text-right font-medium text-small mb-2">Order #{order.orderid}</label>
+                  <div className="flex flex-col items-end">
+                    <Link href={`/order/orderdetail/${order.orderid}`} className="text-right text-black dark:text-white underline font-medium text-small mb-2">
+                      Order #{order.orderid}
+                    </Link>
                     <div className="flex">
                       {order.orderstatus === "in progress" && (
                         <Link href="" className="text-custom-color2 underline text-small">
@@ -235,14 +299,5 @@ export default function OrderList({ searchOrder, orderStatus, searchMonth, searc
                   </div>
                 );
               })}
-            </div>
-          );
-        })}
-      {!isLoading && orderData.length <= 0 && (
-        <div className="flex flex-col max-w-full mb-16 py-4 border-1 rounded-xl">
-          <label className="text-small text-center text-red-700 dark:text-red-200 font-medium">No Order Found!</label>
-        </div>
-      )}
-    </>
-  );
+            </div> */
 }
