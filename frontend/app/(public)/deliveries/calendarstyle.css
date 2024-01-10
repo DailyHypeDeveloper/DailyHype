@@ -1,0 +1,47 @@
+.App {
+    font-family: sans-serif;
+    text-align: center;
+  }
+  .react-calendar {
+    margin: 0 auto;
+  }
+  
+  h2 {
+    margin-bottom: 60px;
+  }
+
+  .green-circle {
+    width: 15px;
+    height: 15px;
+    background-color: green;
+    border-radius: 50%;
+    margin: auto;
+  }
+
+  .blue-circle {
+    width: 15px;
+    height: 15px;
+    background-color: blue;
+    border-radius: 50%;
+    margin: auto;
+  }
+
+
+  .progress {
+    height: 20px;
+    margin-top: 10px;
+  }
+  
+  .progress-bar {
+    background-color: #007bff; /* Bootstrap primary color, change as needed */
+  }
+  
+  /* In your CSS file or styles section */
+.react-calendar {
+  color: black; /* Set the text color to black */
+}
+
+/* Optionally, style the active tile if needed */
+.react-calendar .react-calendar__tile--active {
+  background-color: #4a5568;
+}

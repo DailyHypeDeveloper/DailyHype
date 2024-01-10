@@ -597,6 +597,61 @@ module.exports.deleteDelivery = function deleteByCode(deliveryid) {
 
 
 
+// New models for CA2
+
+// A chatroom is first created upon the creation of the delivery/confirmation of the "order" (heading to delivery). The chatroom consists of the id of user, id of admin, and the delivery id
+
+// ROOM
+// Function to add a new chat/room entry
+module.exports.addNewChatEntry = function addNewChatEntry(adminUserID, userUserID, deliveryID) {
+    const sql = `INSERT INTO chat (adminUserID, userUserID, deliveryID, speakerID) VALUES ($1, $2, $3, $4) RETURNING *`;
+    const values = [adminUserID, userUserID, deliveryID];
+    return query(sql, values).then(function (result) {
+        return result.rows[0];
+    });
+};
+
+
+// Function to add a new message
+module.exports.addNewMessage = function addNewMessage(messagedatetime, msgcontent, roomid, speakerid) {
+    const sql = `INSERT INTO Message (messagedatetime, msgcontent, roomid, speakerid) VALUES ($1, $2, $3, $4) RETURNING *`;
+    const values = [messagedatetime, msgcontent, roomid, speakerid];
+    return query(sql, values).then(function (result) {
+        return result.rows[0];
+    });
+};
+
+
+//Now to get the messages from a particular roomid
+
+// Function to get all message content, speaker IDs, and dates for a specific roomid
+module.exports.getAllMessages = function getAllMessages(roomid) {
+    const sql = `SELECT msgcontent, speakerid, messagedatetime FROM Message WHERE roomid = $1`;
+    const values = [roomid];
+    
+    return query(sql, values).then(function (result) {
+        return result.rows;
+    });
+};
+
+
+// Function to get the room_Id based on userUserID and deliveryID
+module.exports.getRoomId = function getRoomId(userUserID, deliveryID) {
+    const sql = `SELECT roomid FROM chat WHERE userUserID = $1 AND deliveryID = $2`;
+    const values = [userUserID, deliveryID];
+    return query(sql, values).then(function (result) {
+        // Assuming you expect only one result, you can directly return the room_Id
+        if (result.rows.length > 0) {
+            return result.rows[0].roomid;
+        } else {
+            // Return null or some indication that the room was not found
+            return null;
+        }
+    });
+};
+
+
+
 
 
 

@@ -20,6 +20,7 @@ export enum CurrentActivePage {
   ReturnedOrder = "returned orders",
   AllDelivery = "all deliveries",
   None = "none",
+  DeliveryDashboard = "DeliveryDashboard",
 }
 
 /**
