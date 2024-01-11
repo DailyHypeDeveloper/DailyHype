@@ -282,10 +282,11 @@ router.get('/chartJSPart2', validationFn.validateToken, async (req, res) => {
 
 
 // Retrieve all deliveries for a user
-router.get('/Alldeliveries/user/:part', validationFn.validateToken, async (req, res) => {
+router.get('/Alldeliveries/user/:part', async (req, res) => {
   try {
     console.log("hello")
-    var userid = req.body.id;
+    userid = 52;
+    //var userid = req.body.id;
     console.log("decoded userid: " + userid)
     const deliveries = await deliveryController.retrieveAllDeliveriesForUser(userid);
     res.status(200).json(deliveries);
@@ -395,6 +396,70 @@ router.post('/removeDeliveryIDFromOrder/:deliveryid', validationFn.validateToken
     res.status(500).json({ error: error.message });
   }
 });
+
+
+// CA2 New Endpoints
+
+
+// Endpoint to add a new message
+router.post('/addNewMessage', async (req, res) => {
+  try {
+    const { messagedatetime, msgcontent, roomid, speakerid } = req.body;
+    const result = await deliveryController.addNewMessage(messagedatetime, msgcontent, roomid, speakerid);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Endpoint to get all messages for a specific roomid
+router.get('/getAllMessages/:roomid', async (req, res) => {
+  try {
+    const { roomid } = req.params;
+    const result = await deliveryController.getAllMessages(roomid);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+// Endpoint to add a new CHAT room
+router.post('/addNewRoom', async (req, res) => {
+  try {
+    const { adminUserID, userUserID, deliveryID} = req.body;
+    const result = await deliveryController.addNewRoom(adminUserID, userUserID, deliveryID);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// validationFn.validateToken,
+// Endpoint to get room_Id based on userUserID and deliveryID
+router.get('/getRoomId', async (req, res) => {
+  try {
+    const { userUserID, deliveryID } = req.query;
+    
+    // Validate that both userUserID and deliveryID are present in the query parameters
+    if (!userUserID || !deliveryID) {
+      return res.status(400).json({ error: 'Both userUserID and deliveryID are required in the query parameters.' });
+    }
+
+    const roomId = await deliveryController.getRoomId(userUserID, deliveryID);
+
+    if (roomId !== null) {
+      res.json({ room_Id: roomId });
+    } else {
+      res.status(404).json({ error: 'Room not found for the given userUserID and deliveryID.' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+
 
 
 module.exports = router;

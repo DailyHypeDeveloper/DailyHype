@@ -1,0 +1,114 @@
+// Import the necessary modules
+
+"use client";
+
+import { useEffect, useState } from 'react';
+import { io } from 'socket.io-client';
+import { useSearchParams } from 'next/navigation';
+import { Button } from '@nextui-org/react';
+//import DeliveryDetailsModal from './DeliveryDetailsModal'; // Import the new component
+
+import './Chatroom.css';
+
+const ChatRoomPage = () => {
+  const searchParams = useSearchParams();
+  const deliveryDataAll = searchParams.get('data');
+  let deliveryId: string | null = null;
+
+  if (deliveryDataAll) {
+    const deliveryData = JSON.parse(deliveryDataAll);
+    deliveryId = deliveryData.deliveryId;
+  }
+
+  const [messages, setMessages] = useState<string[]>([]);
+  const [messageInput, setMessageInput] = useState<string>('');
+
+  const [socket, setSocket] = useState<any>(null);
+  const [isDeliveryModalOpen, setDeliveryModalOpen] = useState<boolean>(false);
+  const [selectedDelivery, setSelectedDelivery] = useState<any>(null);
+
+  const WS_DOMAIN = 'localhost';
+  const WS_PORT = '5001';
+
+  useEffect(() => {
+    // Check if deliveryId is defined before connecting to WebSocket
+    if (deliveryId) {
+      // Connect to the WebSocket server
+      const newSocket = io(`ws://${WS_DOMAIN}:${WS_PORT}/chat/${deliveryId}`, {
+        transports: ['websocket'],
+      });
+      setSocket(newSocket);
+
+      // Clean up the socket connection on component unmount
+      return () => {
+        newSocket.disconnect();
+      };
+    }
+  }, [deliveryId]);
+
+  useEffect(() => {
+    // Listen for incoming messages
+    if (socket) {
+      socket.on('message', (newMessage: string) => {
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
+      });
+    }
+  }, [socket]);
+
+  const sendMessage = () => {
+    if (socket && messageInput.trim() !== '') {
+      // Emit a message to the server
+      console.log("Message is " + messageInput)
+      socket.emit('message', messageInput);
+      setMessageInput('');
+    }
+  };
+
+  /*const openDeliveryDetailsModal = (delivery: any) => {
+    setSelectedDelivery(delivery);
+    setDeliveryModalOpen(true);
+  };
+
+  const closeDeliveryDetailsModal = () => {
+    setSelectedDelivery(null);
+    setDeliveryModalOpen(false);
+  };*/
+
+  return (
+    <div className="chatroom-container">
+      <div className="chatroom-header">
+        <h1>Chat Room for Delivery #{deliveryId}</h1>
+      </div>
+      <div className="chatroom-messages">
+        {messages.map((message, index) => (
+          <div key={index} className="message">
+            {message}
+          </div>
+        ))}
+      </div>
+      <div className="chatroom-input">
+        <input
+          type="text"
+          value={messageInput}
+          onChange={(e) => setMessageInput(e.target.value)}
+          placeholder="Type your message..."
+        />
+        <button onClick={sendMessage}>Send</button>
+      </div>
+      {/*<div className="delivery-details-button">
+        <Button color="primary" onClick={() => openDeliveryDetailsModal(selectedDelivery)}>
+          View Delivery Details
+        </Button>
+      </div>
+      
+      <DeliveryDetailsModal
+        isOpen={isDeliveryModalOpen}
+        onClose={closeDeliveryDetailsModal}
+        selectedDelivery={selectedDelivery}
+      />
+        */}
+    </div>
+  );
+};
+
+export default ChatRoomPage;

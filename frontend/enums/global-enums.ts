@@ -25,6 +25,7 @@ export enum CurrentActivePage {
   UserForm = "user form",
   OrderList = "order list",
   None = "none",
+  DeliveryDashboard = "DeliveryDashboard",
 }
 
 /**
