@@ -9,6 +9,9 @@ import { MonthValue, OrderStatusValue } from "@/enums/order-enums";
  * This will map input value to MonthValue enum
  * @param value (string)
  * @returns MonthValue (enum)
+ * @example
+ * const month = mapStringToMonthValue("1");
+ * console.log(month);    // MonthValue.Jan (enum)
  */
 export function mapStringToMonthValue(value: string): MonthValue {
   switch (value) {

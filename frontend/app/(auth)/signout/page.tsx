@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function Page() {
-  const { setUserInfo, setIsAuthenticated, setRedirectPage } = useAppState();
+  const { setUserInfo, setRedirectPage, setCart } = useAppState();
   const router = useRouter();
 
   useEffect(() => {
@@ -20,16 +20,13 @@ export default function Page() {
       credentials: "include",
     })
       .then((response) => response.json())
-      .then((result) => {
-        if (result) {
-          if (localStorage) {
-            localStorage.removeItem("user");
-            setIsAuthenticated(false);
-            setUserInfo({ id: 0, name: "", email: "", image: "", role: "" });
-          }
-          setRedirectPage(null);
-          router.replace(URL.Home);
-        }
+      .then(() => {
+        localStorage.clear();
+        sessionStorage.clear();
+        setCart([]);
+        setUserInfo(null);
+        setRedirectPage(null);
+        router.replace(URL.Home);
       });
   }, []);
 

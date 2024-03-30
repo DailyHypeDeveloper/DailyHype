@@ -4,17 +4,15 @@
 
 "use client";
 
-import { CurrentActivePage, URL } from "@/enums/global-enums";
 import { useAppState } from "@/app/app-provider";
-import { useRouter } from "next/navigation";
+import { CurrentActivePage } from "@/enums/global-enums";
 import { useEffect } from "react";
 
 export default function Page() {
   const { setCurrentActivePage } = useAppState();
-  const router = useRouter();
 
   useEffect(() => {
-    setCurrentActivePage(CurrentActivePage.Dashboard);
+    setCurrentActivePage(CurrentActivePage.None);
   }, []);
 
   return <div>This is admin dashboard page!</div>;

@@ -2,7 +2,19 @@
 // Admin No: 2235035
 // Class: DIT/FT/2B/02
 
-export interface CartProductDetail {
+import { ICartLocalStorage } from "./global-interfaces";
+
+export type TCartFetch =
+  | {
+    data: ICartLocalStorage[];
+    error: null;
+  }
+  | {
+    data: null;
+    error: string;
+  };
+
+export interface ICartProductDetail {
   productdetailid: number;
   sizeid: number;
   colourid: number;
@@ -10,25 +22,30 @@ export interface CartProductDetail {
   productstatus: string;
   size: string;
   colour: string;
-  selected?: boolean;
-  cartqty?: number;
 }
 
-export interface CartData {
+export interface ICartDetail {
   productid: number;
   productname: string;
   unitprice: string;
   categoryid: number;
-  detail: CartProductDetail[];
-  url: string;
+  detail: ICartProductDetail[];
+  url: string[];
 }
 
-export type CartDataFetch =
+export type TCartDetailFetch =
   | {
-      data: CartData[] | [];
-      error: null;
-    }
+    data: ICartDetail[] | [];
+    cart: ICartLocalStorage[] | [];
+    error: null;
+  }
   | {
-      data: null;
-      error: string;
-    };
+    data: null;
+    cart: null;
+    error: string;
+  };
+
+export interface ICheckOutCart {
+  productdetailid: number;
+  qty: number;
+}

@@ -27,9 +27,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className={`${inter.className} dark:bg-slate-900`}>
         <GoogleOAuthProvider clientId="661445928383-tf4kpsnredt5pfb5479dbiebrip5pjfl.apps.googleusercontent.com">
-        <UIProvider>
-          <AppProvider>{children}</AppProvider>
-        </UIProvider>
+          <UIProvider>
+            <AppProvider>{children}</AppProvider>
+          </UIProvider>
         </GoogleOAuthProvider>
       </body>
     </html>

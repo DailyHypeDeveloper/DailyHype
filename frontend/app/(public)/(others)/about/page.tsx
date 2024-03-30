@@ -5,8 +5,10 @@
 "use client";
 
 import { Image, Modal, ModalContent, ModalBody, ModalFooter, useDisclosure, Button, ModalHeader } from "@nextui-org/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import { useAppState } from "@/app/app-provider";
+import { CurrentActivePage } from "@/enums/global-enums";
 
 const teams = [
   {
@@ -57,6 +59,11 @@ export default function Page() {
   const { theme } = useTheme();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const { setCurrentActivePage } = useAppState();
+
+  useEffect(() => {
+    setCurrentActivePage(CurrentActivePage.None);
+  }, []);
 
   return (
     <>

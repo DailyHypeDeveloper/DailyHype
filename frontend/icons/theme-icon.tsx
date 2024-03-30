@@ -1,10 +1,30 @@
+// Name: Zay Yar Tun
+// Admin No: 2235035
+// Class: DIT/FT/2B/02
+
 "use client";
 
-import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
 import clsx from "clsx";
 import { useTheme } from "next-themes";
+import Image from "next/image";
 
-export default function ThemeIcon({ className }: { className?: string }) {
+export default function ThemeIcon({ width, height, className }: { width: number; height: number; className?: string }) {
   const { theme, setTheme } = useTheme();
-  return <>{theme === "dark" ? <MoonIcon className={clsx("", className)} onClick={() => setTheme("light")} /> : <SunIcon className={clsx("", className)} onClick={() => setTheme("dark")} />}</>;
+
+  return (
+    <Image
+      src={theme === "dark" ? "/icons/sun.svg" : "/icons/moon.svg"}
+      width={width || 50}
+      height={height || 50}
+      alt="Theme Icon"
+      onClick={() => {
+        if (theme === "dark") {
+          setTheme("light");
+        } else {
+          setTheme("dark");
+        }
+      }}
+      className={clsx("", className)}
+    />
+  );
 }

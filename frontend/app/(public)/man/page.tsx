@@ -4,9 +4,13 @@ import { CurrentActivePage } from "@/enums/global-enums";
 import { useAppState } from "@/app/app-provider";
 import { useEffect, useState } from "react";
 import React from "react";
-import { Listbox, ListboxItem, Switch, Card, CardBody, CardFooter, Image, Tooltip, Input } from "@nextui-org/react";
-import CustomPagination from "@/components/custom/custom-pagination";
+import { Checkbox, Switch, Card, CardBody, CardFooter, Image, Tooltip, Input } from "@nextui-org/react";
+import CustomPagination from "@/components/ui/pagination";
 
+interface Category {
+  categoryid: string;
+  categoryname: string;
+}
 interface Image {
   imageid: string;
   imagename: string;
@@ -17,6 +21,7 @@ interface Image {
 interface Colour {
   colourid: number;
   name: string;
+  hex: string;
 }
 
 interface Product {
@@ -52,7 +57,7 @@ const ItemCounter = ({ number }: { number: number }) => (
 //1.
 //get side bar categories by typeid
 const getSidebarCategoryByType = () => {
-  const typeid = 3; //men typeid=1
+  const typeid = 2; //men typeid=1
   return fetch(`${process.env.BACKEND_URL}/api/categories/${typeid}`)
     .then((response) => {
       return response.json();
@@ -63,29 +68,8 @@ const getSidebarCategoryByType = () => {
       return result.category;
     });
 };
+
 //2.
-//get products by categoryid, offset, litmit, isinstock
-const getProductData = (categoryid: number, noOfItems: number, currentPage: number, isInStock: boolean) => {
-  const limit = noOfItems;
-  const offset = currentPage - 1;
-
-  const queryParams = new URLSearchParams();
-  queryParams.append("categoryid", categoryid.toString());
-  queryParams.append("limit", limit.toString());
-  queryParams.append("offset", offset.toString());
-  queryParams.append("isinstock", isInStock ? "1" : "0");
-
-  return fetch(`${process.env.BACKEND_URL}/api/productsByCategory?${queryParams}`)
-    .then((response) => {
-      return response.json();
-    })
-    .then((result) => {
-      //console.log(result.product);
-      //result.product -> productid, productname, description, unitprice, rating, categoryid, soldqty, createdat, updatedat, typeid
-      return result.product;
-    });
-};
-//3.
 //get productcount by categoryid and isinstock
 const getTotalPages = (categoryid: number, isInStock: boolean, limit: number) => {
   const queryParams = new URLSearchParams();
@@ -103,56 +87,31 @@ const getTotalPages = (categoryid: number, isInStock: boolean, limit: number) =>
       return totalPages;
     });
 };
-//4.
-//get image by productid
-const getProductImage = (productid: number) => {
-  return fetch(`${process.env.BACKEND_URL}/api/productImage/${productid}`)
-    .then((response) => {
-      return response.json();
-    })
-    .then((result) => {
-      //console.log(result.image);
-      //result.image -> imageid, imagename, url, createdat
-      return result.image;
-    });
-};
-//5.
-//get colours by productid
-const getProductColour = (productid: number) => {
-  return fetch(`${process.env.BACKEND_URL}/api/productColour/${productid}`)
-    .then((response) => {
-      return response.json();
-    })
-    .then((result) => {
-      //result.colour -> colourid, name
-      return result.colour;
-    });
-};
-//get product with image and colour
-const getProductWithImageAndColour = (categoryid: number, noOfItems: number, currentPage: number, isInStock: boolean) => {
-  return getProductData(categoryid, noOfItems, currentPage, isInStock)
-    .then((productDataResult) => {
-      //loop through productDataResult and, for each product, fetch its image and color using Promise.all
-      const productDataArr = productDataResult.map((product: Product) => {
-        const productid = product.productid;
-        //CONCURRENT REQUEST --> getProductImage & getProductColour
-        //concurrent request to fetch productimage and productcolour by productid
-        return Promise.all([getProductImage(productid), getProductColour(productid)]).then(([imageResult, colorResult]) => {
-          product.image = imageResult;
-          product.colour = colorResult;
-          //add the product to product object array
-          //productArray.push(product);
-          return product;
-        }); //end of concurrent request
-      }); //end of productDataResult looping
 
-      return Promise.all(productDataArr);
-    })
+//3.
+//get product with image and colour
+//3.
+//get product with image and colour
+const getProductWithImageAndColour = (selectedCategoryIDs: Set<string>, noOfItems: number, currentPage: number, isInStock: boolean) => {
+  const limit = noOfItems;
+  const offset = (currentPage - 1) * limit;
+
+  const categoryIDsArray = Array.from(selectedCategoryIDs);
+  const queryParams = new URLSearchParams();
+  queryParams.append("categoryIDs", categoryIDsArray.join(',')); // Pass array as comma-separated string
+  queryParams.append("limit", limit.toString());
+  queryParams.append("offset", offset.toString());
+  queryParams.append("isinstock", isInStock ? 'true' : 'false');
+
+  return fetch(`${process.env.BACKEND_URL}/api/productsByCategoryIDs?${queryParams}`)
+    .then((response) => response.json())
     .then((result) => {
-      // console.log(result);
-      return result;
+      console.log(result);
+      return result.product;
     });
 };
+
+
 
 export default function ManProduct() {
   const { setCurrentActivePage } = useAppState();
@@ -162,18 +121,15 @@ export default function ManProduct() {
   const [isInvalid, setIsInvalid] = useState(false);
   const [sidebarCategory, setSidebarCategory] = useState<any>([]);
   const [selectedCategoryID, setSelectedCategoryID] = useState<Set<string>>(new Set([""]));
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [totalPages, setTotalPages] = useState<number>(0);
   const [productArr, setProductArr] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   // Function to add a new product to the array
   const addProduct = (newProduct: Product) => {
-    // Use the concat method to create a new array with the new product added
-    //setProductArr(prevArr => (prevArr || []).concat(newProduct));
     setProductArr((prevProductArr) => [...prevProductArr, newProduct]);
   };
-  /* setArtists([
-          ...artists,
-          { id: nextId++, name: name }
-        ]); */
+
 
   useEffect(() => {
     setCurrentActivePage(CurrentActivePage.Man);
@@ -181,11 +137,8 @@ export default function ManProduct() {
       setSidebarCategory(categoryResult);
       setSelectedCategoryID(new Set<string>([categoryResult[0].categoryid + ""]));
 
-      //CONCURRENT REQUEST --> getProductData & getProductCount
-      //concurrent request to fetch productdata and productcount by categoryid
-      Promise.all([getProductWithImageAndColour(categoryResult[0].categoryid, noOfItems, currentPage, isInStock), getTotalPages(categoryResult[0].categoryid, isInStock, noOfItems)])
-        .then(([productDataArray, totalPage]: [Product[], number]) => {
-          setProductArr(productDataArray);
+      getTotalPages(categoryResult[0].categoryid, isInStock, noOfItems)
+        .then((totalPage: number) => {
           setTotalPages(totalPage);
         })
         .catch((error) => {
@@ -206,19 +159,18 @@ export default function ManProduct() {
 
   useEffect(() => {
     getTotalPages(selectedCategoryID.values().next().value, isInStock, noOfItems)
-      .then((totalPage = 1) => {
+      .then((totalPage) => {
+        console.log("HERE 1");
         console.log(totalPage);
-        setCurrentPage(1);
-        if (!isNaN(totalPage)) setTotalPages(totalPage);
+        if (totalPage) {
+          setCurrentPage(1);
+          setTotalPages(totalPage);
+        }
       })
       .catch((error) => {
         console.log(error);
       });
   }, [noOfItems]);
-
-  useEffect(() => {
-    console.log("Current " + currentPage);
-  }, [currentPage]);
 
   const handleItemsInputChange = (value: string) => {
     const newValue = parseInt(value, 10);
@@ -230,40 +182,40 @@ export default function ManProduct() {
     }
   };
 
-  // const selectedValue = React.useMemo(
-  //   () => Array.from(selectedCategoryID).join(", "),
-  //   [selectedCategoryID]
-  // );
-  // console.log(totalPages);
 
   return (
     <div className="flex">
-      <Listbox
-        aria-label="Product Category Menu"
-        //onAction={(key) => alert(key)}
-        disallowEmptySelection
-        selectionMode="single"
-        selectedKeys={selectedCategoryID}
-        onSelectionChange={(keys: any) => {
-          setSelectedCategoryID(keys);
-        }}
-        className=" p-0 gap-0 divide-y divide-default-300/50 dark:divide-default-100/80 bg-content1 max-w-[300px] overflow-visible shadow-small"
-        itemClasses={{
-          base: "px-3  rounded-none gap-3 h-12 data-[hover=true]:custom-color1",
-        }}
-      >
-        {sidebarCategory.map((item: any, index: number) => {
-          return (
-            <ListboxItem className={selectedCategoryID.has(item.categoryid + "") ? "bg-zinc-300" : ""} key={item.categoryid} endContent={<ItemCounter number={item.productcount} />}>
-              {item.categoryname as string}
-            </ListboxItem>
-          );
-        })}
-      </Listbox>
-      <p className="text-small text-default-500">Selected value: {selectedCategoryID}</p>
-
+      <div className="flex flex-col gap-0 divide-y divide-default-300/50 dark:divide-default-100/80 bg-content1 max-w-[300px] overflow-visible shadow-small p-0">
+        {sidebarCategory.map((item: any, index: number) => (
+          <Checkbox
+            key={index}
+            isSelected={selectedCategoryID.has(item.categoryid + "")}
+            onValueChange={(isSelected) => {
+              const updatedSet = new Set(selectedCategoryID);
+              if (isSelected) {
+                updatedSet.add(item.categoryid + "");
+              } else {
+                updatedSet.delete(item.categoryid + "");
+              }
+              setSelectedCategoryID(updatedSet);
+            }}
+            className="px-3  rounded-none gap-3 h-12 data-[hover=true]:custom-color1"
+          >
+            {item.categoryname as string}
+          </Checkbox>
+        ))}
+      </div>
       <div className="flex flex-col m-5 border w-full">
-        <h1 className="text-2xl font-semibold">Women Jumpsuits & Bodysuits</h1>
+        {/* {(sidebarCategory.find((category:Category) => category.categoryid === selectedCategoryID.values().next().value,)).categoryname} */}
+        <h1 className="text-2xl font-semibold">
+          Men
+          {sidebarCategory.map((c: any) => {
+            const selectedIDArr = Array.from(selectedCategoryID);
+            if (c.categoryid === parseInt(selectedIDArr[0])) {
+              return c.categoryname;
+            }
+          })}{" "}
+        </h1>
         <div className="flex justify-end m-2 gap-2">
           <h5 className="font-medium text-sm mt-0.5">Show Only In stock Items</h5>
           <Switch
@@ -273,12 +225,13 @@ export default function ManProduct() {
             onValueChange={(isSelected: boolean) => {
               setIsInStock(isSelected);
             }}
+            classNames={{ thumb: "bg-custom-color1" }}
           ></Switch>
         </div>
 
         <div className="gap-5 m-5 grid sm:grid-cols-2 lg:grid-cols-4 md:grid-cols-3">
           {productArr.map((item, index) => (
-            <Tooltip key={item.productid} color={"warning"} content={item.productname} className="capitalize">
+            <Tooltip key={index} color={"warning"} content={item.productname} className="capitalize">
               <Card shadow="sm" key={index} isPressable onPress={() => console.log("item pressed")}>
                 <CardBody className="overflow-visible p-0">
                   <Image shadow="sm" radius="lg" width="100%" alt={item.productname} className="w-full object-cover h-[140px]" src={item.image[0].url} />
@@ -294,6 +247,11 @@ export default function ManProduct() {
                 </CardFooter>
                 <CardBody className="mb-1 py-0">
                   <p className="text-default-500">${item.unitprice}</p>
+                  <div className="flex flex-row gap-2">
+                    {item.colour.map((colour, index) => (
+                      <span style={{ backgroundColor: `#${colour.hex}`, width: "15px", height: "15px", borderRadius: "50%" }} key={index} className="dark:border-white border-black border-1"></span>
+                    ))}
+                  </div>
                 </CardBody>
               </Card>
             </Tooltip>
@@ -322,10 +280,11 @@ export default function ManProduct() {
               {" "}
               page {currentPage} of {totalPages}
             </p>
-            <CustomPagination total={totalPages} currentPage={currentPage} onChange={(page) => setCurrentPage(page)} />
+            <CustomPagination total={totalPages} currentPage={1} onChange={(page) => setCurrentPage(page)} />
           </div>
         </div>
       </div>
+
     </div>
   );
 }
