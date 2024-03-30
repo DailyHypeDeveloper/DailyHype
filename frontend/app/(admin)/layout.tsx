@@ -2,8 +2,8 @@
 // Admin No: 2235035
 // Class: DIT/FT/2B/02
 
-import SideBar from "@/components/custom/admin-sidebar";
+import AdminContent from "@/components/others/admin-content";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return <SideBar>{children}</SideBar>;
+  return <AdminContent>{children}</AdminContent>;
 }

@@ -8,7 +8,8 @@
  * @param str input string which must not be null
  * @returns string
  * @example
- * capitaliseWord("hello world");
+ * const str = capitaliseWord("hello world");
+ * console.log(str);    // Hello World
  */
 export function capitaliseWord(str: string) {
   if (str) {
@@ -25,12 +26,19 @@ export function capitaliseWord(str: string) {
   return "";
 }
 
+export function formatDecimal(value: string, point: number = 1) {
+  if (value) return parseFloat(value).toFixed(point).toString();
+  else return "";
+}
+
 /**
  *
  * This will return money format (e.g. 23.50)
  * @param value input string which must not be null
  * @returns string
- * formatMoney("20"); // 20.00
+ * @example
+ * const money = formatMoney("20");
+ * console.log(money);    // 20.00
  */
 export function formatMoney(value: string) {
   if (value) return parseFloat(value).toFixed(2).toString();
@@ -42,6 +50,9 @@ export function formatMoney(value: string) {
  * This will return the formatted date (e.g. June 2, 2023)
  * @param date (string)
  * @returns string
+ * @example
+ * const dateStr = formatDateByMonthDayYear(new Date());
+ * console.log(dateStr);    // Jan 11, 2024, 08:18:55 PM
  */
 export function formatDateByMonthDayYear(date: string) {
   return new Date(date).toLocaleDateString("en-US", {
@@ -51,5 +62,27 @@ export function formatDateByMonthDayYear(date: string) {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
+  });
+}
+
+
+/**
+ *
+ * This will return the formatted date in 24 hour format (e.g. June 2, 2023)
+ * @param date (string)
+ * @returns string
+ * @example
+ * const dateStr = formatDateByMonthDayYear(new Date());
+ * console.log(dateStr);    // Jan 11, 2024, 20:18:55
+ */
+export function formatDateByMonthDayYear24Hour(date: string) {
+  return new Date(date).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false
   });
 }
